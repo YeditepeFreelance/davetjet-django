@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    Invitation Test Page
+
+    <form method="post" action="{% url 'invitations:create' %}">
+      {% csrf_token %}
+      <label for="id_name">Invitation Name:</label>
+      <input type="text" id="id_name" name="name" required /><br /><br />
+
+      <label for="id_recipients">Recipients:</label>
+
+      <label for="id_message">Message:</label><br />
+      <label for="id_project">Project:</label>
+      <select id="id_project" name="project" required>
+        {% for project in projects %}
+        <option value="{{ project.id }}">{{ project }}</option>
+        {% endfor %}</select
+      ><br /><br />
+
+      <label for="id_message">Message:</label><br />
+      <textarea
+        id="id_message"
+        name="message"
+        rows="4"
+        cols="50"
+        required
+      ></textarea
+      ><br /><br />
+
+      <button type="submit">Create Invitation</button>
+    </form>
+
+    <h2>Existing Invitations</h2>
+
+    <ul>
+      {% for invitation in invitations %}
+      <li>
+        {{ invitation.name }} - {{ invitation.project.name }} - {{ invitation.message }}
+        <a href="{% url 'invitations:edit' invitation.id %}">Edit</a>
+        <a href="{% url 'invitations:delete' invitation.id %}">Delete</a>
+      </li>
+      {% empty %}
+      <li>No invitations available.</li>
+      {% endfor %}
+  </body>
+</html>

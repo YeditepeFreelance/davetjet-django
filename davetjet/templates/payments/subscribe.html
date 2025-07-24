@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    Payments Page for testing purposes {% for plan in plans %}
+    <div>
+      <h2>{{ plan.name }}</h2>
+      <p>Price: {{ plan.price }}</p>
+      <p>Interval: {{ plan.billing_cycle }}</p>
+      <form action="{% url 'payments:subscribe' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="plan_id" value="{{ plan.id }}" />
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+    {% endfor %}
+  </body>
+</html>

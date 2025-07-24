@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {% if subscription and subscription.is_active == False %} You have a
+    de-active subscription. You need to pay to activate it.
+
+    <form method="post" action="{% url 'payments:pay' %}">
+      {% csrf_token %}
+      <label for="card_number">Card Number:</label>
+      <input
+        type="text"
+        id="card_number"
+        name="card_number"
+        maxlength="19"
+        required
+      /><br /><br />
+
+      <label for="expiry_date">Expiry Date (MM/YY):</label>
+      <input
+        type="text"
+        id="expiry_date"
+        name="expiry_date"
+        maxlength="5"
+        required
+      /><br /><br />
+
+      <label for="cvv">CVV:</label>
+      <input
+        type="text"
+        id="cvv"
+        name="cvv"
+        maxlength="4"
+        required
+      /><br /><br />
+
+      <label for="cardholder_name">Cardholder Name:</label>
+      <input
+        type="text"
+        id="cardholder_name"
+        name="cardholder_name"
+        required
+      /><br /><br />
+      <input
+        type="hidden"
+        name="subscription_id"
+        value="{{ subscription.id }}"
+      />
+      <button type="submit">Pay Now</button>
+    </form>
+    {% endif %}
+  </body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genel Bakış</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="menu">
+          <h3>MENU</h3>
+          <ul>
+            <li class="active"><i class="icon-home"></i> Genel Bakış</li>
+            <li><i class="icon-invite"></i> Davetiyeler</li>
+            <li><i class="icon-list"></i> Davetli Listesi</li>
+            <li><i class="icon-send"></i> Gönderim</li>
+            <li><i class="icon-stats"></i> İstatistikler</li>
+          </ul>
+          <h3>GENEL</h3>
+          <ul>
+            <li><i class="icon-auto"></i> Otomasyon</li>
+            <li><i class="icon-package"></i> Paketim</li>
+            <li><i class="icon-settings"></i> Ayarlar</li>
+            <li><i class="icon-help"></i> Yardım</li>
+            <li><i class="icon-logout"></i> Oturumu Kapat</li>
+          </ul>
+          <div class="premium-box">
+            <p>
+              Daha yüksek davet limiti, otomasyonlar ve daha fazlası için...
+            </p>
+            <button>Şimdi Premium Ol!</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="top-bar">
+          <input
+            type="text"
+            placeholder="Aramaya başla..."
+            class="search-input"
+          />
+          <div class="top-actions">
+            <i class="icon-mail"></i>
+            <i class="icon-bell"></i>
+            <div class="user-info">
+              <img src="assets/images/user-avatar.png" alt="Avatar" />
+              <span
+                >Furkan Esen<br /><small>furkanesen1900@gmail.com</small></span
+              >
+            </div>
+          </div>
+        </header>
+
+        <section class="overview">
+          <h1>Günaydın, Furkan</h1>
+          <p>
+            Bu ekrandan davetiyelerinize ve daha fazlasına göz atabilirsiniz.
+          </p>
+
+          <!-- Cards -->
+          <div class="cards">
+            <div class="card green">
+              <h2>Davetli Sayısı</h2>
+              <span class="value">24/100</span>
+              <p>Son 24 saatte %10 artış!</p>
+            </div>
+            <div class="card">
+              <h2>RSVP Durumu</h2>
+              <span class="value">%64</span>
+              <p>Son 24 saatte %10 artış!</p>
+            </div>
+            <div class="card">
+              <h2>Son Hatırlatma</h2>
+              <span class="value">3 Gün</span>
+              <p>Son 24 saatte %10 artış!</p>
+            </div>
+            <div class="card">
+              <h2>Düğün Tarihi</h2>
+              <span class="value">5 Gün</span>
+              <p>Son 24 saatte %10 artış!</p>
+            </div>
+          </div>
+
+          <!-- Alt Bölümler -->
+          <div class="bottom-widgets">
+            <div class="card invite-preview">
+              <h3>Birincil Davetiye</h3>
+              <img src="assets/images/invite.png" alt="Davetiye" />
+              <div class="actions">
+                <button>PDF İndir</button>
+                <button>Gönderime Geç</button>
+                <button>Düzenle</button>
+                <p>Link: <a href="#">https://davetjet.com/vld24dk20</a></p>
+              </div>
+            </div>
+
+            <div class="card mini-analysis">
+              <h3>Mini Analiz</h3>
+              <ul>
+                <li>Katılım: <strong>25.7%</strong></li>
+                <li>Red: <strong>25.7%</strong></li>
+                <li>Cevapsız: <strong>25.7%</strong></li>
+              </ul>
+              <small>Öngörü: %85’i mobil cihazlardan</small>
+            </div>
+
+            <div class="card suggestions">
+              <h3>Öneriler</h3>
+              <p>Davetiye oluşturuldu. 83 kişi davet edildi.</p>
+              <p>16 kişi yanıtlamadı. <a href="#">Hatırlatma gönder</a></p>
+              <p>Davetiye açılma oranı %20. <a href="#">A/B test yap</a></p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

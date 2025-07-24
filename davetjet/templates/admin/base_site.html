@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %} {% load static %} {% block title %}Davet Jet
+Admin{% endblock %} {% block branding %}
+<h1 id="site-name">
+  <a href="{% url 'admin:index' %}">
+    {% comment %}
+    <img
+      src="{% static 'img/davetjet-logo.svg' %}"
+      alt="Davet Jet"
+      style="height: 32px; vertical-align: middle; margin-right: 8px"
+    />
+    {% endcomment %} DavetJet Admin Portal
+  </a>
+</h1>
+{% endblock %} {% block extrahead %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'css/admin_custom.css' %}"
+/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Admin panel for Davet Jet" />
+{% endblock %}
