@@ -1,0 +1,79 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DavetJet</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  </head>
+  <body>
+    <div class="hero-container">
+      <nav class="navbar">
+        <div class="logo-container">
+          <a href="#">
+            {% comment %}
+            <picture class="logo">
+              <source
+                srcset="{% static 'images/logo.webp' %}"
+                type="image/webp"
+              />
+              <img
+                src="{% static 'images/logo.png' %}"
+                alt="DavetJet Logo"
+                class="logo-image"
+              />
+            </picture>
+            {% endcomment %} DavetJet
+          </a>
+        </div>
+        <div class="nav-center">
+          <ul class="nav-links">
+            <li><a href="#" class="nav-link">About</a></li>
+            <li><a href="#" class="nav-link">Product</a></li>
+            <li><a href="#" class="nav-link">Resources</a></li>
+            <li><a href="#" class="nav-link">Support</a></li>
+          </ul>
+        </div>
+        <div class="auth-buttons">
+          <a href="#" class="signin btn">Sign In</a>
+          <a href="#" class="signup btn btn--secondary">Sign Up</a>
+        </div>
+
+        <div class="hamburger">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </nav>
+      <header class="hero">
+        <div class="hero-content">
+          <div class="badge">⭐ Beta Version v0.505b available!</div>
+          <h1 class="heading-primary">
+            Revolutionize Your<br /><span class="highlight"
+              >Invitation Management</span
+            >
+          </h1>
+          <p class="alt-text">
+            Unlock seamless, secure, and integrable invitation management
+            system. Create, deploy, run tests and analyze your invitations with
+            your co-workers. Try DavetJet free for 7 days!
+          </p>
+          <div class="buttons">
+            <a href="#" class="btn btn--primary">Start Now!</a>
+            <a href="#" class="btn btn--outlined">Learn More</a>
+          </div>
+        </div>
+
+        <div class="hero-transition-image-container">
+          <img
+            src="{% static 'images/laptop.webp' %}"
+            alt="Laptop"
+            class="hero-transition-image"
+          />
+        </div>
+      </header>
+    </div>
+  </body>
+</html>

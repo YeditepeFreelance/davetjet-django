@@ -1,0 +1,17 @@
+{
+  "name": "Davetjet Website",
+  "version": "1.0.0",
+  "description": "Web App for Davetjet Website",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "sass scss/main.scss css/main.css --style compressed",
+    "watch:css": "sass --watch scss/main.scss:css/main.css --style compressed",
+    "start": "nodemon -e scss -x \"npm run build:css\""
+  },
+  "author": "Furkan Esen",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.0",
+    "sass": "^1.66.0"
+  }
+}

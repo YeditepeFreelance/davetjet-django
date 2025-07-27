@@ -1,0 +1,6 @@
+@use "../abstracts/variables";
+
+html {
+  // background-color: map-get(variables.$colors, dark);
+  color: map-get(variables.$colors, light);
+}

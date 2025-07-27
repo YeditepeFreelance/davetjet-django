@@ -1,0 +1,79 @@
+@use '../abstracts/variables';
+@use '../abstracts/animations';
+@use '../abstracts/mixins' as *;
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 3.2rem 6.4rem;
+  font-size: 2rem;
+
+  & .nav-links {
+    display: flex;
+    gap: 4.8rem;
+    margin: 0 auto;
+
+    @include respond(992px) {
+      display: none;
+    }
+  }
+
+  & .nav-link {
+    @include animations.underline-text;
+
+    &:hover {
+      color: darken(map-get(variables.$colors, light), 15%);
+    }
+  }
+
+
+  & .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 0.4rem;
+    cursor: pointer;
+
+
+    & .bar {
+      width: 2.4rem;
+      height: 0.3rem;
+      background-color: map-get(variables.$colors, light);
+      transition: all 0.3s ease-in-out;
+
+      @include respond(480px) {
+        width: 4.8rem;
+        height: 0.6rem;
+      }
+    }
+
+    &:hover .bar {
+      background-color: lighten(map-get(variables.$colors, light), 10%);
+    }
+
+    @include respond(992px) {
+      display: flex;
+    }
+  }
+
+  & .logo-container {
+    font-size: 3.2rem;
+    font-weight: 600;
+    margin-right: auto;
+  }
+
+  & .auth-buttons {
+    display: flex;
+    gap: 2.4rem;
+    margin-left: auto;
+
+    @include respond(992px) {
+      display: none;
+    }
+  }
+
+  .nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

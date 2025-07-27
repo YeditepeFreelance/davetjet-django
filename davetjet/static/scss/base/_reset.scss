@@ -1,0 +1,115 @@
+@use '../abstracts/mixins' as *;
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 62.5%;
+  /* 10px base font size */
+  line-height: 1.6;
+  border: 0;
+  outline: 0;
+  vertical-align: baseline;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+
+  @include respond(1200px) {
+    font-size: 56.25%; // 9px base font size
+  }
+
+  @include respond(992px) {
+    font-size: 50%; // 8px base font size
+  }
+
+  @include respond(768px) {
+    font-size: 43.75%; // 7px base font size
+  }
+
+  @include respond(576px) {
+    font-size: 37.5%; // 6px base font size
+  }
+
+  @include respond(480px) {
+    font-size: 31.25%; // 5px base font size
+  }
+
+  @include respond(390px) {
+    font-size: 25%; // 4px base font size
+  }
+
+  @include respond(320px) {
+    font-size: 18.75%; // 3px base font size
+  }
+
+  @include respond(280px) {
+    font-size: 12.5%; // 2px base font size
+  }
+}
+
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  // Will be used for dark mode styles
+}
+
+input,
+textarea {
+  background-color: map-get($colors, dark);
+  color: map-get($colors, light);
+  border: 1px solid map-get($colors, gray100);
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: map-get($colors, primary-light);
+    box-shadow: 0 0 0 2px rgba(202, 98, 99, 0.4); // subtle red glow
+  }
+
+  &::selection {
+    background: map-get($colors, primary-light);
+    color: map-get($colors, light);
+  }
+}

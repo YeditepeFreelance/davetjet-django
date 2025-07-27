@@ -1,0 +1,75 @@
+@use "../abstracts/variables";
+
+.heading-primary {
+  font-size: 6.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.015em;
+}
+
+.highlight {
+  background: linear-gradient(to right,
+      map-get(variables.$colors, primary-light),
+      map-get(variables.$colors, primary));
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+  }
+}
+
+.alt-text {
+  font-size: 1.6rem;
+  color: map-get(variables.$colors, gray-100);
+  margin-top: 3rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mb-3 {
+  margin-bottom: 3rem;
+}
+
+.mb-4 {
+  margin-bottom: 4rem;
+}
+
+.mb-5 {
+  margin-bottom: 5rem;
+}
+
+.mb-6 {
+  margin-bottom: 6rem;
+}
+
+.mb-8 {
+  margin-bottom: 8rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+.mt-4 {
+  margin-top: 4rem;
+}
+
+.mt-8 {
+  margin-top: 8rem;
+}
+
+.mt-12 {
+  margin-top: 12rem;
+}
