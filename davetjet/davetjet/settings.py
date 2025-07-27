@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-h8q1-%@o34)^3ctx1lvio$+r*6bgnrtkj9k4&r!6f*v76611z(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = ['avetjet-webapp.onrender.com', 'davetjet.com', 'www.davetjet.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
