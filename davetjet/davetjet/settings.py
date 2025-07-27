@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['davetjet-webapp.onrender.com', 'davetjet.com', 'www.davetjet.com', 'localhost', '127.0.0.1']
 
+
 # Application definition
 
 INSTALLED_APPS = [
