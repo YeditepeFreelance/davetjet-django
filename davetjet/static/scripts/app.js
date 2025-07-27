@@ -182,7 +182,7 @@ document.querySelectorAll(".logo span").forEach((el, idx) => {
 document.addEventListener("DOMContentLoaded", () => {
   const app = new App({
     selector: "#countdown",
-    targetDate: "2025-12-31T23:59:59",
+    targetDate: "2025-08-08T20:00:00",
   });
   app.start();
 });
