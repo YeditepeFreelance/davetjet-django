@@ -32,7 +32,7 @@ types-python-dateutil==2.9.0.20250516
 tzdata==2025.2
 vine==5.1.0
 wcwidth==0.2.13
-djangorestframework-simplejwt==5.2.2
-django-cors-headers==3.18.0
-djangorestframework-jwt==1.11.0
-djangorestframework-api-key==1.0.0
+djangorestframework-simplejwt
+django-cors-headers
+djangorestframework-jwt
+djangorestframework-api-key
