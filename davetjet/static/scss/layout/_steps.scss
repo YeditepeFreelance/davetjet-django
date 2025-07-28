@@ -1,0 +1,96 @@
+@use "../abstracts/variables";
+@use "../abstracts/mixins" as *;
+
+.steps-section {
+  padding: 6rem 1rem;
+  text-align: center;
+  margin-top: 25%;
+  max-width: 130rem;
+  margin: 0 auto;
+
+  @media (max-width: 1300px) {
+    max-width: 100rem;
+
+  }
+
+  @media (max-width: 820px) {
+    max-width: 80rem;
+  }
+
+  @include respond(996px) {
+    margin-top: 30%;
+  }
+
+  @include respond(600px) {
+    max-width: 60rem;
+  }
+
+  .steps-heading {
+    margin-bottom: 4rem;
+    color: map-get(variables.$colors, dark);
+
+    & h2 {
+      font-size: 4.8rem;
+      font-weight: 500;
+    }
+
+    & .brand-name {
+      color: map-get(variables.$colors, primary);
+    }
+
+    .steps-subtitle {
+      font-size: 2rem;
+      color: map-get(variables.$colors, gray-200);
+      margin-top: .8rem;
+    }
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4.8rem;
+    justify-content: center;
+    margin: 0 auto;
+
+    @media (max-width: 1300px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    @include respond(600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .step-card {
+    background: map-get(variables.$colors, gray-50);
+    border-radius: 1.5rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    padding: 2.4rem;
+    transition: transform 0.3s ease;
+    text-align: left;
+
+    h3 {
+      font-size: 3rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: map-get(variables.$colors, dark);
+    }
+
+    p {
+      font-size: 1.6rem;
+      color: map-get(variables.$colors, gray-200);
+      margin-bottom: 1.5rem;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    &:hover {
+      transform: translateY(-8px);
+    }
+  }
+}

@@ -1,0 +1,117 @@
+@use "../abstracts/variables";
+@use "../abstracts/mixins" as *;
+
+.testimonials-section {
+  padding: 6rem 1rem;
+  text-align: center;
+  max-width: 130rem;
+  margin: 0 auto;
+
+  @include respond(1300px) {
+    padding: 6rem 2rem;
+    max-width: 100rem;
+  }
+
+  @include respond(820px) {
+    max-width: 80rem;
+  }
+
+  @include respond(600px) {
+    max-width: 70rem;
+  }
+
+  .testimonials-heading {
+    margin-bottom: 4rem;
+
+    h2 {
+      font-size: 4.8rem;
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
+
+      color: map-get(variables.$colors, dark);
+
+      .highlight {
+        color: map-get(variables.$colors, primary);
+      }
+    }
+
+    .subtitle {
+      margin-top: 1rem;
+      font-size: 1.6rem;
+      color: map-get(variables.$colors, gray-200);
+    }
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3.2rem;
+    margin: 0 auto;
+
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .testimonial-card {
+    background: map-get(variables.$colors, gray-50);
+    border-radius: 1.5rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
+    padding: 2.4rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+    }
+
+    img {
+      width: 6rem;
+      height: 6rem;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+    }
+
+    h3 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: map-get(variables.$colors, dark);
+      margin-bottom: 0.2rem;
+    }
+
+    .email {
+      font-size: 1.4rem;
+      color: map-get(variables.$colors, gray-200);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.6rem;
+      color: map-get(variables.$colors, gray-200);
+      margin-bottom: 2rem;
+    }
+
+    .quote-icon {
+      width: 7rem;
+      height: 7rem;
+      border-radius: 50%;
+      background: rgba(map-get(variables.$colors, primary), 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+
+      svg {
+        fill: map-get(variables.$colors, primary);
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+  }
+}

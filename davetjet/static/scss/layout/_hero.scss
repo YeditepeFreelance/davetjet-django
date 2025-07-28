@@ -44,7 +44,8 @@
     }
 
     @include respond(480px) {
-      display: none;
+      width: 50vw;
+      margin-top: 12rem;
     }
   }
 
@@ -83,23 +84,8 @@
     }
 
     @include respond(480px) {
-      margin-top: 37.3%;
+      margin-top: 25%;
     }
 
-    @include respond(390px) {
-      margin-top: 70%;
-    }
-
-    @include respond(320px) {
-      margin-top: 80%;
-    }
-
-    @include respond(280px) {
-      margin-top: 90%;
-    }
-
-    @include respond(240px) {
-      margin-top: 100%;
-    }
   }
 }

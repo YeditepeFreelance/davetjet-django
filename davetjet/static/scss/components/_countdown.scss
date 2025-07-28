@@ -108,13 +108,16 @@ $shine-color: rgba(255, 255, 255, 0.3);
 }
 
 
-.hero-content {
-  text-align: center;
-  margin: auto;
-  max-width: 700px;
-  padding: 1rem;
-  position: relative;
-  z-index: 2;
+.countdown-page {
+  .hero-content {
+    text-align: center;
+    margin: auto;
+    max-width: 700px;
+    padding: 1rem;
+    position: relative;
+    z-index: 2;
+  }
+
 }
 
 // 💫 Animations
@@ -263,7 +266,7 @@ $shine-color: rgba(255, 255, 255, 0.3);
 }
 
 
-.cta {
+.countdown-page .cta {
   margin-top: 4.8rem;
 
   .btn--primary {
