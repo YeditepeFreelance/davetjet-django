@@ -18,6 +18,10 @@
   font-family: 'Segoe UI', sans-serif;
   overflow: hidden;
 
+  &.lightt * {
+    color: map-get(variables.$colors, dark);
+  }
+
   ul {
     list-style: none;
     margin: 0;

@@ -4,9 +4,9 @@
 .steps-section {
   padding: 6rem 1rem;
   text-align: center;
+  margin: 0 auto;
   margin-top: 25%;
   max-width: 130rem;
-  margin: 0 auto;
 
   @media (max-width: 1300px) {
     max-width: 100rem;
@@ -17,13 +17,11 @@
     max-width: 80rem;
   }
 
-  @include respond(996px) {
+  @media (max-width: 600px) {
     margin-top: 30%;
-  }
-
-  @include respond(600px) {
     max-width: 60rem;
   }
+
 
   .steps-heading {
     margin-bottom: 4rem;

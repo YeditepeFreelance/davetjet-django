@@ -142,16 +142,38 @@ class App {
 
   showContextMenu(x, y) {
     const menu = this.contextMenu;
-    menu.style.display = "block";
 
+    // Position menu
+    menu.style.display = "block";
     const { innerWidth, innerHeight } = window;
     const rect = menu.getBoundingClientRect();
-
     const left = x + rect.width > innerWidth ? x - rect.width : x;
     const top = y + rect.height > innerHeight ? y - rect.height : y;
-
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
+
+    // Detect background section by element at point
+    const elementAtPoint = document.elementFromPoint(x, y);
+    // Check if element or any parent has "dark" or "darktt" class
+    let isDark = false;
+    let el = elementAtPoint;
+    while (el) {
+      if (
+        el.classList &&
+        (el.classList.contains("dark") || el.classList.contains("darktt"))
+      ) {
+        isDark = true;
+        break;
+      }
+      el = el.parentElement;
+    }
+
+    if (isDark) {
+      menu.classList.add("darkt");
+    } else {
+      menu.classList.add("lightt");
+      console.log(menu, menu.classList);
+    }
   }
 
   hideContextMenu() {

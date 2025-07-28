@@ -3,8 +3,57 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Required Meta Tags -->
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta -->
+    <title>DavetJet - Yeni Dijital Davetiye Platformu</title>
+    <meta
+      name="description"
+      content="🎉 DavetJet çok yakında! Yeni nesil dijital davetiye deneyimini keşfedin."
+    />
+    <meta
+      name="keywords"
+      content="dijital davetiye, online davetiye, DavetJet, düğün, etkinlik, çağrı, yeni platform"
+    />
+    <meta name="author" content="DavetJet" />
+
+    <!-- Open Graph (For Facebook, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="DavetJet - Yeni Dijital Davetiye Platformu"
+    />
+    <meta
+      property="og:description"
+      content="🎉 DavetJet çok yakında! Yeni nesil dijital davetiye deneyimini kaçırmayın."
+    />
+    <meta property="og:image" content="{% static 'images/favicon.ico' %}" />
+    <meta property="og:url" content="https://davetjet.com/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="DavetJet - Yeni Dijital Davetiye Platformu"
+    />
+    <meta
+      name="twitter:description"
+      content="🎉 DavetJet çok yakında! Yeni nesil dijital davetiye deneyimini keşfedin."
+    />
+    <meta name="twitter:image" content="{% static 'images/favicon.ico' %}" />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="{% static 'images/favicon.ico' %}"
+      type="image/x-icon"
+    />
+
+    <!-- Theme Color for Mobile Browsers -->
+    <meta name="theme-color" content="#0ff" />
     <title>DavetJet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,14 +66,8 @@
   </head>
   <body>
     <div class="custom-cursor"></div>
-    <div class="custom-context-menu">
-      <ul>
-        <li><a href="#">Yenile</a></li>
-        <li><a href="#">Anasayfaya Git</a></li>
-        <li><a href="#">İncele</a></li>
-      </ul>
-    </div>
-    <section class="hero-container">
+
+    <section class="hero-container" class="dark">
       <nav class="navbar">
         <div class="logo-container">
           <a href="#">
@@ -62,7 +105,7 @@
           <span class="bar"></span>
         </div>
       </nav>
-      <header class="hero">
+      <header class="hero dark">
         <div class="hero-content">
           <div class="badge">⭐ Beta Version v0.505b available!</div>
           <h1 class="heading-primary">
@@ -416,7 +459,7 @@
         </div>
       </div>
     </section>
-    <section class="cta">
+    <section class="cta dark">
       <div class="cta__container">
         <h2 class="cta__heading">Design, automate and deploy.</h2>
         <p class="cta__subheading alt-text">
