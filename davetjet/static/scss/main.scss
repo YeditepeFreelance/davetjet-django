@@ -14,9 +14,16 @@
 @import "components/cursor";
 @import "components/context-menu";
 @import "components/cta";
+@import "components/modal";
 
 @import "layout/hero";
 @import "layout/steps";
 @import "layout/features";
 @import "layout/testimonials";
 @import "layout/footer";
+
+@import "pages/auth";
+@import "pages/dashboard";
+@import "pages/subscribe";
+@import "pages/profile";
+@import "pages/package";

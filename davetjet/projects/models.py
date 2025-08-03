@@ -7,7 +7,7 @@ class Project(models.Model):
   description = models.TextField(blank=True, null=True)
 
   owner = models.ForeignKey('users.User', related_name='projects', on_delete=models.CASCADE, blank=True, null=True)
-  recipients = models.ManyToManyField(Recipient, related_name='projects', blank=True, null=True)
+  recipients = models.ManyToManyField(Recipient, related_name='project', blank=True)
   invitation = models.ForeignKey(Invitation, related_name='projects', on_delete=models.CASCADE, blank=True, null=True)
 
   start_date = models.DateField(blank=True, null=True, auto_now_add=True)

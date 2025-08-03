@@ -1,0 +1,1138 @@
+@use '../abstracts/variables';
+
+.subscription-container {
+  padding: 3rem;
+  color: #333;
+
+  .subscription-header {
+    text-align: center;
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+    }
+
+    .billing-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      span {
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+
+    .plan-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      position: relative;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+      }
+
+      &.plan-highlight {
+        border: 2px solid map-get($colors, 'primary');
+        box-shadow: 0 0 20px rgba(map-get($colors, 'primary'), 0.25);
+        background: rgba(255, 255, 255, 0.75);
+      }
+
+      &.current {
+        opacity: 0.85;
+      }
+
+      .badge {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        background: map-get($colors, 'primary-dark');
+        color: #fff;
+        padding: 0.3rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .icon {
+        font-size: 2.4rem;
+        color: map-get($colors, 'primary');
+        margin-bottom: 1.2rem;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      p {
+        font-size: 1.3rem;
+        color: #555;
+      }
+
+      .price {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: map-get($colors, 'primary');
+        margin: 1.5rem 0;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 1.5rem;
+
+        li {
+          margin: 0.75rem 0;
+          font-size: 1.3rem;
+          color: #444;
+
+          i {
+            margin-right: 0.5rem;
+            color: map-get($colors, 'primary');
+          }
+        }
+      }
+
+      .btn {
+        background: map-get($colors, 'primary');
+        border: none;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.3rem;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+          background: map-get($colors, 'primary-dark');
+        }
+
+        &.current-btn {
+          background: #ccc;
+          color: #666;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+.payment-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .modal-content {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 1.5rem;
+    padding: 2.5rem 3rem;
+    min-width: 320px;
+    max-width: 720px;
+    color: map-get($colors, 'primary-dark');
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    position: relative;
+    font-family: 'Inter', sans-serif;
+
+    .payment-modal-inner {
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .payment-form {
+      flex: 1 1 320px;
+      min-width: 300px;
+
+      .form-group {
+        margin-bottom: 1.25rem;
+        position: relative;
+
+        input {
+          width: 100%;
+          padding: 1rem 1.4rem; // Increased padding
+          border-radius: 0.65rem;
+          border: 1.5px solid rgba(0, 0, 0, 0.1);
+          font-size: 1.2rem; // Slightly larger font
+          color: map-get($colors, 'primary-dark');
+          background: rgba(255, 255, 255, 0.75);
+          transition:
+            border-color 0.25s ease,
+            box-shadow 0.25s ease,
+            transform 0.2s ease;
+          box-shadow: none;
+          outline-offset: 2px;
+
+          &:focus {
+            border-color: map-get($colors, 'primary');
+            box-shadow: 0 0 8px rgba(map-get($colors, 'primary'), 0.35);
+            outline: none;
+            transform: scale(1.02);
+          }
+
+          &::placeholder {
+            color: rgba(0, 0, 0, 0.35);
+            font-weight: 500;
+          }
+        }
+      }
+
+      .form-row {
+        display: flex;
+        gap: 1.4rem;
+
+        .small-group {
+          flex: 1;
+        }
+      }
+
+      .pay-btn {
+        margin-top: 1.25rem;
+        width: 100%;
+        padding: 1rem 1.7rem; // Slightly more padding
+        font-weight: 700;
+        font-size: 1.35rem; // Slightly larger
+        border-radius: 1rem;
+        border: none;
+        cursor: pointer;
+        background: map-get($colors, 'primary');
+        color: #fff;
+        box-shadow: 0 6px 15px rgba(map-get($colors, 'primary'), 0.35);
+        transition:
+          background 0.3s ease,
+          box-shadow 0.3s ease,
+          transform 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: map-get($colors, 'primary-dark');
+          box-shadow: 0 8px 20px rgba(map-get($colors, 'primary-dark'), 0.45);
+          transform: scale(1.03);
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+          box-shadow: none;
+          transform: none;
+        }
+      }
+
+      &.loading {
+        pointer-events: none;
+        opacity: 0.75;
+      }
+    }
+
+    .virtual-card {
+      flex: 1 1 320px;
+      min-width: 300px;
+      perspective: 1100px;
+      user-select: none;
+
+      .card-inner {
+        width: 100%;
+        max-width: 320px;
+        height: 190px;
+        border-radius: 1.5rem;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        box-shadow:
+          0 12px 30px rgba(0, 0, 0, 0.15),
+          inset 0 0 80px rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(18px);
+
+        &.flipped {
+          transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 1.5rem;
+          backface-visibility: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 2rem 2.5rem;
+          box-sizing: border-box;
+          font-weight: 600;
+          font-family: 'Courier New', monospace;
+          letter-spacing: 2px;
+          user-select: none;
+        }
+
+        .card-front {
+          background: linear-gradient(135deg, map-get($colors, 'primary'), map-get($colors, 'primary-dark'));
+          color: #fff;
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+
+          .card-chip {
+            width: 54px;
+            height: 38px;
+            background: linear-gradient(135deg, #e0e0e0, #999999);
+            border-radius: 0.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow:
+              inset 0 2px 6px rgba(255, 255, 255, 0.85),
+              0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          .card-number {
+            font-size: 1.45rem;
+            margin-bottom: 1.6rem;
+            letter-spacing: 3.5px;
+          }
+
+          .card-name {
+            text-transform: uppercase;
+            font-size: 1.05rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.8rem;
+          }
+
+          .card-expiry-label {
+            font-size: 0.75rem;
+            opacity: 0.75;
+            margin-bottom: 0.3rem;
+          }
+
+          .card-expiry {
+            font-size: 1.1rem;
+            letter-spacing: 1.8px;
+          }
+        }
+
+        .card-back {
+          background: linear-gradient(135deg, map-get($colors, 'primary-dark'), map-get($colors, 'primary'));
+          color: #fff;
+          transform: rotateY(180deg);
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+
+          .card-stripe {
+            height: 44px;
+            background: #000;
+            margin-bottom: 1.7rem;
+            border-radius: 0.3rem;
+            box-shadow: inset 0 3px 8px rgba(255, 255, 255, 0.15);
+          }
+
+          .card-cvv-label {
+            font-size: 0.9rem;
+            opacity: 0.75;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+          }
+
+          .card-cvv {
+            font-size: 1.35rem;
+            letter-spacing: 5px;
+            user-select: text;
+          }
+        }
+      }
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1.1rem;
+      right: 1.1rem;
+      background: none;
+      border: none;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 2.1rem;
+      cursor: pointer;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.6rem;
+      transition: background 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        background: rgba(map-get($colors, 'primary'), 0.1);
+        color: map-get($colors, 'primary-dark');
+      }
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .payment-modal .modal-content {
+    padding: 2rem 2rem;
+
+    .payment-modal-inner {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .payment-form,
+    .virtual-card {
+      min-width: 100%;
+      max-width: none;
+      margin-bottom: 2rem;
+    }
+
+    .virtual-card .card-inner {
+      max-width: 100%;
+      height: 180px;
+    }
+  }
+}
+
+
+.billing-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+
+  .label {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #444;
+  }
+
+  .toggle-box {
+    display: inline-flex;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    .toggle-option {
+      padding: 0.6rem 1.4rem;
+      font-size: 1.3rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.3s ease;
+
+      &.active {
+        background: map-get($colors, 'primary');
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(map-get($colors, 'primary'), 0.3);
+      }
+
+      &:hover:not(.active) {
+        background: rgba(map-get($colors, 'primary'), 0.1);
+        color: map-get($colors, 'primary');
+      }
+    }
+  }
+}
+
+// FS MODAL
+
+.fs-subscription-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(28px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .fs-subscription-modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2rem;
+    padding: 3.5rem 4.5rem;
+    width: 95vw;
+    max-width: 1280px;
+    max-height: 90vh;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.15),
+      inset 0 0 60px rgba(255, 255, 255, 0.6);
+    overflow-y: auto;
+    position: relative;
+    color: map-get($colors, 'primary-dark');
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 2.8rem;
+
+    /* Scrollbar for content */
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(map-get($colors, 'primary'), 0.3);
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: map-get($colors, 'primary');
+    }
+  }
+
+  .fs-subscription-close-btn {
+    position: absolute;
+    top: 1.6rem;
+    right: 1.6rem;
+    background: rgba(map-get($colors, 'primary'), 0.1);
+    border: none;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: map-get($colors, 'primary-dark');
+    cursor: pointer;
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow:
+      0 4px 12px rgba(map-get($colors, 'primary'), 0.15);
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease;
+
+    &:hover {
+      background-color: map-get($colors, 'primary');
+      color: #fff;
+      box-shadow:
+        0 6px 20px rgba(map-get($colors, 'primary'), 0.5);
+    }
+  }
+
+  .fs-subscription-modal-nav {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 0.8rem;
+
+    .fs-logo {
+      height: 42px;
+      user-select: none;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.07));
+      transition: filter 0.3s ease;
+
+      &:hover {
+        filter: drop-shadow(0 3px 4px rgba(map-get($colors, 'primary'), 0.4));
+      }
+    }
+  }
+
+  .fs-subscription-modal-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+
+    h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      margin-bottom: 0.7rem;
+      color: map-get($colors, 'primary-dark');
+      letter-spacing: 0.03em;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    p {
+      font-size: 1.45rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 1.8rem;
+      line-height: 1.5;
+      letter-spacing: 0.015em;
+    }
+
+    .fs-billing-toggle {
+      margin-top: 1.2rem;
+      display: inline-flex;
+      justify-content: center;
+      gap: 1.25rem;
+      border-radius: 50px;
+      background: rgba(map-get($colors, 'primary'), 0.08);
+      padding: 0.25rem;
+
+      .fs-toggle-option {
+        padding: 0.9rem 2.8rem;
+        border-radius: 50px;
+        border: none;
+        background: transparent;
+        color: map-get($colors, 'primary-dark');
+        font-weight: 700;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition:
+          background-color 0.4s ease,
+          color 0.4s ease,
+          box-shadow 0.3s ease;
+
+        &.active,
+        &:hover {
+          background: map-get($colors, 'primary');
+          color: #fff;
+          box-shadow:
+            0 8px 18px rgba(map-get($colors, 'primary'), 0.4);
+          transform: translateY(-1.5px);
+        }
+      }
+    }
+  }
+
+  .fs-subscription-modal-plans {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    flex-wrap: nowrap;
+    padding-bottom: 1.4rem;
+    scroll-behavior: smooth;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .fs-plan-card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: saturate(180%) blur(22px);
+      border-radius: 2rem;
+      padding: 2.8rem 3rem;
+      width: 330px;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.12),
+        inset 0 0 50px rgba(255, 255, 255, 0.8);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background-color 0.3s ease;
+      position: relative;
+
+      &:hover {
+        transform: translateY(-8px);
+        box-shadow:
+          0 20px 42px rgba(0, 0, 0, 0.18),
+          inset 0 0 60px rgba(255, 255, 255, 0.85);
+        background-color: rgba(255, 255, 255, 0.75);
+      }
+
+      &.fs-plan-highlight {
+        border: 3px solid map-get($colors, 'primary');
+        box-shadow:
+          0 0 30px rgba(map-get($colors, 'primary'), 0.5),
+          inset 0 0 80px rgba(255, 255, 255, 0.9);
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      &.current {
+        opacity: 0.88;
+        box-shadow:
+          0 0 20px rgba(0, 0, 0, 0.08);
+        pointer-events: none;
+      }
+
+      .fs-badge {
+        position: absolute;
+        top: 1.4rem;
+        right: 1.4rem;
+        background: map-get($colors, 'primary-dark');
+        color: #fff;
+        padding: 0.4rem 1.3rem;
+        border-radius: 1.4rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        user-select: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .fs-icon {
+        font-size: 3.2rem;
+        color: map-get($colors, 'primary');
+        margin-bottom: 1.4rem;
+        filter: drop-shadow(0 1px 2px rgba(map-get($colors, 'primary'), 0.25));
+      }
+
+      h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: map-get($colors, 'primary-dark');
+        letter-spacing: 0.02em;
+        user-select: none;
+      }
+
+      p {
+        font-size: 1.25rem;
+        color: #555;
+        margin-bottom: 1.75rem;
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: 0.01em;
+      }
+
+      .fs-price {
+        font-size: 2.8rem;
+        font-weight: 900;
+        color: map-get($colors, 'primary');
+        margin-bottom: 2rem;
+        letter-spacing: 0.06em;
+        text-shadow: 0 2px 6px rgba(map-get($colors, 'primary'), 0.45);
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 2.6rem;
+        width: 100%;
+
+        li {
+          font-size: 1.3rem;
+          color: #444;
+          margin: 1rem 0;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          font-weight: 600;
+
+          i {
+            margin-right: 0.85rem;
+            color: map-get($colors, 'primary');
+            min-width: 28px;
+            text-align: center;
+            filter: drop-shadow(0 1px 1px rgba(map-get($colors, 'primary'), 0.4));
+          }
+        }
+      }
+
+      .fs-btn {
+        background: map-get($colors, 'primary');
+        color: white;
+        border: none;
+        font-weight: 700;
+        padding: 1rem 3.2rem;
+        font-size: 1.4rem;
+        border-radius: 2rem;
+        cursor: pointer;
+        box-shadow:
+          0 12px 30px rgba(map-get($colors, 'primary'), 0.45);
+        transition:
+          background-color 0.35s ease,
+          box-shadow 0.35s ease,
+          transform 0.25s ease;
+
+        &:hover:not(:disabled) {
+          background: map-get($colors, 'primary-dark');
+          box-shadow:
+            0 18px 42px rgba(map-get($colors, 'primary-dark'), 0.6);
+          transform: scale(1.07);
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.48;
+          box-shadow: none;
+          transform: none;
+        }
+      }
+    }
+  }
+
+  .fs-subscription-modal-trust {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #555;
+    font-weight: 600;
+    margin-top: auto;
+    letter-spacing: 0.03em;
+    user-select: none;
+    opacity: 0.85;
+    font-style: italic;
+  }
+
+  @media (max-width: 1100px) {
+    .fs-subscription-modal-content {
+      padding: 3rem 3.5rem;
+      max-height: 95vh;
+    }
+
+    .fs-subscription-modal-plans {
+      gap: 2rem;
+    }
+
+    .fs-plan-card {
+      width: 290px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .fs-subscription-modal-content {
+      padding: 2rem 2rem;
+      max-height: 100vh;
+    }
+
+    .fs-subscription-modal-plans {
+      flex-direction: column;
+      gap: 2.2rem;
+      overflow-x: visible;
+    }
+
+    .fs-plan-card {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+  }
+}
+
+// FS PAYMENT MODAL
+
+
+.fs-payment-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .fs-payment-modal-content {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 1.75rem;
+    padding: 3rem 4rem;
+    max-width: 740px;
+    width: 95%;
+    color: map-get($colors, 'primary-dark');
+    box-shadow: 0 14px 48px rgba(0, 0, 0, 0.16);
+    position: relative;
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+
+    .fs-payment-header {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      color: map-get($colors, 'primary-dark');
+    }
+
+    .fs-payment-subheader {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 2.5rem;
+      color: #555;
+    }
+
+    .fs-payment-modal-inner {
+      display: flex;
+      gap: 3.2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .fs-payment-form {
+      flex: 1 1 320px;
+      min-width: 320px;
+
+      .fs-form-group {
+        margin-bottom: 1.6rem;
+        position: relative;
+
+        input {
+          width: 100%;
+          padding: 1rem 1.4rem;
+          border-radius: 0.75rem;
+          border: 1.8px solid rgba(0, 0, 0, 0.12);
+          font-size: 1.3rem;
+          color: map-get($colors, 'primary-dark');
+          background: rgba(255, 255, 255, 0.78);
+          transition:
+            border-color 0.3s ease,
+            box-shadow 0.3s ease,
+            transform 0.25s ease;
+          box-shadow: none;
+          outline-offset: 3px;
+
+          &:focus {
+            border-color: map-get($colors, 'primary');
+            box-shadow: 0 0 12px rgba(map-get($colors, 'primary'), 0.42);
+            outline: none;
+            transform: scale(1.04);
+          }
+
+          &::placeholder {
+            color: rgba(0, 0, 0, 0.38);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+          }
+        }
+      }
+
+      .fs-form-row {
+        display: flex;
+        gap: 1.8rem;
+
+        .fs-small-group {
+          flex: 1;
+        }
+      }
+
+      .fs-pay-btn {
+        margin-top: 1.8rem;
+        width: 100%;
+        padding: 1.1rem 2rem;
+        font-weight: 800;
+        font-size: 1.4rem;
+        border-radius: 1.25rem;
+        border: none;
+        cursor: pointer;
+        background: map-get($colors, 'primary');
+        color: #fff;
+        box-shadow: 0 7px 20px rgba(map-get($colors, 'primary'), 0.45);
+        transition:
+          background 0.35s ease,
+          box-shadow 0.35s ease,
+          transform 0.25s ease;
+
+        &:hover:not(:disabled) {
+          background: map-get($colors, 'primary-dark');
+          box-shadow: 0 10px 30px rgba(map-get($colors, 'primary-dark'), 0.6);
+          transform: scale(1.05);
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+          box-shadow: none;
+          transform: none;
+        }
+      }
+    }
+
+    .fs-virtual-card {
+      flex: 1 1 320px;
+      min-width: 320px;
+      perspective: 1200px;
+      user-select: none;
+
+      .fs-card-inner {
+        width: 100%;
+        max-width: 320px;
+        height: 195px;
+        border-radius: 1.75rem;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        box-shadow:
+          0 14px 38px rgba(0, 0, 0, 0.18),
+          inset 0 0 90px rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(20px);
+
+        &.flipped {
+          transform: rotateY(180deg);
+        }
+
+        .fs-card-front,
+        .fs-card-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 1.75rem;
+          backface-visibility: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 2.4rem 3rem;
+          box-sizing: border-box;
+          font-weight: 700;
+          font-family: 'Courier New', monospace;
+          letter-spacing: 2.3px;
+          user-select: none;
+          color: #fff;
+        }
+
+        .fs-card-front {
+          background: linear-gradient(135deg, map-get($colors, 'primary'), map-get($colors, 'primary-dark'));
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+
+          .fs-card-chip {
+            width: 56px;
+            height: 40px;
+            background: linear-gradient(135deg, #e0e0e0, #a8a8a8);
+            border-radius: 0.6rem;
+            margin-bottom: 2rem;
+            box-shadow:
+              inset 0 2.5px 7px rgba(255, 255, 255, 0.9),
+              0 3px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          .fs-card-number {
+            font-size: 1.55rem;
+            margin-bottom: 1.85rem;
+            letter-spacing: 4.2px;
+          }
+
+          .fs-card-name {
+            text-transform: uppercase;
+            font-size: 1.15rem;
+            letter-spacing: 1.7px;
+            margin-bottom: 2.3rem;
+          }
+
+          .fs-card-expiry-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 0.45rem;
+          }
+
+          .fs-card-expiry {
+            font-size: 1.25rem;
+            letter-spacing: 2.1px;
+          }
+        }
+
+        .fs-card-back {
+          background: linear-gradient(135deg, map-get($colors, 'primary-dark'), map-get($colors, 'primary'));
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+          transform: rotateY(180deg);
+
+          .fs-card-stripe {
+            height: 48px;
+            background: #000;
+            margin-bottom: 1.9rem;
+            border-radius: 0.35rem;
+            box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.2);
+          }
+
+          .fs-card-cvv-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1.1px;
+          }
+
+          .fs-card-cvv {
+            font-size: 1.5rem;
+            letter-spacing: 5.5px;
+            user-select: text;
+          }
+        }
+      }
+    }
+
+    .fs-payment-close-btn {
+      position: absolute;
+      top: 1.3rem;
+      right: 1.3rem;
+      background: none;
+      border: none;
+      color: rgba(0, 0, 0, 0.48);
+      font-size: 2.3rem;
+      cursor: pointer;
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.7rem;
+      transition: background 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        background: rgba(map-get($colors, 'primary'), 0.12);
+        color: map-get($colors, 'primary-dark');
+      }
+    }
+  }
+}
+
+@media (max-width: 740px) {
+  .fs-payment-modal .fs-payment-modal-content {
+    padding: 2rem 2.2rem;
+
+    .fs-payment-modal-inner {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fs-payment-form,
+    .fs-virtual-card {
+      min-width: 100%;
+      max-width: none;
+      margin-bottom: 2.6rem;
+    }
+
+    .fs-virtual-card .fs-card-inner {
+      max-width: 100%;
+      height: 180px;
+    }
+  }
+}

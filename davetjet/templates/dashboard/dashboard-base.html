@@ -1,0 +1,192 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <!-- Basic Meta -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO -->
+    <title>
+      {% block title %}DavetJet | Dijital Davetiye Paneli{% endblock %}
+    </title>
+    <meta
+      name="description"
+      content="DavetJet ile dijital davetiye hazırlayın, gönderin ve katılımı yönetin. Hızlı, etkili ve şık."
+    />
+    <meta
+      name="keywords"
+      content="dijital davetiye, düğün davetiyesi, davet yönetimi, rsvp, davetjet"
+    />
+    <meta name="author" content="DavetJet" />
+    <link rel="canonical" href="https://davetjet.com/" />
+
+    <!-- Open Graph (Facebook, WhatsApp) -->
+    <meta property="og:title" content="DavetJet | Dijital Davetiye Paneli" />
+    <meta
+      property="og:description"
+      content="Davetiye hazırlayın, gönderin ve katılımı yönetin."
+    />
+    <meta property="og:image" content="{% static 'images/og-image.jpg' %}" />
+    <meta property="og:url" content="https://davetjet.com/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:title" content="DavetJet | Dijital Davetiye Paneli" />
+    <meta
+      name="twitter:description"
+      content="Davetiye hazırlayın, gönderin ve katılımı yönetin."
+    />
+    <meta name="twitter:image" content="{% static 'images/og-image.jpg' %}" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'apple-touch-icon.png' %}"
+    />
+    <link rel="manifest" href="{% static 'site.webmanifest' %}" />
+
+    <!-- Fonts & Icons -->
+    <script
+      src="https://kit.fontawesome.com/83fb529190.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <script src="{% static 'scripts/app.js' %}" type="module" defer></script>
+
+    {% block extra_css %}{% endblock %}
+
+    <!-- Scripts (head) -->
+    {% block head_scripts %}{% endblock %}
+  </head>
+
+  <body>
+    <div class="custom-cursor"></div>
+    <div class="blur-circle top-left"></div>
+    <div class="blur-circle bottom-right"></div>
+    {% include '../utils/modal-window.html' %}
+    {% include '../utils/notifications-window.html' %}
+    <audio id="notificationSound" src="{% static 'sounds/notification-sound.mp3' %}" preload="auto"></audio>
+
+    {% block top_content %} {% endblock %}
+
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="menu">
+          <div class="menu-settings">
+            <h3>MENU</h3>
+            <ul>
+              <li class="active">
+                <a href="{% url 'core:dashboard' %}">
+                  <i class="fa-regular fa-house"></i>
+                  <span>Genel Bakış</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'core:invitations' %}">
+                  <i class="fa-regular fa-envelope"></i>
+                  <span>Davetiyeler</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'core:recipients' %}">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Davetli Listesi</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'core:dashboard' %}">
+                  <i class="fa-regular fa-paper-plane"></i>
+                  <span>Gönderim</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'core:dashboard' %}">
+                  <i class="fa-solid fa-chart-simple"></i>
+                  <span>İstatistikler</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="gen-settings">
+            <h3>GENEL</h3>
+            <ul>
+              <li>
+                <a href="{% url 'core:package' %}">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                <span>Paketim</span>
+                </a></li>
+              <li><a href="{% url 'core:settings' %}">
+                <i class="fa-solid fa-gear"></i>
+                <span>Ayarlar</span></a></li>
+              <li><a href="{% url 'core:logout' %}">
+                <i class="fa-solid fa-power-off"></i>
+                <span>Oturumu Kapat</span></a></li>
+            </ul>
+          </div>
+          <div class="premium-box">
+            <p>
+              Daha yüksek davet limiti, otomasyonlar ve daha fazlası için...
+            </p>
+            <a href="{% url 'core:subscribe' %}">Şimdi Premium Ol!</a>
+          </div>
+        </div>
+      </aside>
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="top-bar">
+          <label for="search-input" style="position: relative; display: inline-block;">
+          <input
+            type="text"
+            name="search"
+            id="search-input"
+            placeholder="Aramaya başla..."
+            class="search-input"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          
+          <ul id="search-suggestions" class="suggestions-list" role="listbox" aria-label="Search suggestions"></ul>
+        </label>
+
+          <div class="top-actions">
+            <i class="fa-regular fa-envelope"></i>
+            <button class="notification-trigger">
+              <i class="fa-regular fa-bell"></i>
+              <span class="badge-pulse hidden" id="notificationBadge"></span>
+
+            </button>
+            <div class="user-info">
+              <img src="{% static 'images/avatar.png' %}" alt="Avatar" />
+              <span class="user-details">
+                <span>{{ request.user.username }}</span>
+                <small>{{ request.user.email }}</small>
+              </span>
+            </div>
+          </div>
+        </header>
+        {% block content %} {% endblock %}
+      </main>
+    </div>
+
+    <!-- Global Scripts -->
+    <script src="{% static 'scripts/searchBar.js' %}" defer></script>
+    <script src="{% static 'scripts/modal.js' %}" defer></script>
+    <script src="{% static 'scripts/notifications.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,41 @@
+{% extends '../dashboard-base.html' %} {% load static %} {% block content %}
+<section class="overview scrollable">
+  <div class="overview-top">
+    <div>
+      <h1>Davetiye Listeleri ({{ projects|length }} adet listelendi)</h1>
+      <p>
+        Bu ekrandan davetiye listelerinize göz atabilir ve yenilerini
+        oluşturabilirsiniz.
+      </p>
+    </div>
+    <a href="#" class="btn btn--create">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom-widgets">
+    {% for list in projects %}
+    <a href="{% url 'core:edit-recipients' list.id %}">
+      <div class="card invite-preview">
+        <h3>{{ list.name }}</h3>
+        <div class="content">
+          <img
+            src="{% static 'images/invitation-sample.png' %}"
+            alt="Davetiye"
+          />
+          <div class="actions">
+            <a>CSV Dışa Aktar</a>
+            <a>Gönderime Geç</a>
+            <a>Düzenle</a>
+            <p>Toplam: {{ list.recipients.count }}</p>
+            <p>Oluşturulma Tarihi: {{ list.created_at }}</p>
+            <p>Son Güncelleme: {{ list.updated_at }}</p>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

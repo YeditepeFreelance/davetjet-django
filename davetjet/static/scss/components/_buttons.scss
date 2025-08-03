@@ -11,6 +11,73 @@
   text-decoration: none;
   text-align: center;
 
+  &--create {
+    background-color: darken(map-get(variables.$colors, primary-aqua), 20%);
+    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+    i {
+      font-size: 2.4rem;
+      color: rgba(map-get(variables.$colors, light), 1);
+    }
+
+    &:hover {
+      background-color: darken(map-get(variables.$colors, primary-aqua), 10%);
+      color: lighten(map-get(variables.$colors, dark), 10%);
+      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+      transform: translateY(-0.1rem);
+    }
+  }
+
+  &--danger {
+    background-color: map-get(variables.$colors, danger);
+    color: map-get(variables.$colors, light);
+    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    padding: 1.2rem 3.6rem;
+
+    &:hover {
+      background-color: darken(map-get(variables.$colors, danger), 10%);
+      color: lighten(map-get(variables.$colors, light), 10%);
+      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &--success {
+    background-color: map-get(variables.$colors, success);
+    color: map-get(variables.$colors, light);
+    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    padding: 1.2rem 3.6rem;
+
+    &:hover {
+      background-color: darken(map-get(variables.$colors, success), 10%);
+      color: lighten(map-get(variables.$colors, light), 10%);
+      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &--cancel {
+    background-color: map-get(variables.$colors, light);
+    color: map-get(variables.$colors, dark);
+    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    padding: 1.2rem 3.6rem;
+
+    &:hover {
+      background-color: darken(map-get(variables.$colors, light), 10%);
+      color: lighten(map-get(variables.$colors, dark), 10%);
+      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+    }
+  }
+
   &--primary {
     background-color: map-get(variables.$colors, primary-aqua);
     color: map-get(variables.$colors, dark);

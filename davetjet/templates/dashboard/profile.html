@@ -1,0 +1,114 @@
+{% extends "./dashboard-base.html" %}
+{% load static %}
+
+{% block title %}Profilim | DavetJet{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+  <!-- Banner & Profile Pic Section -->
+  <section class="profile-header glassmorphic">
+    <label for="bannerUpload" class="banner-upload-label" aria-label="Change banner image">
+      <input type="file" id="bannerUpload" accept="image/*" class="file-input" />
+      <img src="{% static 'images/default-banner.jpg' %}" alt="User Banner" id="bannerImage" class="banner-image" />
+      <div class="banner-overlay">
+        <i class="fas fa-camera"></i>
+        <span>Change Banner</span>
+      </div>
+    </label>
+
+    <div class="profile-pic-wrapper">
+      <label for="profilePicUpload" class="profile-pic-label" aria-label="Change profile picture">
+        <input type="file" id="profilePicUpload" accept="image/*" class="file-input" />
+        <img src="{% static 'images/default-profile.png' %}" alt="Profile Picture" id="profilePicture" class="profile-pic" />
+        <div class="pic-overlay">
+          <i class="fas fa-camera"></i>
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <!-- User Info & Editable Fields -->
+  <section class="profile-info glassmorphic">
+    <div class="profile-basic">
+      <div class="editable-field" tabindex="0" role="textbox" aria-label="Full name" contenteditable="true" id="inputName" data-placeholder="Full Name">John Doe</div>
+      <div class="editable-field" tabindex="0" role="textbox" aria-label="Job title" contenteditable="true" id="inputJobTitle" data-placeholder="Job Title">Software Engineer</div>
+      <div class="editable-field" tabindex="0" role="textbox" aria-label="Date of birth" contenteditable="true" id="inputDob" data-placeholder="Date of Birth (YYYY-MM-DD)">1990-01-01</div>
+    </div>
+
+    <div class="profile-bio">
+      <label for="bioTextarea" class="bio-label">Bio</label>
+      <textarea id="bioTextarea" rows="4" maxlength="350" placeholder="Tell something about yourself...">Passionate about tech and design.</textarea>
+    </div>
+
+    <div class="profile-contact">
+      <h4>Contact & Social Links</h4>
+
+      <div class="contact-group">
+        <label for="inputEmail">Email</label>
+        <input type="email" id="inputEmail" placeholder="your.email@example.com" value="john.doe@example.com" />
+      </div>
+
+      <div class="contact-group">
+        <label for="inputPhone">Phone</label>
+        <input type="tel" id="inputPhone" placeholder="+90 555 123 4567" value="+90 555 123 4567" />
+      </div>
+
+      <div class="social-links">
+        <label for="inputLinkedIn"><i class="fab fa-linkedin"></i> LinkedIn</label>
+        <input type="url" id="inputLinkedIn" placeholder="https://linkedin.com/in/username" value="https://linkedin.com/in/johndoe" />
+
+        <label for="inputTwitter"><i class="fab fa-twitter"></i> Twitter</label>
+        <input type="url" id="inputTwitter" placeholder="https://twitter.com/username" value="https://twitter.com/johndoe" />
+
+        <label for="inputInstagram"><i class="fab fa-instagram"></i> Instagram</label>
+        <input type="url" id="inputInstagram" placeholder="https://instagram.com/username" value="https://instagram.com/johndoe" />
+      </div>
+    </div>
+
+    <!-- Badges / Achievements -->
+    <section class="profile-badges" aria-label="User Badges and Achievements">
+      <h4>Achievements</h4>
+      <ul class="badges-list" role="list">
+        <li class="badge" title="Top Inviter"><i class="fas fa-trophy"></i> Top Inviter</li>
+        <li class="badge" title="Event Organizer"><i class="fas fa-calendar-check"></i> Event Organizer</li>
+        <li class="badge" title="Early Adopter"><i class="fas fa-star"></i> Early Adopter</li>
+      </ul>
+    </section>
+
+    <button id="saveProfileBtn" class="btn btn-primary save-btn" type="button" aria-label="Save profile changes">
+      Save Changes
+    </button>
+  </section>
+
+  <!-- Stats & Graphs Section -->
+  <section class="profile-stats glassmorphic" aria-label="Current Plan Usage and Stats">
+    <h3>Plan Usage</h3>
+
+    <div class="usage-bars">
+      <div class="usage-item">
+        <label for="invitationsUsage">Invitations Used</label>
+        <progress id="invitationsUsage" max="100" value="10"></progress>
+        <span class="usage-text">10 / 100 invitations</span>
+      </div>
+
+      <div class="usage-item">
+        <label for="inviteesUsage">Invitees Used</label>
+        <progress id="inviteesUsage" max="1000" value="150"></progress>
+        <span class="usage-text">150 / 1000 invitees</span>
+      </div>
+    </div>
+
+    <div class="usage-charts">
+      <canvas id="invitationsChart" aria-label="Invitations usage chart" role="img"></canvas>
+      <canvas id="inviteesChart" aria-label="Invitees usage chart" role="img"></canvas>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}

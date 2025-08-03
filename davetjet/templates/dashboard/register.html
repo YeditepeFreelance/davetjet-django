@@ -1,0 +1,280 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kayıt Ol</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <script src="{% static 'scripts/app.js' %}" type="module" defer></script>
+  </head>
+  <body class="login-page dark register">
+    <div class="custom-cursor"></div>
+
+    <div class="blur-circle top-left"></div>
+    <div class="blur-circle bottom-right"></div>
+
+    <div class="login-wrapper register-wrapper">
+      <div class="login-header register-header">
+        <img src="{% static 'images/logo.webp' %}" alt="Logo" />
+        <h2>Kayıt Ol</h2>
+        <p>Hesap oluşturmak için bilgilerinizi girin</p>
+      </div>
+
+      <form
+        id="multiStepForm"
+        action="{% url 'core:register' %}"
+        method="post"
+        enctype="multipart/form-data"
+        class="login-form register-form"
+      >
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="form-error">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Step 1 -->
+        <section class="form-step active" data-step="1">
+          <label>
+            <span>Ad</span>
+            <input
+              type="text"
+              name="first_name"
+              placeholder="Adınız"
+              required
+              value="{{ form.first_name.value|default_if_none:'' }}"
+            />
+            {% if form.first_name.errors %}
+            <div class="field-error">
+              {% for error in form.first_name.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>Soyad</span>
+            <input
+              type="text"
+              name="last_name"
+              placeholder="Soyadınız"
+              required
+              value="{{ form.last_name.value|default_if_none:'' }}"
+            />
+            {% if form.last_name.errors %}
+            <div class="field-error">
+              {% for error in form.last_name.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <button
+            type="button"
+            class="login-btn btn-next"
+            data-next-step="2"
+            aria-label="Devam Et"
+          >
+            Devam Et <span class="arrow">→</span>
+          </button>
+        </section>
+
+        <!-- Step 2 -->
+        <section class="form-step" data-step="2">
+          <label>
+            <span>Kullanıcı Adı</span>
+            <input
+              type="text"
+              name="username"
+              placeholder="Kullanıcı Adı"
+              required
+              value="{{ form.username.value|default_if_none:'' }}"
+            />
+            {% if form.username.errors %}
+            <div class="field-error">
+              {% for error in form.username.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>E-posta</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="ornek@eposta.com"
+              required
+              value="{{ form.email.value|default_if_none:'' }}"
+            />
+            {% if form.email.errors %}
+            <div class="field-error">
+              {% for error in form.email.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>Şifre</span>
+            <input
+              type="password"
+              name="password1"
+              placeholder="Şifre"
+              required
+            />
+            {% if form.password1.errors %}
+            <div class="field-error">
+              {% for error in form.password1.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>Şifreyi Onayla</span>
+            <input
+              type="password"
+              name="password2"
+              placeholder="Şifreyi tekrar girin"
+              required
+            />
+            {% if form.password2.errors %}
+            <div class="field-error">
+              {% for error in form.password2.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <button
+            type="button"
+            class="login-btn btn-next"
+            data-next-step="3"
+            aria-label="Devam Et"
+          >
+            Devam Et <span class="arrow">→</span>
+          </button>
+        </section>
+
+        <!-- Step 3 -->
+        <section class="form-step" data-step="3">
+          <label>
+            <span>Telefon Numarası</span>
+            <input
+              type="tel"
+              name="phone_number"
+              placeholder="+90 555 555 55 55"
+              value="{{ form.phone_number.value|default_if_none:'' }}"
+            />
+            {% if form.phone_number.errors %}
+            <div class="field-error">
+              {% for error in form.phone_number.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>Doğum Tarihi</span>
+            <input
+              type="date"
+              name="date_of_birth"
+              value="{{ form.date_of_birth.value|default_if_none:'' }}"
+            />
+            {% if form.date_of_birth.errors %}
+            <div class="field-error">
+              {% for error in form.date_of_birth.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>Dil</span>
+            <div class="custom-select-wrapper">
+              <select name="language" required>
+                {% for code, name in language_choices %}
+                  <option
+                    value="{{ code }}"
+                    {% if form.language.value == code %}selected{% endif %}
+                  >
+                    {{ name }}
+                  </option>
+                {% endfor %}
+              </select>
+              <div class="custom-select">
+                <div class="custom-select-trigger" tabindex="0">
+                  {% for code, name in language_choices %}
+                    {% if form.language.value == code %}
+                      {{ name }}
+                    {% endif %}
+                  {% endfor %}
+                  {% if not form.language.value %}
+                    Dil Seçin
+                  {% endif %}
+                </div>
+                <div class="custom-options">
+                  {% for code, name in language_choices %}
+                    <span class="custom-option" data-value="{{ code }}">{{ name }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% if form.language.errors %}
+            <div class="field-error">
+              {% for error in form.language.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <label>
+            <span>Profil Fotoğrafı</span>
+            <input
+              type="file"
+              name="profile_picture"
+              accept="image/*"
+            />
+            {% if form.profile_picture.errors %}
+            <div class="field-error">
+              {% for error in form.profile_picture.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </label>
+
+          <button
+            type="submit"
+            class="login-btn btn-submit"
+            aria-label="Kayıt Ol"
+          >
+            Kayıt Ol
+          </button>
+        </section>
+      </form>
+    </div>
+  </body>
+</html>

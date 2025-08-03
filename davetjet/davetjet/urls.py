@@ -12,6 +12,7 @@ urlpatterns = [
     path('projects/', include('projects.urls', namespace='projects')),
     path('recipients/', include('recipients.urls', namespace='recipients')),
     path('invitations/', include('invitations.urls', namespace='invitations')),
+    path('users/', include('users.urls', namespace='users')),
     path('', include('core.urls', namespace='core')),
     # Token 
     

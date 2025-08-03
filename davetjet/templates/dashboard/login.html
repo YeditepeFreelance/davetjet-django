@@ -1,0 +1,79 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giriş Yap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <script src="{% static 'scripts/app.js' %}" type="module" defer></script>
+  </head>
+
+  <body class="login-page dark">
+    <div class="custom-cursor"></div>
+
+    <div class="blur-circle top-left"></div>
+    <div class="blur-circle bottom-right"></div>
+
+    <div class="login-wrapper">
+      <div class="login-header">
+        <img src="{% static 'images/logo.webp' %}" alt="Logo" />
+        <h2>Giriş Yap</h2>
+        <p>Devam etmek için bilgilerinizi girin</p>
+      </div>
+
+      <form class="login-form" action="{% url 'core:login' %}" method="post">
+        {% csrf_token %} {% if form.non_field_errors %}
+        <div class="form-error">
+          {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <label>
+          <span>Kullanıcı Adı</span>
+          <input
+            type="text"
+            name="username"
+            placeholder="ornek_kullanici"
+            required
+          />
+          {% if form.username.errors %}
+          <div class="field-error">
+            {% for error in form.username.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </label>
+
+        <label>
+          <span>Şifre</span>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          />
+          {% if form.password.errors %}
+          <div class="field-error">
+            {% for error in form.password.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </label>
+
+        <button type="submit" class="login-btn">Giriş</button>
+      </form>
+    </div>
+  </body>
+</html>

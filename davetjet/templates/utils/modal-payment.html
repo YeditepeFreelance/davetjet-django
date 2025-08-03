@@ -1,0 +1,55 @@
+<!-- Payment Modal -->
+<div class="payment-modal hidden" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle" aria-describedby="paymentModalDesc">
+  <div class="modal-content" role="document">
+    <h3 id="paymentModalTitle">PayTR Payment</h3>
+    <div class="payment-modal-inner">
+      <form class="payment-form" novalidate>
+        <div class="form-group">
+          <label for="cardholderName" class="sr-only">Cardholder Name</label>
+          <input type="text" id="cardholderName" name="cardholderName" placeholder="Cardholder Name" required autocomplete="cc-name" />
+          <span class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="cardNumber" class="sr-only">Card Number</label>
+          <input type="text" id="cardNumber" name="cardNumber" placeholder="Card Number" maxlength="19" required autocomplete="cc-number" inputmode="numeric" />
+          <span class="error-message"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group small-group">
+            <label for="expiryDate" class="sr-only">Expiry Date</label>
+            <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5" required autocomplete="cc-exp" inputmode="numeric" />
+            <span class="error-message"></span>
+          </div>
+
+          <div class="form-group small-group">
+            <label for="cvv" class="sr-only">CVC</label>
+            <input type="password" id="cvv" name="cvv" placeholder="CVC" maxlength="4" required autocomplete="cc-csc" inputmode="numeric" />
+            <span class="error-message"></span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn pay-btn">Pay</button>
+      </form>
+
+      <div class="virtual-card" aria-hidden="true" aria-label="Credit Card Preview">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="card-chip"></div>
+            <div class="card-number" id="cardNumberDisplay">#### #### #### ####</div>
+            <div class="card-name" id="cardNameDisplay">CARDHOLDER NAME</div>
+            <div class="card-expiry-label">Expires</div>
+            <div class="card-expiry" id="cardExpiryDisplay">MM/YY</div>
+          </div>
+          <div class="card-back">
+            <div class="card-stripe"></div>
+            <div class="card-cvv-label">CVC</div>
+            <div class="card-cvv" id="cardCvvDisplay">***</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="close-modal" aria-label="Close payment modal" onclick="toggleModal(false)">×</button>
+  </div>
+</div>

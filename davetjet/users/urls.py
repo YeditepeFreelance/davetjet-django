@@ -1,13 +1,12 @@
 from django.urls import path
-from .views import UserListView, UserDetailView, ProfileDetailView, UserCreateView, UserDeleteView, UserUpdateView
+from .views import CustomLoginView
+from . import views
+
+app_name = 'users'
 
 urlpatterns = [
-    path('', UserListView.as_view(), name='user-list'),
-    path('<int:pk>/', UserDetailView.as_view(), name='user-detail'),
-    path('profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
-        path('create/', UserCreateView.as_view(), name='user-create'),
-    path('delete/<int:pk>/', UserDeleteView.as_view(), name='user-delete'),
-        path('update/<int:pk>/', UserUpdateView.as_view(), name='user-update'),
-
-
+    path('ajax/check-username/', views.check_username, name='check_username'),
+    path('ajax/check-email/', views.check_email, name='check_email'),
+    path('ajax/check-password/', views.check_password, name='check_password'),
+    # path('login/', CustomLoginView.as_view(), name='login'),
 ]

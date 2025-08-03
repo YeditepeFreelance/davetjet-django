@@ -1,0 +1,73 @@
+<!-- dashboard/settings.html -->
+{% extends './dashboard-base.html' %} {% load static %} {% block content %}
+<div class="settings-wrapper scrollable">
+  <h2 class="section-title">Ayarlar</h2>
+
+  <form method="post" enctype="multipart/form-data" class="settings-form">
+    {% csrf_token %}
+
+    <div class="form-card">
+      <h3 class="form-title">Kullanıcı Bilgileri</h3>
+      <div class="input-group">
+        {{ user_form.email.label_tag }}{{ user_form.email }}
+      </div>
+      <div class="input-group">
+        {{ user_form.phone_number.label_tag }}{{ user_form.phone_number }}
+      </div>
+      <div class="input-group">
+        {{ user_form.timezone.label_tag }}{{ user_form.timezone }}
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3 class="form-title">Profil Bilgileri</h3>
+      <div class="input-group image-upload">
+        <label for="id_profile_picture">
+          {% if request.user.profile.profile_picture %}
+          <img
+            src="{{ request.user.profile.profile_picture.url }}"
+            class="avatar-preview"
+          />
+          {% else %}
+          <img
+            src="{% static 'images/default-avatar.png' %}"
+            class="avatar-preview"
+          />
+          {% endif %}
+        </label>
+        {{ profile_form.profile_picture }}
+      </div>
+
+      <div class="input-group">
+        {{ profile_form.full_name.label_tag }}{{ profile_form.full_name }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.company_name.label_tag }}{{ profile_form.company_name }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.bio.label_tag }}{{ profile_form.bio }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.language.label_tag }}{{ profile_form.language }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.location.label_tag }}{{ profile_form.location }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.social_links.label_tag }}{{ profile_form.social_links }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.date_of_birth.label_tag }}{{ profile_form.date_of_birth
+        }}
+      </div>
+      <div class="input-group">
+        {{ profile_form.website.label_tag }}{{ profile_form.website }}
+      </div>
+    </div>
+
+    <div class="button-wrapper">
+      <button type="submit" class="save-btn">Kaydet</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

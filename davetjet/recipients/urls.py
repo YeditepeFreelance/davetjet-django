@@ -1,10 +1,13 @@
 from django.urls import path
-from .views import RecipientTestView, CreateRecipientView, AddFromFileView
+from .views import CreateRecipientView, ExportRecipientsView, ImportRecipientsView, EditRecipientView, DeleteRecipientView
 
 app_name = 'recipients'
 
 urlpatterns = [
-  path('test', RecipientTestView.as_view(), name='test'),
   path('add-new', CreateRecipientView.as_view(), name='add_new'),
-  path('add-from-file', AddFromFileView.as_view(), name='add_from_file'),
+
+  path('export-csv', ExportRecipientsView.as_view(), name='export-csv'),
+  path('import-csv', ImportRecipientsView.as_view(), name='import-csv'),
+  path('edit', EditRecipientView.as_view(), name='edit'),
+  path('delete/<int:pk>/', DeleteRecipientView.as_view(), name='delete')
 ]

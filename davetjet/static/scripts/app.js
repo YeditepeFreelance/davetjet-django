@@ -4,11 +4,30 @@ class App {
     this.targetDate = new Date(targetDate);
     this.interval = null;
 
+    // Form elements
+    this.form = document.querySelector("form");
+    this.steps = document.querySelectorAll(".form-step");
+    this.nextButtons = document.querySelectorAll(".btn-next");
+    this.csrfToken = document.querySelector(
+      "[name=csrfmiddlewaretoken]"
+    )?.value;
+
+    this.usernameInput = document.querySelector('input[name="username"]');
+    this.emailInput = document.querySelector('input[name="email"]');
+    this.pass1Input = document.querySelector('input[name="password1"]');
+    this.pass2Input = document.querySelector('input[name="password2"]');
+
+    this.currentStep = 0;
+
+    // Initialize features
     this.setupCursor();
     this.createContextMenu();
     this.initContextMenu();
+    this.initCustomSelects();
+    this.initRegisterForm(); // register.js logic
   }
 
+  // ----------- COUNTDOWN -----------
   getTimeRemaining() {
     const now = new Date();
     const diff = this.targetDate - now;
@@ -66,7 +85,7 @@ class App {
     this.interval = setInterval(() => this.update(), 1000);
   }
 
-  // --- CURSOR ---
+  // ----------- CURSOR -----------
   setupCursor() {
     const cursor = document.querySelector(".custom-cursor");
     let mouseX = 0,
@@ -75,13 +94,11 @@ class App {
       currentY = 0;
     const speed = 0.15; // lower is smoother, slower
 
-    // Track real mouse position
     window.addEventListener("mousemove", (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
     });
 
-    // Animate trailing motion
     const animate = () => {
       currentX += (mouseX - currentX) * speed;
       currentY += (mouseY - currentY) * speed;
@@ -90,7 +107,6 @@ class App {
     };
     animate();
 
-    // Handle hover states
     const hoverables = document.querySelectorAll("button, a, .hover-target");
     hoverables.forEach((el) => {
       el.addEventListener("mouseenter", () => cursor.classList.add("hovered"));
@@ -100,7 +116,7 @@ class App {
     });
   }
 
-  // --- RIGHT CLICK ---
+  // ----------- CONTEXT MENU -----------
   createContextMenu() {
     const menu = document.createElement("div");
     menu.className = "custom-context-menu";
@@ -118,19 +134,16 @@ class App {
   initContextMenu() {
     const menu = this.contextMenu;
 
-    // Show menu on right-click
     window.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       this.showContextMenu(e.clientX, e.clientY);
     });
 
-    // Hide on click outside or ESC
     window.addEventListener("click", () => this.hideContextMenu());
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") this.hideContextMenu();
     });
 
-    // Add functionality
     menu.querySelectorAll("a[data-action]").forEach((item) => {
       item.addEventListener("click", (e) => {
         e.preventDefault();
@@ -142,8 +155,6 @@ class App {
 
   showContextMenu(x, y) {
     const menu = this.contextMenu;
-
-    // Position menu
     menu.style.display = "block";
     const { innerWidth, innerHeight } = window;
     const rect = menu.getBoundingClientRect();
@@ -152,9 +163,7 @@ class App {
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
 
-    // Detect background section by element at point
     const elementAtPoint = document.elementFromPoint(x, y);
-    // Check if element or any parent has "dark" or "darktt" class
     let isDark = false;
     let el = elementAtPoint;
     while (el) {
@@ -170,9 +179,10 @@ class App {
 
     if (isDark) {
       menu.classList.add("darkt");
+      menu.classList.remove("lightt");
     } else {
       menu.classList.add("lightt");
-      console.log(menu, menu.classList);
+      menu.classList.remove("darkt");
     }
   }
 
@@ -195,8 +205,360 @@ class App {
         console.warn("Unknown action:", action);
     }
   }
+
+  // ----------- CUSTOM SELECT DROPDOWN -----------
+  initCustomSelects() {
+    const wrappers = document.querySelectorAll(".custom-select-wrapper");
+
+    wrappers.forEach((wrapper) => {
+      const select = wrapper.querySelector("select");
+      const trigger = wrapper.querySelector(".custom-select-trigger");
+      const optionsContainer = wrapper.querySelector(".custom-options");
+      const options = optionsContainer.querySelectorAll(".custom-option");
+
+      trigger.addEventListener("click", () => {
+        const isOpen = optionsContainer.classList.contains("open");
+        this.closeAllCustomSelects();
+        if (!isOpen) {
+          optionsContainer.classList.add("open");
+          trigger.setAttribute("aria-expanded", "true");
+          options[0]?.focus();
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!wrapper.contains(e.target)) {
+          optionsContainer.classList.remove("open");
+          trigger.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      options.forEach((option) => {
+        option.addEventListener("click", () => {
+          this.selectOption(option, trigger, select, optionsContainer);
+        });
+
+        option.addEventListener("keydown", (e) => {
+          switch (e.key) {
+            case "Enter":
+            case " ":
+              e.preventDefault();
+              this.selectOption(option, trigger, select, optionsContainer);
+              break;
+            case "ArrowDown":
+              e.preventDefault();
+              option.nextElementSibling?.focus();
+              break;
+            case "ArrowUp":
+              e.preventDefault();
+              if (option.previousElementSibling)
+                option.previousElementSibling.focus();
+              else trigger.focus();
+              break;
+            case "Escape":
+              optionsContainer.classList.remove("open");
+              trigger.setAttribute("aria-expanded", "false");
+              trigger.focus();
+              break;
+          }
+        });
+      });
+
+      const initialValue = select.value || select.options[0]?.value;
+      const initialOption = Array.from(options).find(
+        (opt) => opt.dataset.value === initialValue
+      );
+      if (initialOption) {
+        trigger.textContent = initialOption.textContent;
+        initialOption.classList.add("selected");
+        select.value = initialValue;
+      }
+    });
+  }
+
+  selectOption(option, trigger, select, optionsContainer) {
+    trigger.textContent = option.textContent;
+
+    option.parentElement
+      .querySelectorAll(".custom-option")
+      .forEach((opt) => opt.classList.remove("selected"));
+
+    option.classList.add("selected");
+    select.value = option.dataset.value;
+    optionsContainer.classList.remove("open");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.focus();
+
+    select.dispatchEvent(new Event("change"));
+  }
+
+  closeAllCustomSelects() {
+    document
+      .querySelectorAll(".custom-options.open")
+      .forEach((openDropdown) => {
+        openDropdown.classList.remove("open");
+        openDropdown.parentElement
+          .querySelector(".custom-select-trigger")
+          .setAttribute("aria-expanded", "false");
+      });
+  }
+
+  // ----------- REGISTER FORM LOGIC -----------
+  initRegisterForm() {
+    this.showStep(this.currentStep);
+
+    this.nextButtons.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const targetStep = parseInt(btn.dataset.nextStep);
+
+        if (this.currentStep === 1) {
+          const valid = await this.validateStep1();
+          if (!valid) return;
+        }
+
+        this.currentStep = targetStep - 1;
+        this.showStep(this.currentStep);
+      });
+    });
+
+    // Real-time checks
+    this.usernameInput.addEventListener("blur", () => {
+      console.log("Username input blurred");
+      if (document.querySelector("body.register")) {
+        console.log("Checking username on blur");
+        this.checkUsername();
+      }
+    });
+    this.emailInput.addEventListener("blur", () => {
+      if (document.querySelector("body.register")) {
+        this.checkEmail();
+      }
+    });
+    this.pass1Input.addEventListener("blur", () => {
+      if (document.querySelector("body.register")) {
+        this.checkPassword1();
+      }
+    });
+    this.pass2Input.addEventListener("blur", () => {
+      if (document.querySelector("body.register")) {
+        this.checkPassword2();
+      }
+    });
+
+    // Remove empty error divs on load
+    document.querySelectorAll(".field-error").forEach((el) => {
+      if (!el.textContent.trim()) {
+        el.remove();
+      }
+    });
+  }
+
+  showStep(index) {
+    this.steps.forEach((step, i) => {
+      step.classList.toggle("active", i === index);
+    });
+  }
+
+  showError(input, message) {
+    let errorDiv = input.parentNode.querySelector(".field-error");
+
+    if (!errorDiv && message) {
+      errorDiv = document.createElement("div");
+      errorDiv.className = "field-error";
+      input.parentNode.appendChild(errorDiv);
+    }
+
+    if (errorDiv) {
+      if (message) {
+        errorDiv.innerHTML = `<p>${message}</p>`;
+        input.classList.add("error");
+      } else {
+        errorDiv.remove();
+        input.classList.remove("error");
+      }
+    }
+  }
+
+  clearErrors(inputs) {
+    inputs.forEach((input) => {
+      this.showError(input, "");
+      input.setCustomValidity("");
+    });
+  }
+
+  async checkUsername() {
+    const username = this.usernameInput.value.trim();
+
+    if (!username) {
+      this.showError(this.usernameInput, "Bu alan boş bırakılamaz.");
+      this.usernameInput.setCustomValidity("Bu alan boş bırakılamaz.");
+      return;
+    }
+
+    try {
+      console.log("Checking username:", username);
+      const res = await fetch(
+        `/users/ajax/check-username/?username=${encodeURIComponent(username)}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.is_taken) {
+        this.showError(this.usernameInput, "Bu kullanıcı adı zaten alınmış.");
+        this.usernameInput.setCustomValidity("Bu kullanıcı adı zaten alınmış.");
+      } else {
+        this.showError(this.usernameInput, "");
+        this.usernameInput.setCustomValidity("");
+      }
+    } catch {
+      this.showError(this.usernameInput, "");
+      this.usernameInput.setCustomValidity("");
+    }
+  }
+
+  async checkEmail() {
+    const email = this.emailInput.value.trim();
+
+    if (!email) {
+      this.showError(this.emailInput, "Bu alan boş bırakılamaz.");
+      this.emailInput.setCustomValidity("Bu alan boş bırakılamaz.");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/users/ajax/check-email/?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.is_taken) {
+        this.showError(this.emailInput, "Bu email zaten kullanımda.");
+        this.emailInput.setCustomValidity("Bu email zaten kullanımda.");
+      } else {
+        this.showError(this.emailInput, "");
+        this.emailInput.setCustomValidity("");
+      }
+    } catch {
+      this.showError(this.emailInput, "");
+      this.emailInput.setCustomValidity("");
+    }
+  }
+
+  async checkPassword1() {
+    const password = this.pass1Input.value;
+
+    if (!password) {
+      this.showError(this.pass1Input, "");
+      this.pass1Input.setCustomValidity("");
+      return;
+    }
+
+    try {
+      const res = await fetch("/users/ajax/check-password/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": this.csrfToken,
+        },
+        body: JSON.stringify({
+          password: this.pass1Input.value,
+          username: this.usernameInput.value.trim(),
+        }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+
+      if (!data.valid) {
+        const message = data.errors.join(" ");
+        this.showError(this.pass1Input, message);
+        this.pass1Input.setCustomValidity(message);
+      } else {
+        this.showError(this.pass1Input, "");
+        this.pass1Input.setCustomValidity("");
+      }
+    } catch (error) {
+      console.error("Password validation error:", error);
+      this.showError(this.pass1Input, "");
+      this.pass1Input.setCustomValidity("");
+    }
+  }
+
+  checkPassword2() {
+    if (
+      this.pass1Input.value &&
+      this.pass2Input.value &&
+      this.pass1Input.value !== this.pass2Input.value
+    ) {
+      this.showError(this.pass2Input, "Şifreler eşleşmiyor.");
+      this.pass2Input.setCustomValidity("Şifreler eşleşmiyor.");
+    } else {
+      this.showError(this.pass2Input, "");
+      this.pass2Input.setCustomValidity("");
+    }
+  }
+
+  async validateStep1() {
+    let hasError = false;
+
+    const username = this.usernameInput.value.trim();
+    const email = this.emailInput.value.trim();
+    const pass1 = this.pass1Input.value;
+    const pass2 = this.pass2Input.value;
+
+    this.clearErrors([
+      this.usernameInput,
+      this.emailInput,
+      this.pass1Input,
+      this.pass2Input,
+    ]);
+
+    if (!username) {
+      this.showError(this.usernameInput, "Bu alan boş bırakılamaz.");
+      this.usernameInput.setCustomValidity("Bu alan boş bırakılamaz.");
+      hasError = true;
+    }
+
+    if (!email) {
+      this.showError(this.emailInput, "Bu alan boş bırakılamaz.");
+      this.emailInput.setCustomValidity("Bu alan boş bırakılamaz.");
+      hasError = true;
+    }
+
+    if (!pass1) {
+      this.showError(this.pass1Input, "Bu alan boş bırakılamaz.");
+      this.pass1Input.setCustomValidity("Bu alan boş bırakılamaz.");
+      hasError = true;
+    }
+
+    if (!pass2) {
+      this.showError(this.pass2Input, "Bu alan boş bırakılamaz.");
+      this.pass2Input.setCustomValidity("Bu alan boş bırakılamaz.");
+      hasError = true;
+    }
+
+    if (pass1 && pass2 && pass1 !== pass2) {
+      this.showError(this.pass2Input, "Şifreler eşleşmiyor.");
+      this.pass2Input.setCustomValidity("Şifreler eşleşmiyor.");
+      hasError = true;
+    }
+
+    return !hasError;
+  }
 }
 
+// Logo span animation
 document.querySelectorAll(".logo span").forEach((el, idx) => {
   el.style.setProperty("--i", idx);
 });

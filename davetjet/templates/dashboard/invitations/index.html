@@ -1,0 +1,43 @@
+{% extends '../dashboard-base.html' %} {% load static %} {% block content %}
+<section class="overview scrollable">
+  <div class="overview-top">
+    <div>
+      <h1>Davetiyeler ({{ projects|length }} adet listelendi)</h1>
+      <p>
+        Bu ekrandan davetiyellerinize göz atabilir ve yenilerini
+        oluşturabilirsiniz.
+      </p>
+    </div>
+    <a href="#" class="btn btn--create">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom-widgets">
+    {% for project in projects %}
+    {% for invitation in project.invitations.all %}
+    <a href="{% url 'core:edit-invitation' invitation.id %}">
+      <div class="card invite-preview">
+        <h3>{{ invitation.name }} ({{ project.name }})</h3>
+        <div class="content">
+          <img
+            src="{% static 'images/invitation-sample.png' %}"
+            alt="Davetiye"
+          />
+          <div class="actions">
+            <a>PDF Dışa Aktar</a>
+            <a>Gönderime Geç</a>
+            <a>Düzenle</a>
+            <p>Toplam: {{ project.recipients.count }}</p>
+            <p>Oluşturulma Tarihi: {{ invitation.created_at }}</p>
+            <p>Son Güncelleme: {{ invitation.updated_at }}</p>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

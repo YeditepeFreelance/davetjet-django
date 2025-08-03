@@ -1,0 +1,325 @@
+@use '../abstracts/variables' as vars;
+
+.my-package-page {
+  padding: 3rem;
+  color: #333;
+  font-family: 'Inter', sans-serif;
+
+  .package-overview {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(14px);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 2.5rem;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+
+      .package-name {
+        font-weight: 600;
+        font-size: 2rem;
+        color: map-get(vars.$colors, 'primary-dark');
+      }
+
+      .btn-upgrade {
+        background: map-get(vars.$colors, 'primary');
+        color: #fff;
+        padding: 0.75rem 1.8rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(map-get(vars.$colors, 'primary'), 0.35);
+        border: none;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+
+        &:hover {
+          background: map-get(vars.$colors, 'primary-dark');
+          box-shadow: 0 8px 20px rgba(map-get(vars.$colors, 'primary-dark'), 0.45);
+        }
+      }
+    }
+
+    .details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+
+      .detail-item {
+        flex: 1 1 240px;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 500;
+        font-size: 1.1rem;
+        color: map-get(vars.$colors, 'primary-dark');
+
+        .label {
+          opacity: 0.7;
+        }
+
+        .value {
+          font-weight: 600;
+
+          &.status-active {
+            color: map-get(vars.$colors, 'primary');
+          }
+
+          &.status-expired {
+            color: #b33a3a;
+          }
+        }
+      }
+    }
+  }
+
+  .usage-stats {
+    margin-top: 3rem;
+
+    h3 {
+      font-weight: 600;
+      font-size: 1.6rem;
+      color: map-get(vars.$colors, 'primary-dark');
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.2rem;
+
+      .label {
+        flex: 0 0 180px;
+        font-weight: 600;
+        color: map-get(vars.$colors, 'primary-dark');
+      }
+
+      progress {
+        flex: 1 1 auto;
+        height: 14px;
+        border-radius: 8px;
+        appearance: none;
+        background-color: rgba(map-get(vars.$colors, 'primary-aqua'), 0.15);
+        overflow: hidden;
+
+        &::-webkit-progress-bar {
+          background-color: rgba(map-get(vars.$colors, 'primary-aqua'), 0.15);
+          border-radius: 8px;
+        }
+
+        &::-webkit-progress-value {
+          background-color: map-get(vars.$colors, 'primary');
+          border-radius: 8px;
+          transition: width 0.4s ease;
+        }
+
+        &::-moz-progress-bar {
+          background-color: map-get(vars.$colors, 'primary');
+          border-radius: 8px;
+          transition: width 0.4s ease;
+        }
+      }
+
+      .numbers {
+        flex: 0 0 90px;
+        font-weight: 600;
+        color: map-get(vars.$colors, 'primary-dark');
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+    }
+  }
+
+  .invoices-promo {
+    margin-top: 3rem;
+
+    h3 {
+      font-weight: 600;
+      font-size: 1.6rem;
+      color: map-get(vars.$colors, 'primary-dark');
+      margin-bottom: 1.5rem;
+    }
+
+    .invoice-list {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 2rem;
+
+      .invoice-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(14px);
+        border-radius: 1.2rem;
+        padding: 0.8rem 1.2rem;
+        margin-bottom: 0.8rem;
+        font-weight: 500;
+        color: map-get(vars.$colors, 'primary-dark');
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+        transition: box-shadow 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .date,
+        .amount {
+          flex: 1 1 110px;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .status {
+          flex: 0 0 90px;
+          font-weight: 600;
+          text-align: center;
+          border-radius: 0.6rem;
+          padding: 0.35rem 0.8rem;
+          font-size: 0.95rem;
+
+          &.status-paid {
+            background-color: rgba(0, 200, 80, 0.15);
+            color: #00c850;
+          }
+
+          &.status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+          }
+        }
+
+        .download-link {
+          color: map-get(vars.$colors, 'primary');
+          font-weight: 600;
+          text-decoration: none;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: map-get(vars.$colors, 'primary-dark');
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .promo-form {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      input[type='text'] {
+        flex: 1 1 auto;
+        padding: 0.75rem 1.2rem;
+        border-radius: 0.75rem;
+        border: 1.5px solid rgba(map-get(vars.$colors, 'primary-aqua'), 0.4);
+        background: rgba(255, 255, 255, 0.7);
+        font-size: 1.1rem;
+        color: map-get(vars.$colors, 'primary-dark');
+        transition: border-color 0.3s ease;
+
+        &::placeholder {
+          color: rgba(map-get(vars.$colors, 'primary-dark'), 0.45);
+          font-weight: 400;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: map-get(vars.$colors, 'primary');
+          box-shadow: 0 0 8px rgba(map-get(vars.$colors, 'primary'), 0.3);
+          background: #fff;
+        }
+      }
+
+      button.btn-secondary {
+        padding: 0.7rem 1.6rem;
+        background: map-get(vars.$colors, 'primary-aqua');
+        border: none;
+        border-radius: 1rem;
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(map-get(vars.$colors, 'primary-aqua'), 0.3);
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+
+        &:hover {
+          background: map-get(vars.$colors, 'primary-dark');
+          box-shadow: 0 6px 14px rgba(map-get(vars.$colors, 'primary-dark'), 0.35);
+        }
+      }
+    }
+
+    .applied-promo-list {
+      list-style: none;
+      padding: 0;
+
+      li {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(14px);
+        border-radius: 1.2rem;
+        padding: 0.6rem 1.2rem;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        color: map-get(vars.$colors, 'primary-dark');
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        transition: box-shadow 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 720px) {
+    padding: 2rem 1.5rem;
+
+    .package-overview .details {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .usage-stats .stat-item {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .label,
+      .numbers {
+        flex: none;
+        margin-bottom: 0.3rem;
+        text-align: left;
+      }
+
+      progress {
+        width: 100%;
+      }
+    }
+
+    .invoices-promo {
+      .invoice-list .invoice-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+      }
+
+      .promo-form {
+        flex-direction: column;
+        gap: 0.8rem;
+
+        button.btn-secondary {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

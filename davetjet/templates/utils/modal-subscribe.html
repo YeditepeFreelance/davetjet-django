@@ -1,0 +1,158 @@
+{% load static %}
+<div id="fsSubscriptionModal" class="fs-subscription-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fsSubscriptionModalTitle" aria-describedby="fsSubscriptionModalDesc">
+  <div class="fs-subscription-modal-content" role="document" tabindex="-1">
+    <button class="fs-subscription-close-btn" aria-label="Close subscription modal" onclick="toggleFsSubscriptionModal(false)">×</button>
+
+
+    <header class="fs-subscription-modal-header">
+      <h1 id="fsSubscriptionModalTitle">Choose Your Plan & Unlock Premium Features</h1>
+      <p id="fsSubscriptionModalDesc">Flexible plans tailored for your needs. Secure payments and no hidden fees.</p>
+
+      <div class="fs-billing-toggle" role="group" aria-label="Toggle billing period">
+        <button class="fs-toggle-option active" data-plan="monthly" aria-pressed="true" type="button">Monthly</button>
+        <button class="fs-toggle-option" data-plan="yearly" aria-pressed="false" type="button">Yearly</button>
+      </div>
+    </header>
+
+    <section class="fs-subscription-modal-plans" role="region" aria-label="Subscription Plans">
+      <article class="fs-plan-card current" aria-label="Starter Plan - Free">
+        <div class="fs-badge">Current Plan</div>
+        <i class="fas fa-leaf fs-icon" aria-hidden="true"></i>
+        <h3>Starter</h3>
+        <p>Perfect for trying things out</p>
+        <div class="fs-price" data-monthly="Free" data-yearly="Free">Free</div>
+        <ul>
+          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> 10 Invitations</li>
+          <li><i class="fas fa-users" aria-hidden="true"></i> Max 50 Invitees</li>
+          <li><i class="fas fa-tools" aria-hidden="true"></i> Basic Features</li>
+        </ul>
+        <button disabled class="fs-btn current-btn" aria-disabled="true">You're on this plan</button>
+      </article>
+
+      <article class="fs-plan-card fs-plan-highlight" aria-label="Pro Plan - 99₺ Monthly, 999₺ Yearly">
+        <i class="fas fa-rocket fs-icon" aria-hidden="true"></i>
+        <h3>Pro</h3>
+        <p>Ideal for growing events</p>
+        <div class="fs-price" data-monthly="99₺" data-yearly="999₺">99₺</div>
+        <ul>
+          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> 100 Invitations</li>
+          <li><i class="fas fa-users" aria-hidden="true"></i> Max 500 Invitees</li>
+          <li><i class="fas fa-bolt" aria-hidden="true"></i> Premium Features</li>
+        </ul>
+        <button class="fs-btn fs-choose-btn" data-plan="Pro" type="button">Subscribe</button>
+      </article>
+
+      <article class="fs-plan-card" aria-label="Elite Plan - 199₺ Monthly, 1999₺ Yearly">
+        <i class="fas fa-gem fs-icon" aria-hidden="true"></i>
+        <h3>Elite</h3>
+        <p>For large-scale experiences</p>
+        <div class="fs-price" data-monthly="199₺" data-yearly="1999₺">199₺</div>
+        <ul>
+          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Unlimited Invitations</li>
+          <li><i class="fas fa-users" aria-hidden="true"></i> Max 5000 Invitees</li>
+          <li><i class="fas fa-crown" aria-hidden="true"></i> All Features</li>
+        </ul>
+        <button class="fs-btn fs-choose-btn" data-plan="Elite" type="button">Subscribe</button>
+      </article>
+    </section>
+    
+    <!-- Payment modal inside subscription modal (initially hidden) -->
+    <!-- Inside your full-page subscription modal, after the plans container -->
+
+    <!-- Fullscreen Payment Modal inside Subscription Modal -->
+    <div class="fs-payment-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fsPaymentModalTitle" aria-describedby="fsPaymentModalDesc">
+      <div class="fs-payment-modal-content" role="document">
+        <h3 id="fsPaymentModalTitle" class="fs-payment-header">PayTR Payment</h3>
+        <p id="fsPaymentModalDesc" class="fs-payment-subheader">Complete your purchase securely.</p>
+
+        <div class="fs-payment-modal-inner">
+          <form class="fs-payment-form" novalidate>
+            <div class="fs-form-group">
+              <label for="fsCardholderName" class="fs-sr-only">Cardholder Name</label>
+              <input
+                type="text"
+                id="fsCardholderName"
+                name="cardholderName"
+                placeholder="Cardholder Name"
+                autocomplete="cc-name"
+                required
+                maxlength="30"
+              />
+              <span class="fs-error-message" aria-live="polite"></span>
+            </div>
+
+            <div class="fs-form-group">
+              <label for="fsCardNumber" class="fs-sr-only">Card Number</label>
+              <input
+                type="text"
+                id="fsCardNumber"
+                name="cardNumber"
+                placeholder="Card Number"
+                maxlength="19"
+                autocomplete="cc-number"
+                inputmode="numeric"
+                required
+              />
+              <span class="fs-error-message" aria-live="polite"></span>
+            </div>
+
+            <div class="fs-form-row">
+              <div class="fs-form-group fs-small-group">
+                <label for="fsExpiryDate" class="fs-sr-only">Expiry Date</label>
+                <input
+                  type="text"
+                  id="fsExpiryDate"
+                  name="expiryDate"
+                  placeholder="MM/YY"
+                  maxlength="5"
+                  autocomplete="cc-exp"
+                  inputmode="numeric"
+                  required
+                />
+                <span class="fs-error-message" aria-live="polite"></span>
+              </div>
+
+              <div class="fs-form-group fs-small-group">
+                <label for="fsCvv" class="fs-sr-only">CVC</label>
+                <input
+                  type="password"
+                  id="fsCvv"
+                  name="cvv"
+                  placeholder="CVC"
+                  maxlength="4"
+                  autocomplete="cc-csc"
+                  inputmode="numeric"
+                  required
+                />
+                <span class="fs-error-message" aria-live="polite"></span>
+              </div>
+            </div>
+
+            <button type="submit" class="fs-btn fs-pay-btn" aria-label="Submit payment">Pay</button>
+          </form>
+
+          <div class="fs-virtual-card" aria-hidden="true" aria-label="Credit Card Preview">
+            <div class="fs-card-inner">
+              <div class="fs-card-front">
+                <div class="fs-card-chip"></div>
+                <div class="fs-card-number" id="fsCardNumberDisplay">#### #### #### ####</div>
+                <div class="fs-card-name" id="fsCardNameDisplay">CARDHOLDER NAME</div>
+                <div class="fs-card-expiry-label">Expires</div>
+                <div class="fs-card-expiry" id="fsCardExpiryDisplay">MM/YY</div>
+              </div>
+              <div class="fs-card-back">
+                <div class="fs-card-stripe"></div>
+                <div class="fs-card-cvv-label">CVC</div>
+                <div class="fs-card-cvv" id="fsCardCvvDisplay">***</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="fs-payment-close-btn" aria-label="Close payment modal">×</button>
+      </div>
+    </div>
+
+
+  </div>
+</div>

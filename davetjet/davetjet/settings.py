@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-h8q1-%@o34)^3ctx1lvio$+r*6bgnrtkj9k4&r!6f*v76611z(
 DEBUG = True
 
 ALLOWED_HOSTS = ['davetjet-webapp.onrender.com', 'davetjet.com', 'www.davetjet.com', 'localhost', '127.0.0.1']
+FILE_CHARSET = 'utf-8'
+DEFAULT_CHARSET = 'utf-8'
 
 
 # Application definition
@@ -149,3 +151,12 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP server
+EMAIL_PORT = 587  # Common port for TLS
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'syntramedia@gmail.com'  # Replace with your email address
+EMAIL_HOST_PASSWORD = 'xmzlgemnfjgwupuv'  # Replace with your email password

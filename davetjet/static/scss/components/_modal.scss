@@ -1,0 +1,100 @@
+// _popup.scss
+@use '../abstracts/variables';
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  &.is-active {
+    display: flex;
+
+    .modal {
+      animation: modalFadeIn 0.25s ease-out forwards;
+    }
+  }
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 480px;
+  padding: 2rem;
+  position: relative;
+  opacity: 0; // ensure hidden by default
+  transform: scale(0.95); // default scale{
+
+  input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid map-get(variables.$colors, gray-200);
+    border-radius: 6px;
+    font-size: 1.4rem;
+    margin-bottom: 1.2rem;
+  }
+
+  &__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  &__header,
+  &__footer {
+    margin-bottom: 1.5rem;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    color: #111;
+  }
+
+  &__body {
+    font-size: 1.4rem;
+    color: #333;
+  }
+
+  // 🎯 Modal Type Variants
+  &--confirm {
+    border-top: 4px solid map-get(variables.$colors, primary);
+  }
+
+  &--form {
+    border-left: 4px solid map-get(variables.$colors, primary);
+  }
+
+  &--info {
+    border-bottom: 4px solid map-get(variables.$colors, primary);
+  }
+}
+
+.modal__buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}

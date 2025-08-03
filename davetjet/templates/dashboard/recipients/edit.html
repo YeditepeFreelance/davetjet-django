@@ -1,0 +1,332 @@
+{% extends '../dashboard-base.html' %} {% load static %} {% block content %}
+<section class="overview scrollable">
+    <div class="overview-top">
+    <div>
+      <h1>Liste: {{ project.name }}</h1>
+      <p>
+        Bu ekrandan davetiye listenize göz atabilir ve düzenleyebilirsiniz.
+      </p>
+    </div>
+    <a href="#" class="btn btn--create" id="back-to-lists">
+      <i class="fa-solid fa-chevron-left"></i>
+    </a>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom-widgets">
+    <div class="card invite-preview">
+      <h3>Hızlı İşlemler</h3>
+      <div class="content">
+        <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
+        <div class="actions">
+          <a
+            data-target="{% url 'recipients:export-csv' %}?project_id={{ project.id }}"
+            class="export-csv"
+            >CSV Dışa Aktar</a
+          >
+          <a data-target="{% url 'recipients:import-csv' %}" class="import-csv"
+            >İçe Aktar</a
+          >
+          <a data-target="{% url 'recipients:add_new' %}" class="add-manually">Manuel Olarak Ekle</a>
+        </div>
+      </div>
+    </div>
+    <div class="card recipient-tracking">
+      <h3>Davetli Takibi</h3>
+      <div class="content">
+        <table>
+          <thead>
+            <tr>
+              <th>Ad</th>
+              <th>Email</th>
+              <th>Durum</th>
+              <th>Eklenme Tarihi</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for recipient in project.recipients.all %}
+            <tr data-id="recipient-{{ recipient.id }}">
+              <td>{{ recipient.name }}</td>
+              <td>{{ recipient.email }}</td>
+              <td>{{ recipient.status }}</td>
+              <td>{{ recipient.created_at|date:"Y-m-d H:i" }}</td>
+              <td class="actions">
+                <a href="#" class="edit-recipient">Düzenle</a>
+                <a class="delete-recipient">Sil</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">Henüz davetli eklenmemiş.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} 
+ 
+{% block extra_js %}
+<script>
+  const backToListsBtn = document.getElementById("back-to-lists");
+  backToListsBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    window.location.href = "{% url 'core:recipients' %}";
+  });
+
+  const popUpOverlay = document.getElementById("popup");
+
+  const addManuallyBtn = document.querySelector(".add-manually");
+  addManuallyBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    window.AppModal.open("form", {
+      title: "Davetli Ekle",
+      body: `
+        <form id="add-recipient-form" method="POST">
+          {% csrf_token %}
+          <label for="recipient-name">Ad:</label>
+          <input type="text" id="recipient-name" name="name" required />
+          <label for="recipient-email">Email:</label>
+          <input type="email" id="recipient-email" name="email" required />
+        </form>
+      `,
+      footer: `
+        <div class="modal__buttons">
+          <button class="btn btn--cancel modal-exit" onclick="window.AppModal.close()">İptal</button>
+          <button class="btn btn--success modal-exit" id="save-recipient">Kaydet</button>
+        </div>
+      `,
+    });
+
+    document.getElementById("save-recipient").addEventListener("click", function () {
+      const form = document.getElementById("add-recipient-form");
+      const formData = new FormData(form);
+      formData.append("project_id", "{{ project.id }}");
+
+      fetch("{% url 'recipients:add_new' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.text().then((text) => { throw new Error(text); });
+          }
+          return response.text();
+        })
+        .then((data) => {
+          window.AppModal.close();
+          location.reload(); // Refresh the page to show the new recipient
+        })
+        .catch((error) => {
+          alert("Davetli ekleme başarısız: " + error.message);
+        });
+    });
+  });
+
+  const deleteRecipientBtns = document.querySelectorAll(".delete-recipient");
+
+  deleteRecipientBtns.forEach((btn) => {
+  btn.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    const row = this.closest("tr");
+    const recipientId = row.getAttribute("data-id");
+    const recipientName = row.querySelector("td:first-child").textContent;
+
+    window.AppModal.open("confirm", {
+      title: "Davetli Sil",
+      body: `<p><strong>${recipientName}</strong> adlı davetliyi silmek istediğinize emin misiniz?</p>`,
+      footer: `
+        <div class="modal__buttons">
+          <button class="btn btn--cancel modal-exit" onclick="window.AppModal.close()">İptal</button>
+          <button class="btn btn--danger" id="confirm-delete" data-id="${recipientId}">Sil</button>
+        </div>
+      `,
+    });
+
+    // Defer binding the delete button click to after modal is inserted
+    setTimeout(() => {
+      const confirmBtn = document.getElementById("confirm-delete");
+      if (confirmBtn) {
+        confirmBtn.addEventListener("click", function () {
+          const idToDelete = this.getAttribute("data-id");
+
+          fetch("/recipients/delete/" + idToDelete.split('-')[1], {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            
+          })
+            .then((response) => {
+              if (!response.ok) {
+                return response.text().then((text) => {
+                  throw new Error(text);
+                });
+              }
+              return response.text();
+            })
+            .then(() => {
+              row.remove(); // Remove the row from UI
+              window.AppModal.close();
+            })
+            .catch((error) => {
+              alert("Silme işlemi başarısız: " + error.message);
+            });
+        });
+      }
+    }, 10);
+  });
+});
+
+
+  const editRecipientBtns = document.querySelectorAll(".edit-recipient");
+
+  editRecipientBtns.forEach((btn) => {
+    btn.addEventListener("click", function (event) {
+      event.preventDefault();
+      const row = this.closest("tr");
+      const recipientName = row.querySelector("td:first-child").textContent;
+      const recipientEmail = row.querySelector("td:nth-child(2)").textContent;
+
+      window.AppModal.open("form", {
+        title: "Davetli Düzenle",
+        body: `
+          <form id="edit-recipient-form" data-id="${row.dataset.id}" method="POST">
+          {% csrf_token %}
+          <label for="recipient-name">Ad:</label>
+            <input type="text" id="recipient-name" value="${recipientName}" required />
+            <label for="recipient-email">Email:</label>
+            <input type="email" id="recipient-email" value="${recipientEmail}" required />
+          </form>
+        `,
+        footer: `
+          <div class="modal__buttons">
+            <button class="btn btn--cancel modal-exit" id="modal-close" onclick="window.AppModal.close()">İptal</button>
+            <button class="btn btn--success modal-exit" data-id="${row.dataset.id}" id="save-changes">Kaydet</button>
+          </div>
+        `,
+      });
+
+   document.querySelectorAll("#save-changes").forEach(button => {
+  button.addEventListener("click", function () {
+    const recipientId = this.getAttribute("data-id");
+    const formRec = document.querySelector(`form[data-id="${recipientId}"]`);
+
+    if (!formRec) {
+      alert("Form bulunamadı.");
+      return;
+    }
+
+    const nameInput = formRec.querySelector("#recipient-name");
+    const emailInput = formRec.querySelector("#recipient-email");
+    const csrfTokenInput = formRec.querySelector('input[name="csrfmiddlewaretoken"]');
+
+    if (!nameInput || !emailInput || !csrfTokenInput) {
+      alert("Eksik form alanı.");
+      return;
+    }
+
+    if (nameInput.value.trim() === "" || emailInput.value.trim() === "") {
+      alert("Lütfen tüm alanları doldurun.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("recipient_id", recipientId.split("-")[1]);
+    formData.append("name", nameInput.value);
+    formData.append("email", emailInput.value);
+    formData.append("csrfmiddlewaretoken", csrfTokenInput.value);
+
+    fetch("{% url 'recipients:edit' %}", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => { throw new Error(text); });
+      }
+      return response.text();
+    })
+    .then(data => {
+      const row = document.querySelector(`tr[data-id="${recipientId}"]`);
+      console.log(row)
+      if (row) {
+        row.querySelector("td:first-child").textContent = nameInput.value;
+        row.querySelector("td:nth-child(2)").textContent = emailInput.value;
+      }
+      window.AppModal?.close?.();
+    })
+    .catch(error => {
+      console.log(error.message)
+      alert("Güncelleme başarısız: " + error.message);
+    });
+  });
+});
+
+    });
+  });
+
+  const exportCSVBtn = document.querySelector(".export-csv");
+
+  exportCSVBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    const url = exportCSVBtn.getAttribute("data-target");
+    let id = new URLSearchParams(url.split("?")[1]).get("project_id");
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `recipients_${id}_${new Date()
+          .toISOString()
+          .slice(0, 10)}.csv`;
+        link.click();
+      })
+      .catch((error) => console.error("CSV export failed:", error));
+  });
+
+  const importCSVBtn = document.querySelector(".import-csv");
+
+  importCSVBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    const url = importCSVBtn.getAttribute("data-target");
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".csv";
+    fileInput.onchange = function () {
+      const file = fileInput.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("project_id", "{{ project.id }}");
+
+        fetch(url, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("CSV dosyası başarıyla yüklendi.");
+              location.reload();
+            } else {
+              alert("Hata: " + data.error);
+            }
+          })
+          .catch((error) => console.error("CSV import failed:", error));
+      }
+    };
+    fileInput.click();
+  });
+</script>
+{% endblock %}

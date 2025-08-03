@@ -55,6 +55,10 @@
     <!-- Theme Color for Mobile Browsers -->
     <meta name="theme-color" content="#0ff" />
     <title>DavetJet</title>
+    <script
+      src="https://kit.fontawesome.com/83fb529190.js"
+      crossorigin="anonymous"
+    ></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -63,9 +67,12 @@
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <script src="{% static 'scripts/app.js' %}" type="module" defer></script>
+    <script src="{% static 'scripts/fsPayment.js' %}" defer></script>
   </head>
   <body>
     <div class="custom-cursor"></div>
+
+    {% include '../utils/modal-subscribe.html' %}
 
     <section class="hero-container" class="dark">
       <nav class="navbar">
@@ -95,8 +102,10 @@
           </ul>
         </div>
         <div class="auth-buttons">
-          <a href="#" class="signin btn">Sign In</a>
-          <a href="#" class="signup btn btn--secondary">Sign Up</a>
+          <a href="{% url 'core:login' %}" class="signin btn">Sign In</a>
+          <a href="{% url 'core:register' %}" class="signup btn btn--secondary"
+            >Sign Up</a
+          >
         </div>
 
         <div class="hamburger">
@@ -119,7 +128,7 @@
             your co-workers. Try DavetJet free for 7 days!
           </p>
           <div class="buttons">
-            <a href="#" class="btn btn--primary">Start Now!</a>
+            <a class="btn btn--primary fs-trigger-btn">Start Now!</a>
             <a href="#" class="btn btn--outlined">Learn More</a>
           </div>
         </div>
@@ -467,7 +476,7 @@
         </p>
 
         <div class="cta__buttons">
-          <button class="btn btn--primary">Try for free!</button>
+          <button class="btn btn--primary fs-trigger-btn">Try for free!</button>
           <button class="btn btn--secondary">View demo</button>
         </div>
 

@@ -1,0 +1,67 @@
+{% extends './dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- /templates/subscription.html -->
+<div class="subscription-container">
+  <header class="subscription-header">
+    <h1>Choose Your Plan</h1>
+    <p>Upgrade your experience — switch between <strong>Monthly</strong> and <strong>Yearly</strong> plans.</p>
+    <div class="billing-toggle">
+      <span class="label">Billing:</span>
+      <div class="toggle-box">
+        <button class="toggle-option active" data-plan="monthly">Monthly</button>
+        <button class="toggle-option" data-plan="yearly">Yearly</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="plans">
+    <div class="plan-card current">
+      <div class="badge">Current Plan</div>
+      <i class="fas fa-leaf icon"></i>
+      <h2>Starter</h2>
+      <p>Perfect for trying things out</p>
+      <div class="price" data-monthly="Free" data-yearly="Free">Free</div>
+      <ul>
+        <li><i class="fas fa-envelope-open-text"></i> 10 Invitations</li>
+        <li><i class="fas fa-users"></i> Max 50 Invitees</li>
+        <li><i class="fas fa-tools"></i> Basic Features</li>
+      </ul>
+      <button disabled class="btn current-btn">You're on this plan</button>
+    </div>
+
+    <div class="plan-card plan-highlight">
+      <i class="fas fa-rocket icon"></i>
+      <h2>Pro</h2>
+      <p>Ideal for growing events</p>
+      <div class="price" data-monthly="99₺" data-yearly="999₺">99₺</div>
+      <ul>
+        <li><i class="fas fa-envelope-open-text"></i> 100 Invitations</li>
+        <li><i class="fas fa-users"></i> Max 500 Invitees</li>
+        <li><i class="fas fa-bolt"></i> Premium Features</li>
+      </ul>
+      <button class="btn choose-btn" data-plan="Pro">Choose Plan</button>
+    </div>
+
+    <div class="plan-card">
+      <i class="fas fa-gem icon"></i>
+      <h2>Elite</h2>
+      <p>For large-scale experiences</p>
+      <div class="price" data-monthly="199₺" data-yearly="1999₺">199₺</div>
+      <ul>
+        <li><i class="fas fa-envelope-open-text"></i> Unlimited Invitations</li>
+        <li><i class="fas fa-users"></i> Max 5000 Invitees</li>
+        <li><i class="fas fa-crown"></i> All Features</li>
+      </ul>
+      <button class="btn choose-btn" data-plan="Elite">Choose Plan</button>
+    </div>
+  </section>
+</div>
+
+{% include '../utils/modal-payment.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'scripts/payment.js' %}" defer></script>
+{% endblock %}
