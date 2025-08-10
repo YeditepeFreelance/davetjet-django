@@ -8,7 +8,7 @@
         oluşturabilirsiniz.
       </p>
     </div>
-    <a href="#" class="btn btn--create">
+    <a href="{% url 'core:create-invitation' %}" class="btn btn--create">
       <i class="fa-solid fa-plus"></i>
     </a>
   </div>
@@ -27,7 +27,7 @@
           />
           <div class="actions">
             <a>PDF Dışa Aktar</a>
-            <a>Gönderime Geç</a>
+            <a class="copy-link-btn" href="{{ invitation.secure_invite_link }}" data-url="{{ invitation.secure_invite_link }}">Bağlantıyı Kopyala (Şifresiz Giriş)</a>
             <a>Düzenle</a>
             <p>Toplam: {{ project.recipients.count }}</p>
             <p>Oluşturulma Tarihi: {{ invitation.created_at }}</p>
@@ -40,4 +40,24 @@
     {% endfor %}
   </div>
 </section>
+{% endblock %}
+
+{% block end_js %}
+<script>
+const copyLinkBtns = document.querySelectorAll('.copy-link-btn')
+
+copyLinkBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault()
+    const url = btn.getAttribute('data-url')
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Bağlantı kopyalandı!')
+    })
+    .catch(err => {
+      console.error('Bağlantı kopyalanamadı: ', err)
+      alert('Bağlantı kopyalanamadı. Lütfen manuel olarak kopyalayın.')
+    })
+  })
+})
+</script>
 {% endblock %}

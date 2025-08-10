@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimal Davetiye</title>
+    <style>
+      :root {
+        --primary: #4caf50;
+        --text-color: #222;
+        --muted: #777;
+        --font: "Helvetica Neue", sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font);
+        background-color: #fff;
+        color: var(--text-color);
+        padding: 5vh 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .invitation-minimal {
+        max-width: 560px;
+        width: 100%;
+        padding: 3rem 2.5rem;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+        line-height: 1.7;
+      }
+
+      .invitation-minimal h1 {
+        font-size: 2.4rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        margin-bottom: 1.2rem;
+      }
+
+      .invitation-minimal p {
+        font-size: 1.05rem;
+        margin-bottom: 1.2rem;
+        color: var(--text-color);
+      }
+
+      .event-info {
+        margin: 2rem 0;
+        font-size: 1rem;
+        color: var(--muted);
+      }
+
+      .event-info span {
+        display: block;
+        margin: 0.3rem 0;
+      }
+
+      .cta-button {
+        margin-top: 2rem;
+      }
+
+      .cta-button a {
+        text-decoration: none;
+        padding: 0.6rem 1.6rem;
+        background-color: var(--primary);
+        color: #fff;
+        font-weight: 500;
+        border-radius: 0.4rem;
+        transition: background 0.25s ease;
+      }
+
+      .cta-button a:hover {
+        background-color: #449c48;
+      }
+
+      .footer-line {
+        font-size: 0.9rem;
+        color: #aaa;
+        margin-top: 3rem;
+      }
+
+      [contenteditable]:hover {
+        outline: 1px dashed var(--primary);
+        cursor: text;
+      }
+
+      @media (max-width: 480px) {
+        .invitation-minimal {
+          padding: 2rem 1.5rem;
+        }
+
+        .invitation-minimal h1 {
+          font-size: 2rem;
+        }
+
+        .cta-button a {
+          display: inline-block;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invitation-minimal">
+      <h1 contenteditable="true" id="event-title">Ahmet & Ayşe</h1>
+      <p contenteditable="true" id="event-message">
+        Sade bir merasimde, hayatlarımızı birleştiriyoruz.
+      </p>
+
+      <div class="event-info">
+        <span contenteditable="true" id="event-date"
+          ><strong>Tarih:</strong> 12 Ağustos 2025</span
+        >
+        <span contenteditable="true" id="event-time"
+          ><strong>Saat:</strong> 19:30</span
+        >
+        <span contenteditable="true" id="event-location"
+          ><strong>Yer:</strong> Bahar Bahçesi, İstanbul</span
+        >
+      </div>
+
+      <div class="cta-button">
+        <a href="#" contenteditable="true">Katılım Bildir</a>
+      </div>
+
+      <div class="footer-line" contenteditable="true">
+        Davet davetjet.com ile hazırlandı.
+      </div>
+    </div>
+  </body>
+</html>

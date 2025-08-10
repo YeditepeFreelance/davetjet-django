@@ -9,7 +9,69 @@ from invitations.models import Invitation
 from projects.models import Project
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .utils import process_recipient_file
+from .serializers import RecipientNameSerializer, RSVPUpdateSerializer
+
+@api_view(['GET'])
+def recipient_autocomplete(request):
+    query = request.GET.get('q', '')
+    recipients = Recipient.objects.filter(name__icontains=query)[:5]
+    serializer = RecipientNameSerializer(recipients, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def rsvp_update(request):
+    name = request.data.get('name')
+    status_value = request.data.get('status')
+
+    try:
+        recipient = Recipient.objects.get(name=name)
+    except Recipient.DoesNotExist:
+        return Response({"error": "Kişi bulunamadı"}, status=status.HTTP_404_NOT_FOUND)
+
+    recipient.rsvp_status = status_value
+    recipient.save(update_fields=['rsvp_status'])
+    return Response({"message": "Katılım durumu güncellendi"})
+
+
+@api_view(['GET', 'POST'])
+def recipients_handler(request, invitation_slug=None):
+    """
+    GET  → /recipients/?q=...
+    POST → /recipients/ { name, status }
+    invitation_slug → davetiyeye ait kontrol
+    """
+    try:
+        invitation = Invitation.objects.get(slug=invitation_slug)
+    except Invitation.DoesNotExist:
+        return Response({"error": "Davet bulunamadı"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        # Autocomplete → sadece bu davetiyedeki kişiler
+        query = request.GET.get("q", "")
+        recipients = invitation.recipients.filter(name__icontains=query)[:5]
+        serializer = RecipientNameSerializer(recipients, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        name = request.data.get("name")
+        status_value = request.data.get("status")
+
+        try:
+            recipient = invitation.recipients.get(name=name)
+        except Recipient.DoesNotExist:
+            return Response({"error": "Bu davetiyeye ait böyle bir kişi yok."}, status=status.HTTP_404_NOT_FOUND)
+
+        if status_value not in ["yes", "no", "maybe"]:
+            return Response({"error": "Geçersiz katılım durumu"}, status=status.HTTP_400_BAD_REQUEST)
+
+        recipient.rsvp_status = status_value
+        recipient.save(update_fields=['rsvp_status'])
+
+        return Response({"message": f"{recipient.name} için katılım durumu güncellendi"})
 
 class EditRecipientView(LoginRequiredMixin, View):
     login_url = reverse_lazy('core:login')

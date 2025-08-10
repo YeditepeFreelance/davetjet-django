@@ -1,5 +1,6 @@
 // _popup.scss
 @use '../abstracts/variables';
+@use '../abstracts/mixins';
 
 @keyframes modalFadeIn {
   from {
@@ -10,6 +11,18 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -97,4 +110,162 @@
   align-items: center;
   gap: 1rem;
   margin-top: 2rem;
+}
+
+
+.draft-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+
+  &.hidden {
+    display: none;
+  }
+
+  .draft-modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(16px);
+    border-radius: 2rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    padding: 2.5rem;
+    transition: all 0.3s ease;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 720px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    overflow: hidden;
+  }
+
+  .draft-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: map-get(variables.$colors, 'primary-dark');
+    }
+
+    .close-modal-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.8rem;
+      color: map-get(variables.$colors, 'primary-dark');
+      cursor: pointer;
+    }
+  }
+
+  .draft-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    max-height: 50vh;
+
+    .draft-card {
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+
+      .draft-header {
+        display: flex;
+        flex-direction: column;
+
+        h4 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #222;
+        }
+
+        .draft-date {
+          font-size: 1.2rem;
+          color: #666;
+        }
+      }
+
+      .draft-actions {
+        display: flex;
+        gap: 1rem;
+
+        button {
+          padding: 0.6rem 1.2rem;
+          font-size: 0.95rem;
+          border-radius: 0.8rem;
+          font-weight: 500;
+          border: none;
+          cursor: pointer;
+          transition: background 0.2s ease;
+
+          &.load-draft {
+            background-color: map-get(variables.$colors, 'primary');
+            color: #fff;
+          }
+
+          &.delete-draft {
+            background-color: rgba(255, 0, 0, 0.15);
+            color: red;
+          }
+        }
+      }
+    }
+  }
+
+  .empty-message {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 1rem;
+    color: #444;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  .draft-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    .btn.close-btn {
+      background-color: map-get(variables.$colors, 'primary');
+      color: #fff;
+      padding: 0.7rem 1.4rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

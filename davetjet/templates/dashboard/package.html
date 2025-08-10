@@ -1,73 +1,90 @@
 {% extends './dashboard-base.html' %}
 
 {% block content %}
-<div class="my-package-page">
-  <section class="package-overview glassmorphic-card" aria-label="Current Package Details">
-    <header class="package-header">
-      <h2 class="package-name">Pro Plan</h2>
-      <button class="btn btn-primary btn-upgrade" type="button" aria-label="Upgrade Plan">Upgrade Plan</button>
-    </header>
-    <div class="package-details">
-      <div class="detail-item">
-        <span class="detail-label">Price:</span>
-        <span class="detail-value">₺99 / month</span>
+
+<div class="my-package">
+  <section class="current-plan glass-card">
+    <div class="plan-header">
+      <div class="plan-icon"><i class="fas fa-seedling"></i></div>
+      <div class="plan-details">
+        <h2 class="plan-name">Starter Plan</h2>
+        <span class="plan-status active">Active</span>
+        <p class="plan-pricing">$12 / Month</p>
+        <small>Renews in <span class="countdown">12 days</span></small>
       </div>
-      <div class="detail-item">
-        <span class="detail-label">Renewal Date:</span>
-        <span class="detail-value">2025-09-15</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Payment Method:</span>
-        <span class="detail-value">Visa **** 1234</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Status:</span>
-        <span class="detail-value status-active">Active</span>
+      <div class="plan-actions">
+        <button class="btn manage-btn">Manage</button>
+        <button class="btn upgrade-btn">Upgrade</button>
       </div>
     </div>
   </section>
 
-  <section class="usage-stats glassmorphic-card" aria-label="Usage Statistics">
-    <h3>Usage Stats</h3>
-    <div class="stat-item">
-      <label for="invitationUsage" class="stat-label">Invitations Used</label>
-      <progress id="invitationUsage" max="100" value="10"></progress>
-      <span class="stat-numbers">10 / 100</span>
-    </div>
-    <div class="stat-item">
-      <label for="inviteeUsage" class="stat-label">Invitees Used</label>
-      <progress id="inviteeUsage" max="1000" value="150"></progress>
-      <span class="stat-numbers">150 / 1000</span>
+  <section class="usage-section glass-card">
+    <h3>Usage Overview</h3>
+    <div class="usage-metrics">
+      <div class="usage-item">
+  <div class="progress-ring">
+    <svg width="90" height="90">
+      <circle class="bg" cx="45" cy="45" r="40" />
+      <circle class="value" cx="45" cy="45" r="40" style="stroke-dashoffset: 60" />
+    </svg>
+    <div class="percent">76%</div>
+  </div>
+  <div class="label">Invitations Used</div>
+</div>
+<div class="usage-item">
+  <div class="progress-ring">
+    <svg width="90" height="90">
+      <circle class="bg" cx="45" cy="45" r="40" />
+      <circle class="value" cx="45" cy="45" r="40" style="stroke-dashoffset: 60" />
+    </svg>
+    <div class="percent">76%</div>
+  </div>
+  <div class="label">Invitees Added</div>
+</div>
+<div class="usage-item coming-soon">
+  <div class="progress-ring">
+    <svg width="90" height="90">
+      <circle class="bg" cx="45" cy="45" r="40" />
+      <circle class="value" cx="45" cy="45" r="40" style="stroke-dashoffset: 60" />
+    </svg>
+    <div class="percent">76%</div>
+  </div>
+  <div class="label">AI Usage</div>
+</div>
+
     </div>
   </section>
 
-  <section class="invoices-promo glassmorphic-card" aria-label="Invoices and Promo Codes">
-    <h3>Invoices</h3>
-    <ul class="invoice-list">
-      <li class="invoice-item">
-        <span class="invoice-date">2025-07-15</span>
-        <span class="invoice-amount">₺99</span>
-        <span class="invoice-status status-paid">Paid</span>
-        <a href="#" class="invoice-download" aria-label="Download Invoice for July 2025">Download</a>
-      </li>
-      <li class="invoice-item">
-        <span class="invoice-date">2025-06-15</span>
-        <span class="invoice-amount">₺99</span>
-        <span class="invoice-status status-paid">Paid</span>
-        <a href="#" class="invoice-download" aria-label="Download Invoice for June 2025">Download</a>
-      </li>
-    </ul>
-
-    <h3>Promo Codes</h3>
-    <form class="promo-code-form" novalidate>
-      <label for="promoCodeInput" class="sr-only">Enter promo code</label>
-      <input type="text" id="promoCodeInput" name="promoCode" placeholder="Enter promo code" />
-      <button type="submit" class="btn btn-secondary">Apply</button>
-    </form>
-
-    <ul class="applied-promo-list" aria-live="polite" aria-atomic="true">
-      <!-- Dynamically inserted applied promo codes -->
-    </ul>
+  <section class="billing-history glass-card">
+    <div class="billing-header">
+      <h3>Billing History</h3>
+      <button class="btn view-invoice">View Last Invoice</button>
+    </div>
+    <table class="billing-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Invoice</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>02 Aug 2025</td>
+          <td>$12.00</td>
+          <td><span class="paid">Paid</span></td>
+          <td><a href="#">Download</a></td>
+        </tr>
+        <tr>
+          <td>02 Jul 2025</td>
+          <td>$12.00</td>
+          <td><span class="paid">Paid</span></td>
+          <td><a href="#">Download</a></td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 </div>
 

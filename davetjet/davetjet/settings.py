@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +32,20 @@ FILE_CHARSET = 'utf-8'
 DEFAULT_CHARSET = 'utf-8'
 
 
+# .env dosyasını yükle
+load_dotenv()
+
+# Fernet key'i al
+FERNET_KEY = os.getenv("FERNET_KEY")
+
+if not FERNET_KEY:
+    raise ValueError("FERNET_KEY .env dosyasında tanımlı değil!")
+
+NETGSM_USERNAME="2626061368"
+NETGSM_PASSWORD="m7.1v6h7"
+NETGSM_APPNAME="GondericiBaslik"
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,13 +56,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    
     'core',
     'users',
     'communication',
     'payments',
     'projects',
-    'recipients',
-    'invitations',
+    'recipients.apps.RecipientsConfig',
+    'invitations.apps.InvitationsConfig',
     'rest_framework',
     'rest_framework_api_key',
 
