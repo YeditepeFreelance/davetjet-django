@@ -1,9 +1,12 @@
+import sys
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, CreateView
 from django.urls import reverse_lazy
 import pandas as pd
 from io import BytesIO, StringIO
+
+from recipients.forms import RecipientForm
 from .models import Recipient
 from invitations.models import Invitation
 from projects.models import Project
@@ -173,13 +176,26 @@ class ViewRecipientListView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['projects'] = Project.objects.filter(owner=self.request.user)
         return context
+from django.views.generic.edit import FormView
+from django.urls import reverse_lazy
+from django.contrib import messages
 
-class CreateRecipientView(CreateView):
-    model = Recipient
-    fields = ['name', 'email']
-    success_url = reverse_lazy('recipients:add_new')
+class CreateRecipientView(FormView):
+    template_name = "dashboard/recipients/edit.html"  # elindeki bir template'i koy
+    form_class = RecipientForm
+    success_url = reverse_lazy('core:recipients')
 
     def form_valid(self, form):
-        form.instance.save()
-        print("Recipient created successfully")
+        obj = form.save()
+        messages.success(self.request, "Alıcı oluşturuldu.")
+        project = Project.objects.filter(owner=self.request.user).first()
+        obj.project.add(project)
+        obj.save()
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # konsola da yaz, sayfada da göster
+        import logging
+        logging.getLogger(__name__).error("Recipient form errors: %s", form.errors.get_json_data())
+        messages.error(self.request, "Form hataları var, lütfen kontrol edin.")
+        return self.render_to_response(self.get_context_data(form=form))

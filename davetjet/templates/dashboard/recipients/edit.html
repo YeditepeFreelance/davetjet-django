@@ -14,7 +14,7 @@
 
   <!-- Bottom Section -->
   <div class="bottom-widgets">
-    <div class="card invite-preview">
+    <div class="card invite-preview" style="grid-column: 1 / -1">
       <h3>Hızlı İşlemler</h3>
       <div class="content">
         <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="card recipient-tracking">
+    <div class="card recipient-tracking"  style="grid-column: 1 / -1">
       <h3>Davetli Takibi</h3>
       <div class="content">
         <table>
@@ -88,15 +88,17 @@
         <form id="add-recipient-form" method="POST">
           {% csrf_token %}
           <label for="recipient-name">Ad:</label>
-          <input type="text" id="recipient-name" name="name" required />
+          <input type="text" id="recipient-name" name="name" style="color: white;" required />
           <label for="recipient-email">Email:</label>
-          <input type="email" id="recipient-email" name="email" required />
+          <input type="email" id="recipient-email" name="email" style="color: white;" required />
+          <label for="recipient-phone">Telefon:</label>
+          <input type="text" id="recipient-phone" name="phone_number" style="color: white;" required />
         </form>
       `,
       footer: `
         <div class="modal__buttons">
           <button class="btn btn--cancel modal-exit" onclick="window.AppModal.close()">İptal</button>
-          <button class="btn btn--success modal-exit" id="save-recipient">Kaydet</button>
+          <button class="btn btn--primary modal-exit" id="save-recipient">Kaydet</button>
         </div>
       `,
     });

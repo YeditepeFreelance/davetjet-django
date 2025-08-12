@@ -36,6 +36,7 @@
       </div>
 
       <!-- Bottom Section -->
+      {% if invitation %}
       <div class="bottom-widgets">
         <div class="card invite-preview">
           <h3>{{ invitation.name }}</h3>
@@ -87,6 +88,7 @@
         </div>
 
       </div>
+      {% endif %}
     </section>
 {% endblock %}
 {% block extra_js %}

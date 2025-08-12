@@ -1,17 +1,6 @@
 {% extends '../dashboard-base.html' %}
 {% load static %}
 
-{# ------------------------------------------------------
-   INVITATION WIZARD — REV A (Minimal Glass, Refined)
-   Notes:
-   - Class names match HTML exactly.
-   - Structure kept familiar; visuals refined; micro-interactions added.
-   - Progress: adds a slim progress bar + active step accent.
-   - Preview: keeps 9:16 frame, adds subtle border glow on hover.
-   - Accessibility: better focus states, larger hit targets, ARIA roles.
-   - JS: tiny additions (progress %, keyboard nav, smooth step changes).
-   ------------------------------------------------------ #}
-
 {% block content %}
 <div class="invitation-wizard-container">
   <!-- Progress -->
@@ -81,75 +70,14 @@
         <textarea id="eventMessage" rows="3" placeholder="Kısa bir davet mesajı..."></textarea>
       </form>
 
-      <!-- Step 3: Settings (Security / Reminders / Appearance) -->
+      <!-- Step 3: Settings (Reminders / Channels / Quiet hours) -->
       <div class="wizard-step step-2 hidden" data-step="3" id="step-settings">
         <div class="step-head">
           <h2 class="step-title">Davet Ayarları</h2>
-          <p class="muted">Güvenlik, hatırlatıcı ve görünüm ayarlarını yapılandırın.</p>
+          <p class="muted">Hatırlatıcı, kanal ve saat aralığı ayarları.</p>
         </div>
 
         <div class="settings-grid">
-          <!-- Security -->
-          <section class="card soft security-card" aria-labelledby="sec-title">
-            <header class="card-head">
-              <div class="head-left">
-                <div class="icon-badge" aria-hidden="true"><i class="fas fa-shield-alt"></i></div>
-                <div>
-                  <h3 id="sec-title">Güvenlik</h3>
-                  <p class="muted">Davetiyeyi şifre ile koruyun, erişim süresi belirleyin.</p>
-                </div>
-              </div>
-            </header>
-
-            <div class="card-body">
-              <div class="line">
-                <label class="switch">
-                  <input type="checkbox" id="protectToggle" aria-controls="passwordRow" aria-expanded="false">
-                  <span class="slider"></span>
-                </label>
-                <div class="line-col">
-                  <strong>Şifre koruma</strong>
-                  <span class="muted xs">Gizli erişim bağlantıları şifre sormaz.</span>
-                </div>
-              </div>
-
-              <div class="grid-2 gap hidden" id="passwordRow">
-                <div>
-                  <label for="invitePassword">Şifre</label>
-                  <input type="text" id="invitePassword" placeholder="En az 6 karakter" autocomplete="new-password">
-                </div>
-                <div>
-                  <label>Güç</label>
-                  <div id="pwdStrength" class="strength-bar" aria-label="Şifre Gücü"><span></span></div>
-                </div>
-              </div>
-
-              <hr class="sep">
-
-              <div class="line">
-                <label class="switch">
-                  <input type="checkbox" id="expToggle" aria-controls="expiryRow" aria-expanded="false">
-                  <span class="slider"></span>
-                </label>
-                <div class="line-col">
-                  <strong>Süre sınırlaması</strong>
-                  <span class="muted xs">Belirlenen tarihten sonra davetiye erişilemez.</span>
-                </div>
-              </div>
-
-              <div class="grid-2 gap hidden" id="expiryRow">
-                <div>
-                  <label for="expireDate">Son erişim tarihi</label>
-                  <input type="datetime-local" id="expireDate">
-                </div>
-                <div>
-                  <label>Durum</label>
-                  <div class="kbd" id="expireHint">—</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
           <!-- Reminders -->
           <section class="card soft rem-card" aria-labelledby="rem-title">
             <header class="card-head">
@@ -169,25 +97,22 @@
             </header>
 
             <div class="card-body" id="reminderControls">
+              <!-- Kota basit: tek seçim (gün) -->
               <div class="quota" aria-live="polite">
                 <div class="quota-top">
-                  <span class="label">Kalan hak</span>
-                  <span class="value"><strong id="remindersLeftValue">—</strong></span>
+                  <span class="label">Seçili hatırlatıcı</span>
+                  <span class="value"><strong id="remindersLeftValue">0/1</strong></span>
                 </div>
                 <div class="quota-bar" aria-hidden="true">
                   <div class="quota-fill" id="remindersLeftBar" style="width:0%"></div>
                 </div>
               </div>
 
-              <div class="timeline">
-                <label class="chip"><input type="checkbox" class="reminderPreset" value="-1d" checked> <span>1 gün önce</span></label>
-                <label class="chip"><input type="checkbox" class="reminderPreset" value="-3h" checked> <span>3 saat önce</span></label>
-                <label class="chip"><input type="checkbox" class="reminderPreset" value="-30m"> <span>30 dk önce</span></label>
-                <div class="custom-inline">
-                  <label for="reminderCustom" class="muted">Özel</label>
-                  <input type="number" id="reminderCustom" min="1" placeholder="dakika" inputmode="numeric">
-                  <span class="muted">önce</span>
-                </div>
+              <!-- Gün bazlı tek alan -->
+              <div class="timeline days-only">
+                <label for="reminderDays" class="muted">Etkinlikten kaç gün önce?</label>
+                <input type="number" id="reminderDays" min="1" max="30" placeholder="1–30" inputmode="numeric" style="max-width:140px">
+                <span class="muted">gün önce hatırlatma gönder.</span>
               </div>
 
               <div class="channels">
@@ -195,55 +120,30 @@
                 <div class="channel-badges">
                   <label class="badge"><input type="checkbox" class="reminderChannel" value="email" checked> <i class="fas fa-envelope"></i> E-posta</label>
                   <label class="badge"><input type="checkbox" class="reminderChannel" value="sms"> <i class="fas fa-sms"></i> SMS</label>
-                  <label class="badge"><input type="checkbox" class="reminderChannel" value="whatsapp"> <i class="fab fa-whatsapp"></i> WhatsApp</label>
                 </div>
-                <p class="muted xs">Paket dışı kanallar otomatik devre dışı kalır.</p>
+                <p class="muted xs">Paketinizde olmayan kanallar otomatik devre dışıdır.</p>
               </div>
 
-              <div class="extras">
-                <label class="line"><input type="checkbox" id="smartRetry"> <span>Yanıt vermeyenlere <strong>24 saat</strong> sonra 1 kez daha dene</span></label>
-                <div class="quiet-hours">
-                  <span class="muted">Sessiz saatler</span>
-                  <div class="qh-inline">
-                    <select id="qhStart"><option>21:00</option><option>22:00</option><option selected>23:00</option></select>
-                    <span class="sep">–</span>
-                    <select id="qhEnd"><option>06:00</option><option selected>07:00</option><option>08:00</option></select>
-                  </div>
+              <div class="quiet-hours">
+                <span class="muted">Mesaj gönderilebilecek saat aralığı</span>
+                <div class="qh-inline">
+                  <select id="qhStart">
+                    <option selected>07:00</option><option>08:00</option><option>09:00</option><option>10:00</option>
+                  </select>
+                  <span class="sep">–</span>
+                  <select id="qhEnd">
+                    <option>20:00</option><option>21:00</option><option selected>23:00</option>
+                  </select>
                 </div>
               </div>
 
-              <div class="warn hidden" id="reminderWarning"><i class="fas fa-exclamation-triangle"></i> Kota yetersiz. Seçimleri azaltın ya da paketi yükseltin.</div>
+              <div class="warn hidden" id="reminderWarning">
+                <i class="fas fa-exclamation-triangle"></i> Lütfen 1–30 gün arasında bir değer girin.
+              </div>
             </div>
           </section>
 
-          <!-- Appearance -->
-          <section class="card soft appearance-card" aria-labelledby="app-title">
-            <header class="card-head">
-              <div class="head-left">
-                <div class="icon-badge" aria-hidden="true"><i class="fas fa-palette"></i></div>
-                <div>
-                  <h3 id="app-title">Görünüm</h3>
-                  <p class="muted">Tema ve dil ayarları.</p>
-                </div>
-              </div>
-            </header>
-            <div class="card-body grid-2 gap">
-              <div>
-                <label for="themeSelect">Tema</label>
-                <select id="themeSelect">
-                  <option value="light" selected>Aydınlık</option>
-                  <option value="dark">Karanlık</option>
-                </select>
-              </div>
-              <div>
-                <label for="langSelect">Dil</label>
-                <select id="langSelect">
-                  <option value="tr" selected>Türkçe</option>
-                  <option value="en">English</option>
-                </select>
-              </div>
-            </div>
-          </section>
+          <!-- (Appearance/Theme/Dil kartı tamamen kaldırıldı) -->
         </div>
       </div>
 
@@ -251,7 +151,7 @@
       <div class="wizard-step step-3 hidden" data-step="4">
         <div class="step-head">
           <h2>Mesaj & Kanal Önizlemesi</h2>
-          <p class="muted">Metni düzenledikçe SMS, e‑posta ve WhatsApp kartları canlı güncellenir.</p>
+          <p class="muted">Metni düzenledikçe SMS ve e-posta kartları canlı güncellenir.</p>
         </div>
 
         <label for="broadcastMessage">Gönderilecek Mesaj</label>
@@ -263,7 +163,6 @@
             <div class="mp-tabs" role="tablist">
               <button class="mp-tab active" data-target="#mp-sms" role="tab" aria-selected="true">SMS</button>
               <button class="mp-tab" data-target="#mp-email" role="tab">E-posta</button>
-              <button class="mp-tab" data-target="#mp-wa" role="tab">WhatsApp</button>
             </div>
             <div class="mp-tools">
               <button class="mp-copy" id="copyMsgBtn" title="Mesajı kopyala" aria-label="Mesajı kopyala"><i class="fas fa-copy"></i></button>
@@ -291,14 +190,6 @@
                 <div class="mail-body" id="mp-email-body">[E-posta gövdesi önizleme]</div>
               </div>
             </div>
-
-            <div class="mp-panel" id="mp-wa" role="tabpanel">
-              <div class="mp-device whatsapp" aria-label="WhatsApp Önizleme">
-                <div class="wa-header"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-                <div class="wa-body"><div class="wa-bubble me" id="mp-wa-text">[WhatsApp önizleme]</div></div>
-              </div>
-              <div class="mp-hints"><small>Uzun bağlantılar kısaltılırsa mesaj derli toplu görünür.</small></div>
-            </div>
           </div>
         </div>
       </div>
@@ -320,13 +211,12 @@
             </div>
           </section>
 
-          <!-- QR + Quick -->
+          <!-- Quick -->
           <section class="share-card glass">
             <header><i class="fas fa-bolt"></i> Hızlı Aksiyon</header>
             <div class="quick-row">
-              <button class="pill whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-              <button class="pill email"><i class="fas fa-envelope"></i> E-posta</button>
-              <button class="pill sms"><i class="fas fa-sms"></i> SMS</button>
+              <button class="pill email" id="quickEmail"><i class="fas fa-envelope"></i> E-posta</button>
+              <button class="pill sms" id="quickSms"><i class="fas fa-sms"></i> SMS</button>
             </div>
             <div class="qr-row">
               <img src="{% static 'images/qr-placeholder.png' %}" class="qr-code" alt="QR">
@@ -339,8 +229,7 @@
             <div class="final-row">
               <button type="button" class="btn" id="saveDraftBtn">Taslağa Kaydet</button>
               <button type="button" class="btn btn--primary" id="finishBtn">Yayınla</button>
-              <!-- Step 5: Final row içine EK -->
-<button id="updateBtn" type="button" class="btn btn--primary hidden">Güncelle</button>
+              <button id="updateBtn" type="button" class="btn btn--primary hidden">Güncelle</button>
             </div>
             <small class="muted xs">Taslak; alıcı eklenmeden kaydedilir.</small>
           </section>
@@ -351,11 +240,7 @@
       <div class="wizard-nav">
         <button type="button" class="btn back-btn" id="prevBtn" disabled>Geri</button>
         <button type="button" class="btn next-btn" id="nextBtn">İleri</button>
-         <!-- EK: Taslaklar'ı açan buton (uygun yere koy) -->
-        <button type="button" class="btn" id="openDraftsBtn">
-          Taslaklar
-        </button>
-
+        <button type="button" class="btn" id="openDraftsBtn">Taslaklar</button>
       </div>
     </div>
 
@@ -382,59 +267,33 @@
     </div>
   </div>
 
-  <!-- EK: Taslaklar Modal -->
+  <!-- Drafts Modal (değişmedi) -->
   <div id="draftsModal" class="fullscreen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="drafts-title">
-    <!-- draftsModal içinde YERİNE GEÇER -->
-<div class="drafts-modal-panel" role="document">
-  <div class="dm-head">
-    <div class="title">
-      <i class="fas fa-file-alt"></i> Taslaklar
-    </div>
-    <button type="button" class="dm-close" id="closeDraftsModal" aria-label="Kapat">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
-
-  <div class="dm-body">
-    <!-- boşken gösterilecek -->
-    <div id="draftsEmpty" class="dm-empty hidden">
-      <div class="bubble">
-        <i class="fas fa-inbox"></i>
+    <div class="drafts-modal-panel" role="document">
+      <div class="dm-head">
+        <div class="title"><i class="fas fa-file-alt"></i> Taslaklar</div>
+        <button type="button" class="dm-close" id="closeDraftsModal" aria-label="Kapat"><i class="fas fa-times"></i></button>
       </div>
-      <div class="text">
-        <strong>Henüz taslak yok</strong>
-        <span class="muted">Davet oluşturduğunda burada görünecek.</span>
+      <div class="dm-body">
+        <div id="draftsEmpty" class="dm-empty hidden">
+          <div class="bubble"><i class="fas fa-inbox"></i></div>
+          <div class="text"><strong>Henüz taslak yok</strong><span class="muted">Davet oluşturduğunda burada görünecek.</span></div>
+        </div>
+        <div id="draftsSkeleton" class="drafts-grid skeleton">
+          <div class="draft-card sk"></div><div class="draft-card sk"></div><div class="draft-card sk"></div>
+        </div>
+        <div id="draftsGrid" class="drafts-grid"></div>
+      </div>
+      <div class="dm-foot">
+        <button type="button" class="btn btn--ghost" id="newDraftBtn"><i class="fas fa-plus"></i> Yeni taslak</button>
       </div>
     </div>
-
-    <!-- yükleme iskeleti -->
-    <div id="draftsSkeleton" class="drafts-grid skeleton">
-      <div class="draft-card sk"></div>
-      <div class="draft-card sk"></div>
-      <div class="draft-card sk"></div>
-    </div>
-
-    <!-- gerçek liste -->
-    <div id="draftsGrid" class="drafts-grid"></div>
   </div>
-
-  <div class="dm-foot">
-    <button type="button" class="btn btn--ghost" id="newDraftBtn">
-      <i class="fas fa-plus"></i> Yeni taslak
-    </button>
-  </div>
-</div>
-
-  </div>
-
- 
 </div>
 {% endblock %}
 
 {% block extra_js %}
-{% if inv_json %}
-<script>window.INV_META = {{ inv_json|safe }};</script>
-{% endif %}
+{% if inv_json %}<script>window.INV_META = {{ inv_json|safe }};</script>{% endif %}
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -459,15 +318,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventLocation = document.getElementById("eventLocation");
   const eventMessage = document.getElementById("eventMessage");
 
-  // Settings
-  const protectToggle = document.getElementById("protectToggle");
-  const passwordRow = document.getElementById("passwordRow");
-  const invitePassword = document.getElementById("invitePassword");
-  const expToggle = document.getElementById("expToggle");
-  const expiryRow = document.getElementById("expiryRow");
-  const expireDate = document.getElementById("expireDate");
-  const pwdStrength = document.getElementById("pwdStrength")?.querySelector("span");
-  const expireHint = document.getElementById("expireHint");
+  // Reminders / channels / hours
+  const remEnabledEl = document.getElementById("remindersEnabled");
+  const remCtrEl     = document.getElementById("reminderControls");
+  const reminderDays = document.getElementById("reminderDays");
+  const channelEls   = Array.from(document.querySelectorAll(".reminderChannel"));
+  const qhStartEl    = document.getElementById("qhStart");
+  const qhEndEl      = document.getElementById("qhEnd");
+  const quotaValEl   = document.getElementById("remindersLeftValue");
+  const quotaBarEl   = document.getElementById("remindersLeftBar");
+  const quotaWarnEl  = document.getElementById("reminderWarning");
 
   // Message preview
   const broadcastMessage = document.getElementById("broadcastMessage");
@@ -479,33 +339,34 @@ document.addEventListener("DOMContentLoaded", () => {
   // Share
   const shareLink = document.getElementById("shareLink");
   const copyShare = document.getElementById("copyShare");
+  const quickEmail = document.getElementById("quickEmail");
+  const quickSms = document.getElementById("quickSms");
 
-  // Drafts modal (opsiyonel)
+  // Drafts modal (unchanged refs)
   const draftsModal = document.getElementById("draftsModal");
   const openDraftsBtn = document.getElementById("openDraftsBtn");
   const closeDraftsModal = document.getElementById("closeDraftsModal");
   const draftsGrid = document.getElementById("draftsGrid");
 
-  // URL paramları + sunucudan gelen meta
- // --- EDIT ID BOOT ---
-const params   = new URLSearchParams(location.search);
-const bootMeta = window.INV_META || null;
-
-// let kullan; akışta güncelleyeceğiz
-let editId = params.get("inv")
-           || (bootMeta && bootMeta.id ? String(bootMeta.id) : document.body.dataset.invId || null);
-
-window.editId = editId;           // handler'lar window.editId'ı kullanıyor
-console.log("[BOOT] editId =", window.editId);
+  // --- EDIT ID BOOT ---
+  const params   = new URLSearchParams(location.search);
+  const bootMeta = window.INV_META || null;
+  let editId = params.get("inv")
+             || (bootMeta && bootMeta.id ? String(bootMeta.id) : document.body.dataset.invId || null);
+  window.editId = editId;
   const forcedDraft = params.get("draft") === "1" || (bootMeta ? bootMeta.is_draft : false);
   let isEditing = !!editId;
   let isEditingDraft = forcedDraft || !!bootMeta?.is_draft;
 
   // ===== Helpers
-  const getCSRF = () => {
-    const m = document.cookie.match(/csrftoken=([^;]+)/);
-    return m ? decodeURIComponent(m[1]) : "";
-  };
+  const getCSRF = () => document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? "";
+
+  function toast(msg){
+    let t = document.querySelector('.mini-toast');
+    if(!t){ t = document.createElement('div'); t.className = 'mini-toast'; document.body.appendChild(t); }
+    t.textContent = msg;
+    requestAnimationFrame(()=>{ t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1800); });
+  }
 
   const setProgress = (index) => {
     const pct = ((index) / (steps.length - 1)) * 100;
@@ -517,74 +378,30 @@ console.log("[BOOT] editId =", window.editId);
     });
   };
 
-  function toast(msg){
-    let t = document.querySelector('.mini-toast');
-    if(!t){
-      t = document.createElement('div');
-      t.className = 'mini-toast';
-      document.body.appendChild(t);
-    }
-    t.textContent = msg;
-    requestAnimationFrame(()=>{
-      t.classList.add('show');
-      setTimeout(()=> t.classList.remove('show'), 1800);
-    });
-  }
-
-  // ===== Reminders & Channels STATE + HELPERS (TEK KAYNAK)
+  // ===== Reminders STATE (sadeleştirilmiş)
   const rem = {
     enabled: false,
-    presets: new Set(),                 // "-1d", "-3h", "-30m"
-    customMinutes: null,                // sayı (dk)
-    channels: { email: true, sms: false, whatsapp: false },
-    quietHours: { start: "23:00", end: "07:00" },
-    smartRetry: false,
-    quota: { max: 3, used: 0 },
+    days: null,                          // 1..30
+    channels: { email: true, sms: false },
+    quietHours: { start: "07:00", end: "23:00" },
+    quota: { max: 1, used: 0 },          // tek seçim
   };
 
-  // UI referansları
-  const remEnabledEl = document.getElementById("remindersEnabled");
-  const remCtrEl     = document.getElementById("reminderControls");
-  const presetEls    = Array.from(document.querySelectorAll(".reminderPreset"));
-  const customEl     = document.getElementById("reminderCustom");
-  const channelEls   = Array.from(document.querySelectorAll(".reminderChannel"));
-  const qhStartEl    = document.getElementById("qhStart");
-  const qhEndEl      = document.getElementById("qhEnd");
-  const smartRetryEl = document.getElementById("smartRetry");
-  const quotaValEl   = document.getElementById("remindersLeftValue");
-  const quotaBarEl   = document.getElementById("remindersLeftBar");
-  const quotaWarnEl  = document.getElementById("reminderWarning");
-
-  function tokenToMinutes(t){
-    if (!t) return null;
-    const m = String(t).match(/^-?(\d+)([dhm])$/i);
-    if (!m) return null;
-    const n = parseInt(m[1],10); const u = m[2].toLowerCase();
-    return u === "d" ? n*1440 : u === "h" ? n*60 : n;
+  function minutesFromDays(d){
+    const n = parseInt(d, 10);
+    return (!Number.isNaN(n) && n >= 1 && n <= 30) ? n * 1440 : null;
   }
 
   function buildReminderConfig(){
-    const arr = [];
-    rem.presets.forEach(tok => {
-      const mins = tokenToMinutes(tok);
-      if (mins && mins > 0) arr.push(mins);
-    });
-    if (customEl && customEl.value){
-      const cm = parseInt(customEl.value,10);
-      if (!Number.isNaN(cm) && cm > 0) arr.push(cm);
-    } else if (rem.customMinutes && rem.customMinutes > 0){
-      arr.push(rem.customMinutes);
-    }
-    return Array.from(new Set(arr)).sort((a,b)=>a-b);
+    const mins = minutesFromDays(rem.days);
+    return (rem.enabled && mins) ? [mins] : [];
   }
 
   function getDeliverySettings(){
     return {
       email: !!rem.channels.email,
       sms: !!rem.channels.sms,
-      whatsapp: !!rem.channels.whatsapp,
-      quiet_hours: { ...rem.quietHours },
-      smart_retry: !!rem.smartRetry,
+      quiet_hours: { ...rem.quietHours }
     };
   }
 
@@ -598,82 +415,19 @@ console.log("[BOOT] editId =", window.editId);
   }
 
   function updateQuotaUI(){
-    const cfg = buildReminderConfig();
-    rem.quota.used = cfg.length;
-    const left = Math.max(0, rem.quota.max - rem.quota.used);
-    if (quotaValEl) quotaValEl.textContent = String(left);
-    if (quotaBarEl){
-      const pct = rem.quota.max ? (Math.min(rem.quota.used, rem.quota.max) / rem.quota.max)*100 : 0;
-      quotaBarEl.style.width = `${pct}%`;
-    }
-    if (quotaWarnEl){
-      quotaWarnEl.classList.toggle("hidden", !(rem.enabled && rem.quota.used > rem.quota.max));
-    }
+    const used = (rem.enabled && minutesFromDays(rem.days)) ? 1 : 0;
+    rem.quota.used = used;
+    if (quotaValEl) quotaValEl.textContent = `${used}/1`;
+    if (quotaBarEl) quotaBarEl.style.width = (used ? "100%" : "0%");
+    if (quotaWarnEl) quotaWarnEl.classList.toggle("hidden", !(rem.enabled && !minutesFromDays(rem.days)));
   }
 
   function validateReminders(){
     if (!rem.enabled) return true;
-    const cfg = buildReminderConfig();
-    const ds = getDeliverySettings();
-    const channelAny = ds.email || ds.sms || ds.whatsapp;
-    if (cfg.length === 0){ toast("Hatırlatıcı zamanı seçin (preset veya özel)."); return false; }
-    if (!channelAny){ toast("En az bir hatırlatma kanalı seçin."); return false; }
-    if (rem.quota.used > rem.quota.max){ toast("Kota yetersiz. Seçimi azaltın ya da paketi yükseltin."); return false; }
-    return true;
+    const ok = !!minutesFromDays(rem.days);
+    if (!ok){ toast("Hatırlatıcı: 1–30 gün arasında bir değer giriniz."); }
+    return ok;
   }
-function ensureRemindersValidOrThrow(){
-  if (typeof validateReminders === "function" && !validateReminders()){
-    const err = new Error("REM_INVALID");
-    err.code = "REM_INVALID";
-    throw err;
-  }
-}
-
-  (function initRemindersFromMeta(){
-    const meta = window.INV_META || null;
-
-    rem.enabled = !!meta?.reminders;
-    if (remEnabledEl) remEnabledEl.checked = rem.enabled;
-
-    const cfg = Array.isArray(meta?.reminder_config) ? meta.reminder_config : [];
-    const presetMapMinutes = { "-1d":1440, "-3h":180, "-30m":30 };
-    presetEls.forEach(cb=>{
-      const mins = tokenToMinutes(cb.value);
-      const on = mins && cfg.includes(mins);
-      cb.checked = !!on;
-      if (on) rem.presets.add(cb.value);
-    });
-    const others = cfg.filter(v => !Object.values(presetMapMinutes).includes(v));
-    if (customEl && others.length){
-      customEl.value = String(others[0]);
-      rem.customMinutes = others[0];
-    }
-
-    const ds = meta?.delivery_settings || {};
-    rem.channels.email = ds.email !== false; // default true
-    rem.channels.sms = !!ds.sms;
-    rem.channels.whatsapp = !!ds.whatsapp;
-    channelEls.forEach(cb=>{
-      if (cb.value in rem.channels) cb.checked = !!rem.channels[cb.value];
-    });
-
-    if (ds.quiet_hours){
-      rem.quietHours.start = ds.quiet_hours.start || rem.quietHours.start;
-      rem.quietHours.end   = ds.quiet_hours.end   || rem.quietHours.end;
-    }
-    if (qhStartEl) qhStartEl.value = rem.quietHours.start;
-    if (qhEndEl)   qhEndEl.value   = rem.quietHours.end;
-
-    rem.smartRetry = !!ds.smart_retry;
-    if (smartRetryEl) smartRetryEl.checked = rem.smartRetry;
-
-    if (typeof meta?.max_reminders === "number"){
-      rem.quota.max = meta.max_reminders;
-    }
-
-    applyRemindersUIEnabled(rem.enabled);
-    updateQuotaUI();
-  })();
 
   // ===== Template load + bindings
   const loadTemplate = (name) => {
@@ -696,11 +450,7 @@ function ensureRemindersValidOrThrow(){
       card.classList.add("selected");
       loadTemplate(card.dataset.template);
     });
-    card.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault(); card.click();
-      }
-    });
+    card.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); card.click(); } });
   });
   loadTemplate("classic");
 
@@ -740,52 +490,16 @@ function ensureRemindersValidOrThrow(){
     showStep(Math.min(currentStep + 1, steps.length - 1));
   });
 
-  document.addEventListener('keydown', (e)=>{
-    if(e.ctrlKey && e.key === 'ArrowRight') nextBtn.click();
-    if(e.ctrlKey && e.key === 'ArrowLeft') prevBtn.click();
-  });
-
-  // ===== Settings UI
-  protectToggle?.addEventListener("change", () => {
-    const on = !!protectToggle.checked;
-    passwordRow.classList.toggle("hidden", !on);
-    protectToggle.setAttribute('aria-expanded', on ? 'true' : 'false');
-  });
-  expToggle?.addEventListener("change", () => {
-    const on = !!expToggle.checked;
-    expiryRow.classList.toggle("hidden", !on);
-    expToggle.setAttribute('aria-expanded', on ? 'true' : 'false');
-  });
-  invitePassword?.addEventListener("input", () => {
-    const v = invitePassword.value || "";
-    const score = Math.max(0, Math.min(100, v.length * 12 + (/[A-Z]/.test(v) ? 20 : 0) + (/\d/.test(v) ? 15 : 0) + (/[^A-Za-z0-9]/.test(v) ? 15 : 0)));
-    if (pwdStrength) pwdStrength.style.width = score + "%";
-  });
-  expireDate?.addEventListener("input", () => {
-    const dt = new Date(expireDate.value);
-    if (isNaN(dt)) { if (expireHint) expireHint.textContent = "—"; return; }
-    const leftMs = dt - new Date();
-    if (leftMs <= 0) expireHint.textContent = "Süre doldu";
-    else {
-      const hours = Math.floor(leftMs / 36e5);
-      expireHint.textContent = `~ ${hours} saat kaldı`;
-    }
-  });
+  document.addEventListener('keydown', (e)=>{ if(e.ctrlKey && e.key === 'ArrowRight') nextBtn.click(); if(e.ctrlKey && e.key === 'ArrowLeft') prevBtn.click(); });
 
   // ===== Form -> iframe + Multi-channel
   [eventTitle, eventDate, eventTime, eventLocation, eventMessage].forEach(inp => {
-    inp && inp.addEventListener("input", () => {
-      pushFormIntoIframe(previewIframe);
-      refreshMultiChannel();
-    });
+    inp && inp.addEventListener("input", () => { pushFormIntoIframe(previewIframe); refreshMultiChannel(); });
   });
-  broadcastMessage?.addEventListener("input", () => {
-    refreshMultiChannel();
-  });
+  broadcastMessage?.addEventListener("input", () => { refreshMultiChannel(); });
 
   function pushFormIntoIframe(iframe) {
-    const doc = iframe.contentDocument;
-    if (!doc) return;
+    const doc = iframe.contentDocument; if (!doc) return;
     const map = {
       "event-title": eventTitle?.value || "Etkinlik Başlığı",
       "event-date": eventDate?.value || "",
@@ -793,15 +507,11 @@ function ensureRemindersValidOrThrow(){
       "event-location": eventLocation?.value || "",
       "event-message": eventMessage?.value || ""
     };
-    Object.entries(map).forEach(([id, val]) => {
-      const el = doc.getElementById(id);
-      if (el) el.textContent = val;
-    });
+    Object.entries(map).forEach(([id, val]) => { const el = doc.getElementById(id); if (el) el.textContent = val; });
   }
 
   function enableIframeSync(sourceIframe, mirrorIframe) {
-    const doc = sourceIframe.contentDocument;
-    if (!doc) return;
+    const doc = sourceIframe.contentDocument; if (!doc) return;
     const pairs = {
       "event-title": eventTitle,
       "event-date": eventDate,
@@ -828,7 +538,7 @@ function ensureRemindersValidOrThrow(){
     const title = eventTitle?.value || "Etkinlik";
     const date = eventDate?.value || "";
     const time = eventTime?.value || "";
-    const loc = eventLocation?.value || "";
+    const loc  = eventLocation?.value || "";
     const baseMsg = eventMessage?.value || "";
     const extra = broadcastMessage?.value || "";
     const compiled = `${title}\n${date} ${time}\n${loc}\n${extra || baseMsg}`.trim();
@@ -841,39 +551,7 @@ function ensureRemindersValidOrThrow(){
     const bodyEl = document.getElementById("mp-email-body");
     subjEl && subjEl.replaceChildren(document.createTextNode(`${title} - Davet`));
     bodyEl && bodyEl.replaceChildren(document.createTextNode(`${extra || baseMsg}\n\nTarih: ${date} ${time}\nYer: ${loc}`));
-
-    const waNode = document.getElementById("mp-wa-text");
-    waNode && waNode.replaceChildren(document.createTextNode(compiled));
   }
-// === Başlangıçta (ilk yüklemede) kilitlenecek alanlar ===
-// ŞİFRE (protect) ve HATIRLATICI kartı HARİÇ hepsi kilitli olsun.
-(function lockInitialSettings(){
-  // Güvenlik: "Süre sınırlaması" (expToggle + tarih alanı) kilitli
-  if (expToggle) {
-    expToggle.disabled = true;
-    expToggle.setAttribute('aria-disabled','true');
-  }
-  if (expiryRow) {
-    expiryRow.classList.add('is-off');
-    expiryRow.querySelectorAll('input,select,button').forEach(el=>{
-      el.disabled = true;
-      el.setAttribute('aria-disabled','true');
-    });
-  }
-
-  // Görünüm: Tema & Dil kilitli
-  const appBody = document.querySelector('.appearance-card .card-body');
-  if (appBody) {
-    appBody.classList.add('is-off');
-    appBody.querySelectorAll('input,select,button').forEach(el=>{
-      el.disabled = true;
-      el.setAttribute('aria-disabled','true');
-    });
-  }
-
-  // HATIRLATICI kartı BİLEREK dokunmuyoruz (aktif kalacak)
-  // ŞİFRE koruma (protectToggle) ve şifre alanları da aktif kalsın
-})();
 
   function updateSmsCounter(text) {
     if (!smsCountEl || !smsLimitEl || !smsSegsEl) return;
@@ -893,19 +571,34 @@ function ensureRemindersValidOrThrow(){
       tabs.forEach(t=>t.classList.remove("active"));
       panels.forEach(p=>p.classList.remove("active"));
       btn.classList.add("active");
-      const t = document.querySelector(btn.dataset.target);
-      t && t.classList.add("active");
+      const t = document.querySelector(btn.dataset.target); t && t.classList.add("active");
     }
     tabs.forEach(btn => btn.addEventListener("click", ()=> setActive(btn)));
   })();
 
-  document.getElementById("copyMsgBtn")?.addEventListener("click", ()=>{
+  document.getElementById("copyMsgBtn")?.addEventListener("click", ()=> {
     const val = document.getElementById("mp-sms-text").textContent || "";
     navigator.clipboard.writeText(val).then(()=> toast("Mesaj kopyalandı!"));
   });
 
-  copyShare?.addEventListener("click", () => {
-    navigator.clipboard.writeText(shareLink.value).then(()=> toast("Bağlantı kopyalandı"));
+  copyShare?.addEventListener("click", () => { navigator.clipboard.writeText(shareLink.value).then(()=> toast("Bağlantı kopyalandı")); });
+
+  // Quick actions
+  quickEmail?.addEventListener("click", () => {
+    const link = shareLink.value || "";
+    const subj = encodeURIComponent((eventTitle?.value || "Davet") + " - DavetJet");
+    const body = encodeURIComponent(`${eventMessage?.value || ""}\n\n${link}`);
+    window.location.href = `mailto:?subject=${subj}&body=${body}`;
+  });
+  quickSms?.addEventListener("click", async () => {
+    const link = shareLink.value || "";
+    const text = `${(eventTitle?.value || "Davet")}\n${eventDate?.value || ""} ${eventTime?.value || ""}\n${eventLocation?.value || ""}\n${eventMessage?.value || ""}\n${link}`;
+    if (navigator.share) {
+      try { await navigator.share({ text }); } catch(e){}
+    } else {
+      // Desktop fallback
+      window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
+    }
   });
 
   // ===== Fullscreen Preview
@@ -924,79 +617,63 @@ function ensureRemindersValidOrThrow(){
     fullscreenIframe.srcdoc = html;
     expandModal.classList.remove("hidden");
   });
-
   closeFullscreenBtn?.addEventListener("click", () => expandModal.classList.add("hidden"));
 
-  // ===== UPDATE (Publish edilmiş davetiyeyi güncelle)
-// GÜNCELLE (event delegation: DOM'a sonradan gelse bile çalışır)
+  // ===== UPDATE (publish sonrası düzenleme)
   document.addEventListener("click", async (evt) => {
     const btn = evt.target.closest("#updateBtn");
     if (!btn) return;
+    evt.preventDefault(); evt.stopPropagation();
 
-    console.log("[UPDATE] click yakalandı");
-    evt.preventDefault();
-    evt.stopPropagation();
-
-    if (!window.editId) { console.warn("[UPDATE] editId yok"); toast && toast("Kayıt yüklenmedi."); return; }
-
-    const old = btn.textContent;
-    btn.disabled = true; btn.textContent = "Güncelleniyor…";
-
+    if (!window.editId) { toast("Kayıt yüklenmedi."); return; }
+    const old = btn.textContent; btn.disabled = true; btn.textContent = "Güncelleniyor…";
     try{
-      ensureRemindersValidOrThrow();
+      if (!validateReminders()) return;
 
       const tplSel = document.querySelector(".template-card.selected");
       const payload = {
-        name: (document.getElementById("eventTitle")?.value || "").trim(),
-        message: document.getElementById("eventMessage")?.value || "",
-        invitation_date: (document.getElementById("eventDate")?.value && document.getElementById("eventTime")?.value)
-          ? `${document.getElementById("eventDate").value}T${document.getElementById("eventTime").value}:00`
-          : null,
-        template: tplSel ? tplSel.dataset.template : undefined, // published'ta backend ignore edebilir
-        is_password_protected: !!document.getElementById("protectToggle")?.checked,
-        password: document.getElementById("protectToggle")?.checked ? (document.getElementById("invitePassword")?.value || "") : "",
+        name: (eventTitle?.value || "").trim(),
+        message: eventMessage?.value || "",
+        invitation_date: (eventDate?.value && eventTime?.value) ? `${eventDate.value}T${eventTime.value}:00` : null,
+        template: tplSel ? tplSel.dataset.template : undefined,
+        // Güvenlik: otomatik
+        is_password_protected: true,
+        password: "",
         // reminders
-        reminders: window.rem?.enabled ?? false,
-        reminder_config: (window.rem?.enabled ? (typeof buildReminderConfig==="function" ? buildReminderConfig() : []) : []),
-        reminder_message: (document.getElementById("broadcastMessage")?.value || document.getElementById("eventMessage")?.value || "").trim(),
+        reminders: rem.enabled,
+        reminder_config: buildReminderConfig(),
+        reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
         // delivery
-        delivery_settings: (typeof getDeliverySettings==="function" ? getDeliverySettings() : {}),
+        delivery_settings: getDeliverySettings(),
       };
 
       const url = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", String(window.editId));
-      console.log("[UPDATE] PATCH →", url, payload);
-
       const r = await fetch(url, {
         method: "PATCH",
-        headers: { "Content-Type":"application/json", "X-CSRFToken": (document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? "") },
+        headers: { "Content-Type":"application/json", "X-CSRFToken": getCSRF() },
         body: JSON.stringify(payload)
       });
-
       const isNoContent = r.status === 204 || r.headers.get("content-length") === "0";
       const data = isNoContent ? {} : await r.json().catch(()=> ({}));
       if (!r.ok) throw new Error(data?.detail || `HTTP ${r.status}`);
-
-      console.log("[UPDATE] success", data);
-      toast && toast("Güncellendi ✅");
-      // İstersen: data && hydrateFromData(data);
+      toast("Güncellendi ✅");
     }catch(e){
-      if (e.code === "REM_INVALID") return;
-      console.error("[UPDATE] error", e);
-      toast && toast("Güncellenemedi");
+      console.error(e); toast("Güncellenemedi");
     }finally{
       btn.disabled = false; btn.textContent = old;
     }
   });
 
-  // ===== DRAFTS MODAL (opsiyonel)
-  openDraftsBtn?.addEventListener("click", async () => {
+  // ===== DRAFTS MODAL (kısaltılmış: list/handlers eskisiyle aynı)
+  const openDrafts = async () => {
     document.body.classList.add("modal-open");
     draftsModal.classList.remove("hidden");
     document.getElementById("draftsSkeleton")?.classList.remove("hidden");
     document.getElementById("draftsEmpty")?.classList.add("hidden");
     await loadDrafts();
-  });
+  };
   function closeDrafts(){ draftsModal.classList.add("hidden"); document.body.classList.remove("modal-open"); }
+  openDraftsBtn?.addEventListener("click", openDrafts);
   closeDraftsModal?.addEventListener("click", closeDrafts);
   draftsModal?.addEventListener("click", (e)=>{ if(e.target === draftsModal) closeDrafts(); });
   document.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && !draftsModal?.classList.contains("hidden")) closeDrafts(); });
@@ -1012,21 +689,12 @@ function ensureRemindersValidOrThrow(){
     const sk = document.getElementById("draftsSkeleton");
     const empty = document.getElementById("draftsEmpty");
     const grid = document.getElementById("draftsGrid");
-    sk && sk.classList.remove("hidden");
-    empty && empty.classList.add("hidden");
-    grid && (grid.innerHTML = "");
-
+    sk && sk.classList.remove("hidden"); empty && empty.classList.add("hidden"); grid && (grid.innerHTML = "");
     try{
       const r = await fetch("{% url 'invitations:invitation-drafts' %}", { headers: { "X-Requested-With":"XMLHttpRequest" } });
       const list = await r.json();
       sk && sk.classList.add("hidden");
-
-      if(!Array.isArray(list) || list.length === 0){
-        empty && empty.classList.remove("hidden");
-        grid.innerHTML = "";
-        return;
-      }
-
+      if(!Array.isArray(list) || list.length === 0){ empty && empty.classList.remove("hidden"); grid.innerHTML = ""; return; }
       grid.innerHTML = "";
       list.forEach(item => {
         const el = document.createElement("div");
@@ -1035,78 +703,47 @@ function ensureRemindersValidOrThrow(){
         const date = item.invitation_date ? new Date(item.invitation_date) : null;
         const dateStr = date ? `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : "—";
         const avatar = (title?.trim()?.charAt(0) || "D").toUpperCase();
-
         el.innerHTML = `
           <div class="dc-thumb">${avatar}</div>
           <div class="dc-body">
-            <div class="dc-title">
-              <span>${title}</span>
-              <span class="chip">Taslak</span>
-            </div>
-            <div class="dc-meta">
-              <div class="row"><i class="far fa-calendar"></i> ${dateStr}</div>
-              <div class="row"><span class="dot"></span> Şablon: ${item.template || "classic"}</div>
-            </div>
+            <div class="dc-title"><span>${title}</span><span class="chip">Taslak</span></div>
+            <div class="dc-meta"><div class="row"><i class="far fa-calendar"></i> ${dateStr}</div><div class="row"><span class="dot"></span> Şablon: ${item.template || "classic"}</div></div>
           </div>
           <div class="dc-foot">
             <div class="left">ID #${item.id}</div>
             <div class="actions">
-              <button type="button" class="btn" data-act="open" data-id="${item.id}">
-                <i class="fas fa-external-link-alt"></i> Aç
-              </button>
-              <button type="button" class="btn btn--primary" data-act="promote" data-id="${item.id}">
-                <i class="fas fa-upload"></i> Yayınla
-              </button>
-              <button type="button" class="btn btn--danger" data-act="delete" data-id="${item.id}">
-                <i class="fas fa-trash"></i> Sil
-              </button>
+              <button type="button" class="btn" data-act="open" data-id="${item.id}"><i class="fas fa-external-link-alt"></i> Aç</button>
+              <button type="button" class="btn btn--primary" data-act="promote" data-id="${item.id}"><i class="fas fa-upload"></i> Yayınla</button>
+              <button type="button" class="btn btn--danger" data-act="delete" data-id="${item.id}"><i class="fas fa-trash"></i> Sil</button>
             </div>
-          </div>
-        `;
+          </div>`;
         grid.appendChild(el);
       });
-
       grid.querySelectorAll(".dc-foot .actions .btn").forEach(btn=>{
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-id");
           const act = btn.getAttribute("data-act");
-          if(act === "open"){
-            // Bu URL'i kendi edit view URL adına göre düzelt
-            window.location.href = "{% url 'core:edit-invitation-api' 0 %}".replace("0", id);
-          }
+          if(act === "open"){ window.location.href = "{% url 'core:edit-invitation-api' 0 %}".replace("0", id); }
           if(act === "promote"){
             const old = btn.textContent; btn.disabled = true; btn.textContent = "Yayınlanıyor…";
             try{
-              const r = await fetch(`{% url 'invitations:invitation-draft-promote' 0 %}`.replace("0", id), {
-                method:"POST",
-                headers:{ "X-CSRFToken": getCSRF() }
-              });
-              if(!r.ok) throw new Error("Promote failed");
-              const data = await r.json().catch(()=> ({}));
+              const r = await fetch(`{% url 'invitations:invitation-draft-promote' 0 %}`.replace("0", id), { method:"POST", headers: { "X-CSRFToken": getCSRF() } });
+              const data = (r.status === 204) ? {} : await r.json().catch(()=> ({}));
+              if (!r.ok) throw new Error(data?.detail || "Promote failed");
               if (data?.share_url && shareLink) shareLink.value = data.share_url;
-              showStep(4);
-              toast("Taslak yayınlandı ✅");
-              btn.closest(".draft-card")?.remove();
-            }catch(e){
-              console.error(e); toast("Yayınlama başarısız.");
-            }finally{
-              btn.disabled = false; btn.textContent = old;
-            }
+              showStep(4); toast("Taslak yayınlandı ✅"); btn.closest(".draft-card")?.remove();
+            }catch(e){ console.error(e); toast("Yayınlama başarısız."); }
+            finally{ btn.disabled = false; btn.textContent = old; }
           }
           if(act === "delete"){
             if(!confirm("Taslağı silmek istediğine emin misin?")) return;
             try{
-              const r = await fetch(`{% url 'invitations:invitation-draft-delete' 0 %}`.replace("0", id), {
-                method:"DELETE",
-                headers:{ "X-CSRFToken": getCSRF() }
-              });
-              if(r.status === 204){ btn.closest(".draft-card")?.remove(); toast("Taslak silindi"); }
-              else { toast("Silinemedi"); }
+              const r = await fetch(`{% url 'invitations:invitation-draft-delete' 0 %}`.replace("0", id), { method:"DELETE", headers:{ "X-CSRFToken": getCSRF() } });
+              if(r.status === 204){ btn.closest(".draft-card")?.remove(); toast("Taslak silindi"); } else { toast("Silinemedi"); }
             }catch(e){ console.error(e); toast("Silme başarısız"); }
           }
         });
       });
-
     }catch(e){
       console.error(e);
       document.getElementById("draftsSkeleton")?.classList.add("hidden");
@@ -1114,153 +751,155 @@ function ensureRemindersValidOrThrow(){
     }
   }
 
-  // ===== SAVE DRAFT (POST or PATCH)
-// (ESKİ)
-// try {
-//   ensureRemindersValidOrThrow();   // <-- TASLAKTA KALDIR
-//   const payload = { ... };
-// } catch(e) { ... }
+  // ===== SAVE DRAFT
+  saveDraftBtn?.addEventListener("click", async () => {
+    const old = saveDraftBtn.textContent;
+    saveDraftBtn.disabled = true; saveDraftBtn.textContent = "Kaydediliyor…";
+    try{
+      const payload = {
+        name: eventTitle?.value || "Yeni Davetiye",
+        message: eventMessage?.value || "",
+        invitation_date: (eventDate?.value && eventTime?.value) ? `${eventDate.value}T${eventTime.value}:00` : null,
+        template: document.querySelector(".template-card.selected")?.dataset.template || "classic",
+        is_draft: true,
+        // güvenlik otomatik
+        is_password_protected: true,
+        password: "",
+        reminders: rem.enabled,
+        reminder_config: buildReminderConfig(),
+        reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
+        delivery_settings: getDeliverySettings(),
+      };
 
-// (YENİ)
-saveDraftBtn?.addEventListener("click", async () => {
-  const old = saveDraftBtn.textContent;
-  saveDraftBtn.disabled = true; saveDraftBtn.textContent = "Kaydediliyor…";
-  try{
-    // Taslakta hatırlatıcı validasyonu YOK
-    const payload = {
-      name: eventTitle?.value || "Yeni Davetiye",
-      message: eventMessage?.value || "",
-      invitation_date: (eventDate?.value && eventTime?.value) ? `${eventDate.value}T${eventTime.value}:00` : null,
+      let r;
+      if (editId) {
+        r = await fetch(`{% url 'invitations:invitation-detail' 0 %}`.replace("0", editId), {
+          method: "PATCH",
+          headers: { "Content-Type":"application/json", "X-CSRFToken": getCSRF() },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        r = await fetch("{% url 'core:create-invitation-api' %}", {
+          method: "POST",
+          headers: { "Content-Type":"application/json", "X-CSRFToken": getCSRF() },
+          body: JSON.stringify(payload)
+        });
+      }
+
+      const data = (r.status === 204) ? {} : await r.json().catch(()=> ({}));
+      if (!r.ok) throw new Error(data?.detail || `HTTP ${r.status}`);
+
+      if (!editId && data?.id) {
+        editId = String(data.id);
+        const qs = new URLSearchParams({ inv: editId, draft: "1" });
+        history.replaceState(null, "", `${location.pathname}?${qs.toString()}`);
+      }
+      if (data?.share_url || data?.url || data?.public_url || data?.link) {
+        shareLink.value = data.share_url || data.url || data.public_url || data.link;
+      }
+      toast(editId ? "Taslak güncellendi ✅" : "Taslak kaydedildi ✅");
+    } catch (err) {
+      console.error("[draft save] error:", err);
+      toast("Taslak kaydedilemedi.");
+    } finally {
+      saveDraftBtn.disabled = false; saveDraftBtn.textContent = old;
+    }
+  });
+
+  // ===== SINGLE INVITE LIMIT (frontend guard)
+  async function canCreateAnotherInvitation(){
+    try {
+      // Basit kontrol: yayınlanmış davet sayısı
+      const r = await fetch("/invitations/api/invitations/?is_draft=false&limit=2", { headers:{ "X-Requested-With":"XMLHttpRequest" }});
+      if (!r.ok) return true; // sunucu kapalıysa engelleme
+      const list = await r.json();
+      const count = Array.isArray(list) ? list.length : (list?.count ?? 0);
+      return count < 1; // max 1
+    } catch { return true; }
+  }
+
+  // ===== PUBLISH (Yayınla)
+  finishBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    if (!eventTitle.value.trim() || !eventDate.value || !eventTime.value) {
+      toast("Yayınlamak için başlık, tarih ve saat gerekli."); showStep(1); return;
+    }
+    if (!validateReminders()) return;
+
+    // Limit: tüm planlar max 1 yayınlanmış davetiye
+    if (!(isEditing && !isEditingDraft)) { // yeni yayın veya taslağı yayınla
+      const ok = await canCreateAnotherInvitation();
+      if (!ok) { toast("Bu planda en fazla 1 yayınlanmış davetiye oluşturabilirsiniz."); return; }
+    }
+
+    const basePayload = {
+      name: eventTitle.value.trim(),
+      message: eventMessage.value || "",
+      invitation_date: `${eventDate.value}T${eventTime.value}:00`,
       template: document.querySelector(".template-card.selected")?.dataset.template || "classic",
-      is_draft: true,
-      is_password_protected: !!protectToggle?.checked,
-      password: protectToggle?.checked ? (invitePassword?.value || "") : "",
-      // Hatırlatıcı/kanal alanları her zaman gönderelim
+      // Güvenlik: otomatik şifreli + secure link şifresiz giriş
+      is_password_protected: true,
+      password: "",
       reminders: rem.enabled,
       reminder_config: buildReminderConfig(),
       reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
       delivery_settings: getDeliverySettings(),
     };
 
-    let r;
-    if (editId) {
-      r = await fetch(`{% url 'invitations:invitation-detail' 0 %}`.replace("0", editId), {
-        method: "PATCH",
-        headers: { "Content-Type":"application/json", "X-CSRFToken": getCSRF() },
-        body: JSON.stringify(payload)
-      });
-    } else {
-      r = await fetch("{% url 'core:create-invitation-api' %}", {
-        method: "POST",
-        headers: { "Content-Type":"application/json", "X-CSRFToken": getCSRF() },
-        body: JSON.stringify(payload)
-      });
-    }
+    const old = finishBtn.textContent;
+    finishBtn.disabled = true; finishBtn.textContent = "Yayınlanıyor…";
 
-    const data = (r.status === 204) ? {} : await r.json().catch(()=> ({}));
-    if (!r.ok) throw new Error(data?.detail || `HTTP ${r.status}`);
+    try {
+      if (isEditing && isEditingDraft && editId) {
+        // PATCH -> PROMOTE
+        const patchUrl = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", editId);
+        const patchRes = await fetch(patchUrl, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
+          body: JSON.stringify({ ...basePayload, is_draft: true })
+        });
+        if (!patchRes.ok) throw new Error(await patchRes.text().catch(()=> "PATCH failed"));
 
-    // ilk oluşturma sonrası URL’yi inv paramıyla güncelle
-    if (!editId && data?.id) {
-      editId = String(data.id);
-      const qs = new URLSearchParams({ inv: editId, draft: "1" });
-      history.replaceState(null, "", `${location.pathname}?${qs.toString()}`);
-    }
+        const promoteUrl = `{% url 'invitations:invitation-draft-promote' 0 %}`.replace("0", editId);
+        const promoteRes = await fetch(promoteUrl, { method: "POST", headers: { "X-CSRFToken": getCSRF() } });
+        const promoteData = (promoteRes.status === 204) ? {} : await promoteRes.json().catch(()=> ({}));
+        if (!promoteRes.ok) throw new Error(promoteData?.detail || "Promote failed");
 
-    if (data?.share_url || data?.url || data?.public_url || data?.link) {
-      shareLink.value = data.share_url || data.url || data.public_url || data.link;
-    }
-
-    toast(editId ? "Taslak güncellendi ✅" : "Taslak kaydedildi ✅");
-  } catch (err) {
-    console.error("[draft save] error:", err);
-    toast("Taslak kaydedilemedi.");
-  } finally {
-    saveDraftBtn.disabled = false; saveDraftBtn.textContent = old;
-  }
-});
-
-
-  // ===== PUBLISH (Yayınla)
-// === YERİNE KOY — Publish handler ===
-// === PUBLİSH HANDLER (tamamen değiştir) ===
-finishBtn?.addEventListener("click", async (e) => {
-  e.preventDefault();
-
-  if (!eventTitle.value.trim() || !eventDate.value || !eventTime.value) {
-    toast("Yayınlamak için başlık, tarih ve saat gerekli."); showStep(1); return;
-  }
-  if (!validateReminders()) return;
-
-  const basePayload = {
-    name: eventTitle.value.trim(),
-    message: eventMessage.value || "",
-    invitation_date: `${eventDate.value}T${eventTime.value}:00`,
-    template: document.querySelector(".template-card.selected")?.dataset.template || "classic",
-    is_password_protected: !!protectToggle?.checked,
-    password: protectToggle?.checked ? (invitePassword?.value || "") : "",
-    // reminders
-    reminders: rem.enabled,
-    reminder_config: rem.enabled ? buildReminderConfig() : [],
-    reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
-    // delivery
-    delivery_settings: getDeliverySettings(),
-  };
-
-  const old = finishBtn.textContent;
-  finishBtn.disabled = true; finishBtn.textContent = "Yayınlanıyor…";
-
-  try {
-    if (isEditing && isEditingDraft && editId) {
-      // A) VAR OLAN TASLAK: önce PATCH, sonra PROMOTE
-      const patchUrl = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", editId);
-      const patchRes = await fetch(patchUrl, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
-        body: JSON.stringify({ ...basePayload, is_draft: true })
-      });
-      if (!patchRes.ok) throw new Error(await patchRes.text().catch(()=> "PATCH failed"));
-
-      const promoteUrl = `{% url 'invitations:invitation-draft-promote' 0 %}`.replace("0", editId);
-      const promoteRes = await fetch(promoteUrl, {
-        method: "POST",
-        headers: { "X-CSRFToken": getCSRF() }
-      });
-      const promoteData = (promoteRes.status === 204) ? {} : await promoteRes.json().catch(()=> ({}));
-      if (!promoteRes.ok) throw new Error(promoteData?.detail || "Promote failed");
-
-      isEditingDraft = false;
-      if (promoteData?.share_url) shareLink.value = promoteData.share_url;
-
-    } else {
-      // B) YENİ: tek POST ile yayınlıyoruz
-      const createRes = await fetch("{% url 'core:create-invitation-api' %}", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
-        body: JSON.stringify({ ...basePayload, is_draft: false })
-      });
-      const createData = await createRes.json().catch(()=> ({}));
-      if (!createRes.ok) throw new Error(createData?.detail || `HTTP ${createRes.status}`);
-
-      if (createData?.id) {
-        editId = String(createData.id);
-        isEditing = true;
         isEditingDraft = false;
-      }
-      if (createData?.share_url || createData?.url || createData?.public_url || createData?.link) {
-        shareLink.value = createData.share_url || createData.url || createData.public_url || createData.link;
-      }
-    }
+        if (promoteData?.share_url) shareLink.value = promoteData.share_url;
 
-    showStep(4);
-    toast("Davet yayınlandı ✅");
-  } catch (err) {
-    console.error("Publish error:", err);
-    toast("Yayınlanamadı. Lütfen tekrar deneyin.");
-  } finally {
-    finishBtn.disabled = false; finishBtn.textContent = old;
-  }
-});
+      } else {
+        // Yeni oluştur ve yayınla
+        const createRes = await fetch("{% url 'core:create-invitation-api' %}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
+          body: JSON.stringify({ ...basePayload, is_draft: false })
+        });
+        const createData = await createRes.json().catch(()=> ({}));
+        if (!createRes.ok) throw new Error(createData?.detail || `HTTP ${createRes.status}`);
+        if (createData?.id) { editId = String(createData.id); isEditing = true; isEditingDraft = false; }
+        if (createData?.share_url || createData?.url || createData?.public_url || createData?.link) {
+          shareLink.value = createData.share_url || createData.url || createData.public_url || createData.link;
+        }
+      }
+
+      // Yayınlandı: Update butonunu göster
+      saveDraftBtn?.classList.add("hidden");
+      finishBtn?.classList.add("hidden");
+      updateBtn?.classList.remove("hidden");
+
+      showStep(4);
+      toast("Davet yayınlandı ✅");
+    } catch (err) {
+      console.error("Publish error:", err);
+      toast("Yayınlanamadı. Lütfen tekrar deneyin.");
+    } finally {
+      finishBtn.disabled = false; finishBtn.textContent = old;
+    }
+  });
+
+  // Yanıt vermeyenlere SMS (buton iskeleti)
 
 
   // ===== Hydrate helper
@@ -1279,13 +918,24 @@ finishBtn?.addEventListener("click", async (e) => {
     document.querySelector(`.template-card[data-template="${tpl}"]`)?.classList.add("selected");
     loadTemplate(tpl);
 
-    protectToggle.checked = !!data.is_password_protected;
-    passwordRow.classList.toggle("hidden", !protectToggle.checked);
-    invitePassword.value = data.password || "";
-
-    expToggle.checked = !!data.expires_at;
-    expiryRow.classList.toggle("hidden", !expToggle.checked);
-    expireDate.value = data.expires_at ? data.expires_at.replace("Z","") : "";
+    // Reminders hydrate
+    rem.enabled = !!data.reminders;
+    remEnabledEl.checked = rem.enabled;
+    const cfg = Array.isArray(data.reminder_config) ? data.reminder_config : [];
+    if (cfg.length){
+      const days = Math.round((cfg[0] || 0) / 1440);
+      if (days >= 1 && days <= 30){ rem.days = days; if (reminderDays) reminderDays.value = String(days); }
+    }
+    const ds = data.delivery_settings || {};
+    rem.channels.email = ds.email !== false;
+    rem.channels.sms = !!ds.sms;
+    channelEls.forEach(cb=>{ if (cb.value in rem.channels) cb.checked = !!rem.channels[cb.value]; });
+    if (ds.quiet_hours){
+      rem.quietHours.start = ds.quiet_hours.start || rem.quietHours.start;
+      rem.quietHours.end   = ds.quiet_hours.end   || rem.quietHours.end;
+    }
+    if (qhStartEl) qhStartEl.value = rem.quietHours.start;
+    if (qhEndEl)   qhEndEl.value   = rem.quietHours.end;
 
     // UI modu
     if (data.is_draft){
@@ -1298,11 +948,12 @@ finishBtn?.addEventListener("click", async (e) => {
       updateBtn?.classList.remove("hidden");
     }
 
-    // edit flags
     isEditing = true;
     isEditingDraft = !!data.is_draft;
     editId = String(data.id);
 
+    applyRemindersUIEnabled(rem.enabled);
+    updateQuotaUI();
     refreshMultiChannel();
   }
 
@@ -1311,38 +962,15 @@ finishBtn?.addEventListener("click", async (e) => {
   showStep(0);
   refreshMultiChannel();
 
-  if (bootMeta) {
-    hydrateFromData(bootMeta);
-  } else if (editId) {
-    loadInvitationById(editId).catch(err => { console.error(err); toast("Kayıt yüklenemedi"); });
-  }
-
-  // Reminders bindings (UI)
-  remEnabledEl?.addEventListener("change", (e)=>{
-    rem.enabled = !!e.target.checked;
-    applyRemindersUIEnabled(rem.enabled);
-    updateQuotaUI();
-  });
-  presetEls.forEach(cb=>{
-    cb.addEventListener("change", (e)=>{
-      if (e.target.checked) rem.presets.add(e.target.value);
-      else rem.presets.delete(e.target.value);
-      updateQuotaUI();
-    });
-  });
-  customEl?.addEventListener("input", (e)=>{
-    const v = parseInt(e.target.value,10);
-    rem.customMinutes = Number.isNaN(v) ? null : Math.max(1, v);
-    updateQuotaUI();
-  });
-  channelEls.forEach(cb=>{
-    cb.addEventListener("change", (e)=>{
-      rem.channels[e.target.value] = !!e.target.checked;
-    });
-  });
+  // Reminders bindings
+  remEnabledEl?.addEventListener("change", (e)=>{ rem.enabled = !!e.target.checked; applyRemindersUIEnabled(rem.enabled); updateQuotaUI(); });
+  reminderDays?.addEventListener("input", (e)=>{ const v = parseInt(e.target.value,10); rem.days = Number.isNaN(v) ? null : Math.max(1, Math.min(30, v)); updateQuotaUI(); });
+  channelEls.forEach(cb=> cb.addEventListener("change", (e)=>{ rem.channels[e.target.value] = !!e.target.checked; }));
   qhStartEl?.addEventListener("change", (e)=> rem.quietHours.start = e.target.value);
   qhEndEl?.addEventListener("change",  (e)=> rem.quietHours.end   = e.target.value);
-  smartRetryEl?.addEventListener("change", (e)=> rem.smartRetry = !!e.target.checked);
+
+  if (bootMeta) { hydrateFromData(bootMeta); }
+  else if (editId) { loadInvitationById(editId).catch(err => { console.error(err); toast("Kayıt yüklenemedi"); }); }
 });
 </script>
 {% endblock %}

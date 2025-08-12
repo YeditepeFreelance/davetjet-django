@@ -125,12 +125,7 @@
 {% endwith %}
 
 
-      <li class="{% if name == 'send' %}active{% endif %}">
-        <a href="{% url 'core:dashboard' %}" class="sb-item" {% if name == 'send' %}aria-current="page"{% endif %}>
-          <i class="fa-regular fa-paper-plane"></i>
-          <span class="label">Gönderim</span>
-        </a>
-      </li>
+    
 
       {% with name=request.resolver_match.url_name %}
 <li class="{% if name == 'analytics' or name == 'analytics_detail' %}active{% endif %}">
@@ -172,9 +167,8 @@
   </div>
 
   <div class="premium-box {% if name == 'subscribe' %}active{% endif %}">
-    <p>Daha yüksek davet limiti, otomasyonlar ve daha fazlası için...</p>
     <a href="{% url 'core:subscribe' %}" class="sb-item" {% if name == 'subscribe' %}aria-current="page"{% endif %}>
-      <i class="fa-solid fa-crown"></i>
+      <i class="fa-solid fa-crown" style="color: white;"></i>
       <span class="label">Şimdi Premium Ol!</span>
     </a>
   </div>

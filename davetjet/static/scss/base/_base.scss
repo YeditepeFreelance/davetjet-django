@@ -4,6 +4,19 @@ html {
   // background-color: map-get(variables.$colors, dark);
   color: map-get(variables.$colors, light);
   font-family: 'Roboto', sans-serif !important;
+
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+/* a11y: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 *:not(i) {

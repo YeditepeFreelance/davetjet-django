@@ -193,63 +193,7 @@
             </div>
             {% endif %}
           </label>
-
-          <label>
-            <span>Doğum Tarihi</span>
-            <input
-              type="date"
-              name="date_of_birth"
-              value="{{ form.date_of_birth.value|default_if_none:'' }}"
-            />
-            {% if form.date_of_birth.errors %}
-            <div class="field-error">
-              {% for error in form.date_of_birth.errors %}
-                <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </label>
-
-          <label>
-            <span>Dil</span>
-            <div class="custom-select-wrapper">
-              <select name="language" required>
-                {% for code, name in language_choices %}
-                  <option
-                    value="{{ code }}"
-                    {% if form.language.value == code %}selected{% endif %}
-                  >
-                    {{ name }}
-                  </option>
-                {% endfor %}
-              </select>
-              <div class="custom-select">
-                <div class="custom-select-trigger" tabindex="0">
-                  {% for code, name in language_choices %}
-                    {% if form.language.value == code %}
-                      {{ name }}
-                    {% endif %}
-                  {% endfor %}
-                  {% if not form.language.value %}
-                    Dil Seçin
-                  {% endif %}
-                </div>
-                <div class="custom-options">
-                  {% for code, name in language_choices %}
-                    <span class="custom-option" data-value="{{ code }}">{{ name }}</span>
-                  {% endfor %}
-                </div>
-              </div>
-            </div>
-            {% if form.language.errors %}
-            <div class="field-error">
-              {% for error in form.language.errors %}
-                <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </label>
-
+          
           <label>
             <span>Profil Fotoğrafı</span>
             <input

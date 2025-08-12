@@ -51,6 +51,38 @@ NETGSM_USERNAME="2626061368"
 NETGSM_PASSWORD="2FC5$3C"
 NETGSM_APPNAME="GondericiBaslik"
 NETGSM_APIURL = "https://api.netgsm.com.tr/sms/rest/v2/send"
+# settings.py
+import logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,  # Var olan logger'ları KAPATMA
+    "formatters": {
+        "simple": {
+            "format": "%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    # Root logger: tüm propagate eden loglar buraya düşer
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",   # gerekirse INFO yap
+    },
+    "loggers": {
+        # Django'nun kendi server logları (runserver çıktısı)
+        "django.server": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        # Uygulama modüllerin (ör: recipients, invitations)
+        # __name__ ile aldığın logger'lar root'a propagate edeceği için
+        # bunları tanımlamasan da olur; ama spesifik seviye istiyorsan ekle:
+        "recipients": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "invitations": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+    },
+}
 
 # Application definition
 

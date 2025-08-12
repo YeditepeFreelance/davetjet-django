@@ -71,14 +71,7 @@ class CustomRegisterForm(UserCreationForm):
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Telefon Numarasi', 'class': 'form-control'})
     )
-    date_of_birth = forms.DateField(
-        required=False,
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
-    )
-    language = forms.ChoiceField(
-        choices=language_choices,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
+
     profile_picture = forms.ImageField(
         required=False,
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
@@ -88,8 +81,7 @@ class CustomRegisterForm(UserCreationForm):
         model = User
         fields = [
             'username', 'first_name', 'last_name', 'email', 
-            'password1', 'password2', 'phone_number', 'date_of_birth',
-            'language', 'profile_picture'
+            'password1', 'password2', 'phone_number','profile_picture'
         ]
 
     def clean(self):
@@ -114,8 +106,6 @@ class CustomRegisterForm(UserCreationForm):
 
             # Create or update profile
             profile, created = Profile.objects.get_or_create(user=user)
-            profile.language = self.cleaned_data.get('language')
-            profile.date_of_birth = self.cleaned_data.get('date_of_birth')
 
             # Only update profile_picture if provided
             profile_picture = self.cleaned_data.get('profile_picture')
