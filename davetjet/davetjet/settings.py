@@ -27,10 +27,16 @@ SECRET_KEY = 'django-insecure-h8q1-%@o34)^3ctx1lvio$+r*6bgnrtkj9k4&r!6f*v76611z(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['davetjet-webapp.onrender.com', 'davetjet.com', 'www.davetjet.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['davetjet-webapp.onrender.com', 'davetjet.com', 'www.davetjet.com', 'localhost', '127.0.0.1', '192.168.1.137']
 FILE_CHARSET = 'utf-8'
 DEFAULT_CHARSET = 'utf-8'
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://davetjet-webapp.onrender.com',
+    'https://davetjet.com',
+    'https://www.davetjet.com',
+    'http://localhost:8000',
+    'http://192.168.1.137:80',
+]
 
 # .env dosyasını yükle
 load_dotenv()
@@ -42,9 +48,9 @@ if not FERNET_KEY:
     raise ValueError("FERNET_KEY .env dosyasında tanımlı değil!")
 
 NETGSM_USERNAME="2626061368"
-NETGSM_PASSWORD="m7.1v6h7"
+NETGSM_PASSWORD="2FC5$3C"
 NETGSM_APPNAME="GondericiBaslik"
-
+NETGSM_APIURL = "https://api.netgsm.com.tr/sms/rest/v2/send"
 
 # Application definition
 
@@ -108,7 +114,9 @@ TEMPLATES = [
         },
     },
 ]
-
+TEMPLATES[0]['DIRS'] += [
+    BASE_DIR / 'static' / 'inv-temps',  # now engine can load from here
+]
 WSGI_APPLICATION = 'davetjet.wsgi.application'
 
 

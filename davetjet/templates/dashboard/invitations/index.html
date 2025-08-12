@@ -15,29 +15,43 @@
 
   <!-- Bottom Section -->
   <div class="bottom-widgets">
-    {% for project in projects %}
-    {% for invitation in project.invitations.all %}
-    <a href="{% url 'core:edit-invitation' invitation.id %}">
-      <div class="card invite-preview">
-        <h3>{{ invitation.name }} ({{ project.name }})</h3>
-        <div class="content">
-          <img
-            src="{% static 'images/invitation-sample.png' %}"
-            alt="Davetiye"
-          />
-          <div class="actions">
-            <a>PDF Dışa Aktar</a>
-            <a class="copy-link-btn" href="{{ invitation.secure_invite_link }}" data-url="{{ invitation.secure_invite_link }}">Bağlantıyı Kopyala (Şifresiz Giriş)</a>
-            <a>Düzenle</a>
-            <p>Toplam: {{ project.recipients.count }}</p>
-            <p>Oluşturulma Tarihi: {{ invitation.created_at }}</p>
-            <p>Son Güncelleme: {{ invitation.updated_at }}</p>
+{% for project in projects %}
+  {% for invitation in project.invitations.all %}
+    <div class="card invite-preview"
+         data-href="{% url 'core:edit-invitation' invitation.id %}"
+         role="link" tabindex="0" aria-label="{{ invitation.name }} davetiyesini düzenle">
+      <h3>{{ invitation.name }}</h3>
+
+      <div class="content">
+          <div class="inv-preview-frame" data-base-w="390" data-max-h="140">
+            <div class="inv-preview-canvas">
+              {% include invitation.preview_template_path with invitation=invitation only %}
+            </div>
           </div>
-        </div>
+        <div class="actions btn-row">
+  <button type="button"
+          class="btn btn--soft btn--sm btn--pill export-pdf"
+          data-id="{{ invitation.id }}" data-stop>
+    PDF Dışa Aktar
+  </button>
+
+  <button type="button"
+          class="btn btn--outlined btn--sm btn--pill copy-link-btn"
+          data-url="{{ invitation.secure_invite_link }}" data-stop>
+    Bağlantıyı Kopyala
+  </button>
+
+  <a class="btn btn--primary btn--sm btn--pill"
+     href="{% url 'core:edit-invitation' invitation.id %}" data-stop>
+    Düzenle
+  </a>
+</div>
+
       </div>
-    </a>
-    {% endfor %}
-    {% endfor %}
+    </div>
+  {% endfor %}
+{% endfor %}
+
   </div>
 </section>
 {% endblock %}

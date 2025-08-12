@@ -3,5 +3,16 @@
 html {
   // background-color: map-get(variables.$colors, dark);
   color: map-get(variables.$colors, light);
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', sans-serif !important;
+}
+
+*:not(i) {
+  font-family: 'Roboto', sans-serif !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

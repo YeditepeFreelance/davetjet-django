@@ -1,14 +1,20 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.db import models
 from django.utils.text import slugify
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.db.models import JSONField
+from django.core.exceptions import ValidationError
 
 from communication.scheduler import SchedulerService
 from davetjet.config import channel_choices
 from .utils import generate_secure_invitation_link
+from django.template.loader import render_to_string
+
+# KREDİ yardımcıları
+from users.credits import get_reminder_credits, consume_reminder_credits
 
 scheduler = SchedulerService()
 
@@ -19,6 +25,11 @@ TEMPLATE_CHOICES = [
     ('minimal', 'Minimal'),
 ]
 
+TEMPLATE_MAP = {
+    "classic": "inv-temps/classic.html",
+    "modern":  "inv-temps/modern.html",
+    "minimal": "inv-temps/minimal.html",
+}
 
 class Invitation(models.Model):
     """
@@ -99,14 +110,13 @@ class Invitation(models.Model):
     is_draft = models.BooleanField(default=True, db_index=True)
     published_at = models.DateTimeField(null=True, blank=True)  # EK
 
-    # İsteğe bağlı: sadece yayınlanmış olanlar için convenience manager
     class Published(models.Manager):
         def get_queryset(self):
             return super().get_queryset().filter(is_draft=False)
 
     objects = models.Manager()
     published = Published()
-    # --- METHODS ---
+
     def __str__(self):
         return self.name
 
@@ -114,52 +124,97 @@ class Invitation(models.Model):
     def can_send(self) -> bool:
         """Gönderim/schedule yapılabilir mi?"""
         return (not self.is_draft) and (self.invitation_date is not None) and (not self.is_expired())
+
+    @cached_property
+    def preview_template_path(self) -> str:
+        return TEMPLATE_MAP.get(self.template, "inv-temps/classic.html")
+
+    def render_preview(self, request):
+        return render_to_string(self.preview_template_path, {"invitation": self}, request=request)
+
+    # ---- NEW: Backend validation (kredi yoksa reminders açılamaz)
+    def clean(self):
+        super().clean()
+        if self.reminders:
+            user = getattr(self.project, "owner", None)
+            if not user:
+                raise ValidationError({"project": "Sahip bilgisi eksik."})
+            if get_reminder_credits(user) < 1:
+                raise ValidationError({"reminders": "Hatırlatma hakkınız yok. Planınızı yükseltin."})
+
     def save(self, *args, **kwargs):
         """Custom save method to auto-fill fields and schedule reminders."""
-        # Set event date if missing
         if not self.invitation_date:
             self.invitation_date = timezone.now()
 
-        # Generate slug
         if not self.slug:
             base_slug = slugify(self.name)
             unique_suffix = str(uuid.uuid4())[:8]
             self.slug = f"{base_slug}-{unique_suffix}"
 
-        # Auto-generate password
         if self.is_password_protected and not self.password:
             self.password = get_random_string(length=16)
 
-        # Generate secure invite link
         self.secure_invite_link = generate_secure_invitation_link(self)
 
-        # Schedule reminders if enabled and automation is not already set
-        if self.reminders and not self.automation and self.can_send:
-            self.schedule_reminders()
-            self.automation = True
-
+        # Önce kaydet (id gerekiyor)
         super().save(*args, **kwargs)
 
+        # Planlama: reminders=True, automation=False ve gönderilebilir ise
+        if self.reminders and not self.automation and self.can_send:
+            self.schedule_reminders()
+
     def schedule_reminders(self):
-        """Schedule reminders based on reminder_config and limits."""
-        # Default reminder times if not set
+        """Kalan krediye göre gelecekteki slotları planla ve krediyi tüket."""
         if not self.can_send:
             return
-        times = self.reminder_config or [1440, 60, 30]  # minutes before event
 
+        now = timezone.now()
+        times = self.reminder_config or [1440, 60, 30]  # dakika
+        # Geleceğe düşen slotları topla
+        future_slots = []
         for minutes_before in times:
-            if self.reminders_sent >= self.max_reminders:
-                break
-
             send_time = self.invitation_date - timedelta(minutes=minutes_before)
+            if send_time > now:
+                future_slots.append(send_time)
+
+        if not future_slots:
+            return
+
+        # max_reminders sınırı + daha önce gönderilenler
+        remain_allowed = max(self.max_reminders - self.reminders_sent, 0)
+        future_slots = future_slots[:remain_allowed]
+        if not future_slots:
+            return
+
+        # Alıcılar
+        recipient_emails = list(self.recipients.values_list('email', flat=True))
+        if not recipient_emails:
+            # alıcı yoksa kredi tüketme / job kurma
+            return
+
+        # Kullanıcı & kredi tüketimi (1 slot = 1 kredi)
+        user = getattr(self.project, "owner", None)
+        if not user:
+            raise ValidationError("Sahip bilgisi eksik.")
+
+        needed_credits = len(future_slots)
+        consume_reminder_credits(user, needed_credits)
+
+        # E-postaları planla
+        for send_time in future_slots:
             scheduler.schedule_email(
-                recipients=self.recipients.values_list('email', flat=True),
+                recipients=recipient_emails,
                 send_time=send_time,
                 subject=f"Reminder: {self.name}",
                 message=self.reminder_message or self.message,
                 callback=self.update_last_reminder_sent,
             )
             self.reminders_sent += 1
+
+        # Otomasyon artık kuruldu
+        self.automation = True
+        self.save(update_fields=['reminders_sent', 'automation'])
 
     def update_last_reminder_sent(self, *args, **kwargs):
         self.last_reminder_sent = timezone.now()

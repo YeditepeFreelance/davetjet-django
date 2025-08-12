@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Klasik Davetiye</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Georgia", serif;
+        background: #f6f4f0;
+        color: #333;
+        display: flex;
+        justify-content: center;
+      }
+
+      .invitation-container {
+        background: #fff;
+        padding: 4rem 3rem;
+        max-width: 600px;
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        position: relative;
+      }
+
+      .invitation-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 6px;
+        width: 80px;
+        background-color: #4caf50;
+        border-radius: 3px;
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #222;
+      }
+
+      p {
+        font-size: 1.05rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+      }
+
+      .event-details {
+        margin-top: 2rem;
+        font-weight: 500;
+      }
+
+      .event-details p {
+        margin: 0.3rem 0;
+      }
+
+      .footer-note {
+        font-style: italic;
+        font-size: 0.9rem;
+        margin-top: 2rem;
+        color: #666;
+      }
+
+      [contenteditable]:hover {
+        outline: 1px dashed #4caf50;
+        cursor: text;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invitation-container">
+      <h1  data-id="header" id="event-title">
+        Ahmet & Ayşe'nin Düğünü'ne Davetlisiniz
+      </h1>
+
+      <p  data-id="intro" id="event-message">
+        Siz değerli dostlarımızı, bu mutlu günümüzde bizimle birlikte olmaya
+        davet ediyoruz.
+      </p>
+
+      <div class="event-details">
+        <p>
+          <strong>Tarih:</strong>
+          <span  data-id="date" id="event-date"
+            >20 Eylül 2025</span
+          >
+        </p>
+        <p>
+          <strong>Saat:</strong>
+          <span  data-id="time" id="event-time"
+            >19:30</span
+          >
+        </p>
+        <p>
+          <strong>Mekan:</strong>
+          <span  data-id="location" id="event-location"
+            >Sahil Düğün Bahçesi, İstanbul</span
+          >
+        </p>
+      </div>
+
+      <p class="footer-note"  data-id="rsvp">
+        Lütfen 10 Eylül 2025 tarihine kadar geri dönüş yapınız.
+      </p>
+    </div>
+
+    <script>
+      // Bu alan backend entegrasyonunda kullanılabilir
+      console.log("Klasik şablon (data-id destekli) yüklendi");
+    </script>
+  </body>
+</html>

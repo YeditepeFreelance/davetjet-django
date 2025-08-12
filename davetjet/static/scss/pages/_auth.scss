@@ -405,3 +405,99 @@
     }
   }
 }
+
+/* === Login – mobile polish & a11y patch === */
+
+/* 1) Mobile viewport güvenli: 100dvh + safe-area paddings */
+.login-page {
+  min-height: 100dvh;
+  /* iOS bar bug fix */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 2) Backdrop-filter fallback (eski cihazlar) */
+@supports not ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+  .login-page .login-wrapper {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  }
+}
+
+/* 3) Küçük telefon optimizasyonları */
+@media (max-width: 360px) {
+  .login-page .login-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .login-page .login-header p {
+    font-size: .8rem;
+  }
+
+  .login-page .login-form label input {
+    padding: .7rem .9rem;
+    font-size: .9rem;
+  }
+
+  .login-page .login-form .login-btn {
+    padding: .85rem;
+    font-size: .9rem;
+  }
+}
+
+/* 4) Daha iyi odak & caret görünürlüğü */
+.login-page .login-form input {
+  caret-color: #fff;
+  outline-offset: 2px;
+}
+
+.login-page .login-form input:focus-visible,
+.login-page .custom-select:focus-within {
+  box-shadow: 0 0 0 2px rgba(0, 255, 255, .25);
+  border-color: rgba(0, 255, 255, .65);
+}
+
+/* 5) Custom select – küçük ekranda daha rahat liste yüksekliği */
+.login-page .custom-select-wrapper .custom-options {
+  max-height: min(50vh, 240px);
+  overscroll-behavior: contain;
+}
+
+/* 6) Hata kutuları dar ekranda taşmasın */
+@media (max-width: 600px) {
+
+  .form-error,
+  .field-error {
+    font-size: .8rem;
+    padding: .6rem .8rem;
+  }
+}
+
+/* 7) Animasyon azaltımı (erişilebilirlik) */
+@media (prefers-reduced-motion: reduce) {
+  .login-page * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 8) Dosya input yüksekliği – dokunmatik için yeterli alan */
+.login-page input[type='file'] {
+  min-height: 44px;
+  /* touch target */
+}
+
+/* 9) Küçük spacing iyileştirmeleri */
+.login-page .login-form {
+  gap: .75rem;
+}
+
+.login-page .login-form label {
+  margin-bottom: 1rem;
+}
+
+.login-page .login-form .login-btn {
+  touch-action: manipulation;
+  will-change: transform, box-shadow;
+}

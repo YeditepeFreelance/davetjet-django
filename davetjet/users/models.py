@@ -1,11 +1,17 @@
+from datetime import timedelta
 import sys
+from math import ceil
 from django.db import models
 from django.apps import apps
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 from davetjet.config import language_choices
-from django.db.models import Max
+from django.db.models import Max, Q, Count
 from django.utils import timezone
+
+from invitations.models import Invitation
+from projects.models import Project
+from recipients.models import Recipient
 
 class User(AbstractUser):
     """
@@ -24,6 +30,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=True)
     last_login = models.DateTimeField(auto_now=True)
     active_devices = models.JSONField(default=list, blank=True)
+    reminder_credits = models.IntegerField(default=3)
 
     # Related models
 
@@ -49,47 +56,115 @@ class User(AbstractUser):
     def __str__(self):
         return self.username 
 
-    def get_statistics(self):
-        projects = self.projects.all()
+    def get_statistics(self, range_hours=24):
+        projects = Project.objects.filter(owner=self)
         if not projects:
-            return {
-                'invitee_count': 0,
-                'rsvp_ratio': 0,
-                'last_reminder_sent': None,
-                'event_date': None
+            return None, {
+                "invitee_count": 0,
+                "recipient_count_change": 0,
+                "recipient_count_change_pct": 0.0,  # %
+                "rsvp_ratio": 0.0,                  # %
+                "rsvp_ratio_change": 0.0,           # yüzde puan
+                "last_reminder_sent": None,
+                "time_left": None,
+                "event_date": None,
+                "status_counts": {"yes": 0, "maybe": 0, "no": 0, "pending": 0},
             }
 
-        project_ids = projects.values_list('id', flat=True)
-        invitee_count = sum(project.recipients.count() for project in projects)
+        project_ids = list(projects.values_list("id", flat=True))
 
-        rsvp_ratio = 1 # Placeholder for RSVP ratio calculation
-        # Get all invitations related to the user's projects as a queryset
-        Invitation = apps.get_model('invitations', 'Invitation')  # Replace 'your_app_name' with the actual app name
-        invitations_qs = Invitation.objects.filter(project_id__in=project_ids)
-        last_reminder_sent = invitations_qs.aggregate(latest_reminder=Max('last_reminder_sent'))['latest_reminder']
-        event_date = invitations_qs.aggregate(latest_event=Max('invitation_date'))['latest_event']
+        # Tüm davetliler (tekrarsız)
+        recs = (
+            Recipient.objects
+            .filter(invitations__project_id__in=project_ids)
+            .distinct()
+        )
+        invitee_count = recs.count()
 
-        # Calculate time left to the event (in days and hours) using basic functions
+        # Anlık durum dağılımı
+        status_rows = recs.values("rsvp_status").annotate(c=Count("id"))
+        counts = {r["rsvp_status"]: r["c"] for r in status_rows}
+        yes = counts.get("yes", 0)
+        maybe = counts.get("maybe", 0)
+        no = counts.get("no", 0)
+        pending = counts.get("pending", 0)
+
+        responded = yes + maybe + no
+        rsvp_ratio = (responded / invitee_count) if invitee_count else 0.0  # 0–1
+
+        # --- Değişimler: periyot başlangıcına göre ---
+        start_dt = timezone.now() - timedelta(hours=range_hours)
+
+        # Periyot BAŞINDA mevcut olan davetliler (yaklaşık: created_at <= start_dt)
+        past_recs = recs.filter(created_at__lte=start_dt)
+        prev_total = past_recs.count()
+
+        # Kişi sayısı değişimi (mutlak & yüzde)
+        recipient_count_change = invitee_count - prev_total
+        if prev_total:
+            recipient_count_change_pct = (recipient_count_change / prev_total) * 100.0
+        else:
+            recipient_count_change_pct = 100.0 if invitee_count > 0 else 0.0
+
+        # Periyot BAŞINDA zaten yanıtlamış olanlar (yaklaşık)
+        previously_responded = (
+            past_recs.filter(updated_at__lte=start_dt)
+                    .exclude(rsvp_status="pending")
+                    .count()
+        )
+        prev_ratio = (previously_responded / prev_total) if prev_total else 0.0  # 0–1
+        rsvp_ratio_change = (rsvp_ratio - prev_ratio) * 100.0  # yüzde puan
+
+        # Çıkışları yüzde formatına çevir (2 ondalık)
+        rsvp_ratio_pct = round(rsvp_ratio * 100.0, 0)
+        rsvp_ratio_change_pct = round(rsvp_ratio_change, 0)
+        recipient_count_change_pct = round(recipient_count_change_pct, 0)
+
+        # Son hatırlatma ve en yakın etkinlik
+        last_reminder_sent = (
+            Invitation.objects
+            .filter(project_id__in=project_ids, last_reminder_sent__isnull=False)
+            .order_by("-last_reminder_sent")
+            .values_list("last_reminder_sent", flat=True)
+            .first()
+        )
+        invitation = Invitation.objects.filter(project_id__in=project_ids, is_draft=False).order_by("invitation_date")
+        event_date = (
+            invitation.values_list("invitation_date", flat=True)
+            .first()
+        )
+ # === time_left (saat/gün/ay) ===
         time_left = None
         if event_date:
             now = timezone.now()
             delta = event_date - now
-            print(f"Time left for event: {delta}", file=sys.stderr)
-            if delta.total_seconds() > 0:
-                days_left = delta.days
-                hours_left = delta.seconds // 3600
-                time_left = {'days': days_left, 'hours': hours_left}
+            secs = delta.total_seconds()
+            if secs <= 0:
+                time_left = 'Yok'
             else:
-                time_left = {'days': 0, 'hours': 0}
+                hours = ceil(secs / 3600)
+                days = ceil(secs / 86400)
+                if days < 1:
+                    value, unit = hours, "saat"
+                elif days > 30:
+                    months = ceil(days / 30)
+                    value, unit = months, "ay"
+                else:
+                    value, unit = days, "gün"
+                time_left = f"{int(value)} {unit}"
 
-        return {
-            'invitee_count': invitee_count if invitee_count else 0,
-            'rsvp_ratio': f'%{rsvp_ratio * 100}' if rsvp_ratio else 0,
-            'last_reminder_sent': last_reminder_sent if last_reminder_sent else "Yok",
-            'event_date': event_date if event_date else None,
-            'time_left': f"{time_left['days']} Gün" if time_left['days'] > 0 else f"{time_left['hours']} Saat" if time_left['hours'] > 0 else "Geldi!"
+        return invitation.first(), {
+            "invitee_count": invitee_count,
+            "recipient_count_change": recipient_count_change,
+            "recipient_count_change_pct": recipient_count_change_pct,  # %
+            "rsvp_ratio": rsvp_ratio_pct,                              # %
+            "rsvp_ratio_change": rsvp_ratio_change_pct,                # yüzde puan
+            "last_reminder_sent": last_reminder_sent or "Yok",
+            "time_left": time_left,
+            "event_date": event_date,
+            "status_counts": {"yes": yes, "maybe": maybe, "no": no, "pending": pending},
         }
-    
+
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'

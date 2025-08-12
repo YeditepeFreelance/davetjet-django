@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Davetiye + RSVP Form</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f6f9;
+        color: #333;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .invitation-card {
+        max-width: 600px;
+        background: #fff;
+        padding: 3rem 2.5rem;
+        border-radius: 1.2rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+      }
+      .invitation-card h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: #222;
+      }
+      .invitation-card p {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+      }
+      .event-details { margin: 2rem 0; }
+      .event-details span {
+        display: block; font-weight: 500; margin: 0.4rem 0; font-size: 1.05rem;
+      }
+      .divider { width: 100%; height: 1px; background: #ddd; margin: 2rem 0; }
+
+      /* RSVP Form */
+      .rsvp-form {
+        max-width: 600px;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 1.2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        width: 100%;
+      }
+      .rsvp-form h2 {
+        font-size: 1.6rem; margin-bottom: 1rem; text-align: center; color: #222;
+      }
+      .input-group { position: relative; margin-bottom: 1rem; }
+      .input-group input {
+        width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 0.5rem; font-size: 1rem;
+      }
+      .suggestions {
+        position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ccc; border-top: none;
+        z-index: 100; max-height: 180px; overflow-y: auto; display: none;
+      }
+      .suggestion-item { padding: 0.6rem; cursor: pointer; }
+      .suggestion-item:hover { background: #f0f0f0; }
+      .rsvp-status {
+        display: flex; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+      }
+      .chip {
+        padding: 0.6rem 1.2rem; border-radius: 2rem; border: 1px solid #ccc; cursor: pointer; user-select: none;
+        transition: all 0.2s ease; background: #fff;
+      }
+      .chip.active { background: #4caf50; color: #fff; border-color: #4caf50; }
+      .rsvp-submit {
+        width: 100%; padding: 0.9rem; background: #4caf50; color: #fff; border: none; border-radius: 0.6rem;
+        font-size: 1rem; cursor: pointer; transition: background 0.2s ease;
+      }
+      .rsvp-submit:disabled { background: #ccc; cursor: not-allowed; }
+      .rsvp-msg { margin-top: 0.8rem; font-size: 0.95rem; text-align: center; min-height: 1.2rem; }
+      .rsvp-msg.ok { color: #2e7d32; }
+      .rsvp-msg.err { color: #e53935; }
+
+      @media (max-width: 600px) {
+        .invitation-card, .rsvp-form { padding: 1.5rem; }
+        .invitation-card h1 { font-size: 2rem; }
+      }
+
+      /* Gizli slug holder */
+      #inv-slug { display: none; }
+    </style>
+  </head>
+  <body>
+    <!-- Davetiye -->
+    <div class="invitation-card">
+      <h1 id="event-title">Ahmet & Ayşe</h1>
+      <p id="event-message">Hayatımızın en özel anını birlikte paylaşmaya ne dersiniz?</p>
+
+      <div class="event-details">
+        <span id="event-date"><strong>Tarih:</strong> 12 Ağustos 2025</span>
+        <span id="event-time"><strong>Saat:</strong> 19:30</span>
+        <span id="event-location"><strong>Yer:</strong> Bahar Kır Düğün Salonu, İstanbul</span>
+      </div>
+
+      <div class="divider"></div>
+      <p>Sevgi ve saygılarımızla davetlisiniz.</p>
+    </div>
+
+    <!-- RSVP Form -->
+    <div class="rsvp-form" aria-labelledby="rsvp-title">
+      <h2 id="rsvp-title">Katılım Bildirimi</h2>
+
+      <div class="input-group">
+        <input type="text" id="rsvp-name" placeholder="Adınızı yazın" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="name-suggestions" />
+        <div class="suggestions" id="name-suggestions" role="listbox" aria-live="polite"></div>
+      </div>
+
+      <div class="rsvp-status" role="group" aria-label="Katılım durumu seçin">
+        <div class="chip" data-status="yes" role="button" tabindex="0">Geleceğim</div>
+        <div class="chip" data-status="maybe" role="button" tabindex="0">Emin Değilim</div>
+        <div class="chip" data-status="no" role="button" tabindex="0">Gelmeyeceğim</div>
+      </div>
+
+      <button id="rsvp-submit" class="rsvp-submit" disabled>Gönder</button>
+      <div id="rsvp-msg" class="rsvp-msg" aria-live="polite"></div>
+    </div>
+
+    <!-- Django view slug buraya yazacak -->
+    <span id="inv-slug"></span>
+
+    <script>
+      // --- Utilities ---
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+      }
+      function debounce(fn, delay = 250) {
+        let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+      }
+      function deriveSlugFromURL() {
+        // /invitations/<slug>/ veya /i/<slug> gibi
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        return parts.pop() || "";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const nameInput = document.getElementById("rsvp-name");
+        const suggestionsBox = document.getElementById("name-suggestions");
+        const statusChips = document.querySelectorAll(".chip");
+        const submitBtn = document.getElementById("rsvp-submit");
+        const msg = document.getElementById("rsvp-msg");
+
+        let slug = (document.getElementById("inv-slug")?.textContent || "").trim();
+        if (!slug) slug = deriveSlugFromURL();
+
+        let selectedStatus = null;
+        let currentFetchController = null;
+
+        function updateButtonState() {
+          submitBtn.disabled = !nameInput.value.trim() || !selectedStatus;
+        }
+
+        // Status seçimi + klavye
+        statusChips.forEach((chip) => {
+          function activate() {
+            statusChips.forEach((c) => c.classList.remove("active"));
+            chip.classList.add("active");
+            selectedStatus = chip.dataset.status;
+            updateButtonState();
+          }
+          chip.addEventListener("click", activate);
+          chip.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); }
+          });
+        });
+
+        // Dışarı tıklayınca önerileri kapat
+        document.addEventListener("click", (e) => {
+          if (!suggestionsBox.contains(e.target) && e.target !== nameInput) {
+            suggestionsBox.style.display = "none";
+            nameInput.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        // İsim yazıldığında öneriler (debounced)
+        const fetchSuggestions = debounce(async () => {
+          const q = nameInput.value.trim();
+          if (q.length < 1) {
+            suggestionsBox.style.display = "none";
+            nameInput.setAttribute("aria-expanded", "false");
+            return;
+          }
+
+          // Önceki istek devam ediyorsa iptal
+          if (currentFetchController) currentFetchController.abort();
+          currentFetchController = new AbortController();
+
+          try {
+            const res = await fetch(`/recipients/${encodeURIComponent(slug)}/?q=${encodeURIComponent(q)}`, {
+              signal: currentFetchController.signal
+            });
+            if (!res.ok) throw new Error("Öneriler alınamadı");
+            const data = await res.json();
+
+            suggestionsBox.innerHTML = "";
+            if (Array.isArray(data) && data.length) {
+              data.forEach((item, idx) => {
+                const div = document.createElement("div");
+                div.classList.add("suggestion-item");
+                div.setAttribute("role", "option");
+                div.setAttribute("id", `suggestion-${idx}`);
+                div.textContent = item.name;
+                div.addEventListener("click", () => {
+                  nameInput.value = item.name;
+                  suggestionsBox.style.display = "none";
+                  nameInput.setAttribute("aria-expanded", "false");
+                  updateButtonState();
+                });
+                suggestionsBox.appendChild(div);
+              });
+              suggestionsBox.style.display = "block";
+              nameInput.setAttribute("aria-expanded", "true");
+            } else {
+              suggestionsBox.style.display = "none";
+              nameInput.setAttribute("aria-expanded", "false");
+            }
+          } catch (err) {
+            // İptal edildiyse ses etme
+          }
+        }, 250);
+
+        nameInput.addEventListener("input", () => {
+          updateButtonState();
+          fetchSuggestions();
+        });
+
+        // Enter ile gönder
+        nameInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (!submitBtn.disabled) submitBtn.click();
+          }
+        });
+
+        // Form gönderimi
+        submitBtn.addEventListener("click", async () => {
+          msg.textContent = "";
+          msg.className = "rsvp-msg";
+          submitBtn.disabled = true;
+
+          const csrftoken = getCookie("csrftoken");
+
+          try {
+            const res = await fetch(`/recipients/${encodeURIComponent(slug)}/`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken || "",
+              },
+              body: JSON.stringify({
+                name: nameInput.value.trim(),
+                status: selectedStatus,
+              }),
+              credentials: "same-origin", // CSRF cookie için
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok && data && data.message) {
+              msg.textContent = data.message;
+              msg.className = "rsvp-msg ok";
+            } else {
+              msg.textContent = data.error || "Bir hata oluştu. Lütfen tekrar deneyin.";
+              msg.className = "rsvp-msg err";
+            }
+          } catch (e) {
+            msg.textContent = "Ağ hatası. Lütfen tekrar deneyin.";
+            msg.className = "rsvp-msg err";
+          } finally {
+            submitBtn.disabled = false;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

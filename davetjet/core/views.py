@@ -17,9 +17,9 @@ from invitations.serializers import InvitationSerializer
 
 class DashboardView(LoginRequiredMixin, View):
   def get(self, request, *args, **kwargs):
-    statistics = request.user.get_statistics()
+    invitation, statistics = request.user.get_statistics()
 
-    return render(request, 'dashboard/index.html', {'profile': request.user.profile, 'statistics': statistics})
+    return render(request, 'dashboard/index.html', {'profile': request.user.profile, 'statistics': statistics, 'invitation': invitation})
 
   login_url = '/login/'
 

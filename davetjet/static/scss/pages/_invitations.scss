@@ -1200,6 +1200,13 @@
   border: 1px solid #e6ece7;
 }
 
+/* Kilitli grup stili */
+.is-off {
+  opacity: .55;
+  pointer-events: none;
+  filter: grayscale(.05);
+}
+
 @keyframes shine {
   0% {
     background-position: 100% 50%

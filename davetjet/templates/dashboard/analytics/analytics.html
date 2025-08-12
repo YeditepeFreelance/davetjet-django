@@ -11,8 +11,10 @@
         <select id="invitationSelect">
           <option value="all">Tümü</option>
           <!-- Backend: dinamik doldur -->
-          <option value="1">Ahmet & Ayşe Düğünü</option>
-          <option value="2">Ali’nin Doğum Günü</option>
+          {% for inv in invitations %}
+    <option value="{{ inv.pk }}">{{ inv.name }}</option>
+    {# veya slug kullanacaksan: value="{{ inv.slug }}" #}
+  {% endfor %}
         </select>
       </div>
 
@@ -178,6 +180,41 @@
       </table>
     </div>
   </section>
+
+  <section class="analytics__table glass-card" id="recipientsPanel" style="display:none">
+  <div class="panel__header">
+    <h3>Katılımcı Yanıtları</h3>
+    <div class="panel__legend small" style="display:flex; gap:.5rem; align-items:center;">
+      <label class="muted">Durum</label>
+      <select id="rsvpFilter">
+        <option value="all">Tümü</option>
+        <option value="yes">Evet</option>
+        <option value="maybe">Emin Değil</option>
+        <option value="no">Hayır</option>
+        <option value="pending">Beklemede</option>
+      </select>
+      <input id="rsvpSearch" type="search" placeholder="İsim, e-posta, telefon" style="min-width:220px;">
+      <button id="rsvpExport" class="btn">CSV</button>
+    </div>
+  </div>
+  <div class="table__wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>İsim</th>
+          <th>E-posta</th>
+          <th>Telefon</th>
+          <th>RSVP</th>
+          <th>Son Güncelleme</th>
+        </tr>
+      </thead>
+      <tbody id="recipientsBody">
+        <!-- JS dolduracak -->
+      </tbody>
+    </table>
+  </div>
+</section>
+
 </div>
 {% endblock %}
 
@@ -187,49 +224,137 @@
 // Backend bağlayınca burayı fetch/axios ile değiştir.
 // Filtreler baz alınarak örnek veri üretir.
 const DataAPI = {
+  // ... mevcut fonksiyonların yanında:
+  async getInvitationRecipients(key, { status = 'all', search = '' } = {}) {
+    if (!key || key === 'all') return { count: 0, results: [] };
+    const base = `/invitations/api/analytics/invitations/${encodeURIComponent(key)}/recipients/`;
+    const qs = new URLSearchParams({ status, search });
+    const r = await fetch(`${base}?${qs.toString()}`, { headers: { "X-Requested-With":"XMLHttpRequest" }});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  },
+
+
+  async listInvitations() {
+    const url = "{% url 'invitations:analytics-inv-list' %}";
+    const r = await fetch(url, { headers: { "X-Requested-With":"XMLHttpRequest" }});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  },
   async getSummary({ invitation='all', channel='all', range='30d' }) {
-    // örnek sayılar
-    const seed = range === '7d' ? 0.7 : range === '90d' ? 1.3 : 1.0;
-    const total = Math.round(820 * seed);
-    const delivered = Math.round(total * 0.95);
-    const bounces = total - delivered;
-    const opened = Math.round(delivered * 0.62);
-    const clicked = Math.round(opened * 0.35);
-    const rsvped = Math.round(opened * 0.28);
-    const yes = Math.round(rsvped * 0.65);
-    const maybe = Math.round(rsvped * 0.15);
-    const no = Math.max(rsvped - yes - maybe, 0);
-
-    const channels = {
-      email: Math.round(delivered * 0.65),
-      sms: Math.round(delivered * 0.25),
-      whatsapp: Math.max(delivered - Math.round(delivered * 0.9), 0) + Math.round(delivered * 0.10),
-    };
-
-    const timelineDays = range === '7d' ? 7 : range === '90d' ? 30 : 14; // grafik sade
-    const timeline = Array.from({length: timelineDays}, (_,i) => ({
-      send: Math.round((delivered/timelineDays) * (0.7 + Math.random()*0.6)),
-      open: Math.round((opened/timelineDays) * (0.7 + Math.random()*0.6)),
-      rsvp: Math.round((rsvped/timelineDays) * (0.7 + Math.random()*0.6)),
-    }));
-
-    const top = Array.from({length: 10}, (_,i) => ({
-      name: `Davet ${i+1}`,
-      sent: 40 + Math.round(Math.random()*400),
-      opened: 20 + Math.round(Math.random()*300),
-      rsvp: 5 + Math.round(Math.random()*150),
-      updated: new Date(Date.now() - (i+1)*86400000).toLocaleDateString('tr-TR'),
-      url: '#'
-    }));
-
-    return {
-      totals: { total, delivered, bounces, opened, clicked, rsvped, yes, maybe, no },
-      channels,
-      timeline,
-      top
-    };
+    const base = "{% url 'invitations:analytics-overview' %}";
+    const qs = new URLSearchParams({ invitation, channel, range });
+    const r = await fetch(`${base}?${qs}`, { headers: { "X-Requested-With":"XMLHttpRequest" }});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  },
+  async getInvitationDetail(id, range='30d') {
+    const base = "{% url 'invitations:analytics-inv-detail' pk=0 %}".replace("0", String(id));
+    const r = await fetch(`${base}?range=${encodeURIComponent(range)}`, { headers: { "X-Requested-With":"XMLHttpRequest" }});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
   }
 };
+function renderRecipientsTable(rows) {
+  const tbody = document.getElementById('recipientsBody');
+  if (!tbody) return;
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="muted">Kayıt bulunamadı.</td></tr>`;
+    return;
+  }
+  const label = { yes:"Evet", maybe:"Emin Değil", no:"Hayır", pending:"Beklemede" };
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.name || "—"}</td>
+      <td>${r.email || "—"}</td>
+      <td>${r.phone || "—"}</td>
+      <td><span class="rsvp-badge rsvp--${r.status}">${label[r.status] || r.status}</span></td>
+      <td>${r.updated ? new Date(r.updated).toLocaleString('tr-TR') : "—"}</td>
+    </tr>
+  `).join('');
+}
+
+
+function exportRecipientsCSV() {
+  const rows = [['İsim','E-posta','Telefon','RSVP','Son Güncelleme']];
+  document.querySelectorAll('#recipientsBody tr').forEach(tr=>{
+    const cols = Array.from(tr.children).map(td=> td.textContent.trim());
+    rows.push(cols);
+  });
+  const csv = rows.map(r=>r.map(v=>`"${v.replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'recipients.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// sayfa açılışında dropdown’u doldur
+document.addEventListener("DOMContentLoaded", async () => {
+  try{
+    const sel = document.getElementById('invitationSelect');
+    // mevcut “Tümü”’nü koru, altına gerçek liste gelsin
+    const list = await DataAPI.listInvitations();
+    list.forEach(i => {
+      const opt = document.createElement('option');
+      opt.value = String(i.id);
+      opt.textContent = i.name;
+      sel.appendChild(opt);
+    });
+  }catch(e){ console.warn("Davet listesi alınamadı:", e); }
+});
+async function refresh() {
+  const invitation = document.getElementById('invitationSelect').value;
+  const channel    = document.getElementById('channelSelect').value;
+  const range      = document.getElementById('rangeSelect').value;
+  const panel      = document.getElementById('recipientsPanel');
+
+  // --- panel görünürlüğünü fetch'ten ÖNCE belirle
+  if (panel) panel.style.display = (invitation !== "all") ? "" : "none";
+
+  // overview her zaman çekilir
+  let data;
+  try {
+    data = await DataAPI.getSummary({ invitation, channel, range });
+    updateKpis(data.totals);
+    updateBars(data.channels);
+    updateFunnel({
+      delivered: data.totals.delivered,
+      opened:    data.totals.opened,
+      clicked:   data.totals.clicked,
+      rsvped:    data.totals.rsvped
+    });
+    drawTimeline(data.timeline);
+    renderTopInvites(data.top);
+  } catch (e) {
+    console.error("[analytics] overview error:", e);
+    // en azından UI çökmeyip eski değerleri korusun
+  }
+
+  // tek davet seçildiyse RSVP donut + alıcı listesi
+  if (invitation !== "all") {
+    try {
+      const d = await DataAPI.getInvitationDetail(invitation, range);
+      // donut merkez yüzdesi toplam delivered üstünden daha anlamlı
+      const totalDelivered = data?.totals?.delivered ?? 1;
+      updateDonut({ yes: d.rsvp.yes, maybe: d.rsvp.maybe, no: d.rsvp.no, total: totalDelivered });
+    } catch (e) {
+      console.warn("[analytics] detail error:", e);
+    }
+
+    try {
+      const status = document.getElementById('rsvpFilter')?.value || "all";
+      const search = document.getElementById('rsvpSearch')?.value?.trim() || "";
+      const recs   = await DataAPI.getInvitationRecipients(invitation, { status, search });
+      renderRecipientsTable(recs.results);
+    } catch (e) {
+      console.warn("[analytics] recipients error:", e);
+      renderRecipientsTable([]); // boş tablo + "Kayıt bulunamadı" satırı
+    }
+  }
+}
+
 
 // ---- DOM helpers -------------------------------------------------------------
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -355,7 +480,7 @@ function updateKpis({ total, delivered, bounces, opened, rsvped }) {
 }
 
 // ---- Orkestrasyon ------------------------------------------------------------
-async function refresh() {
+{% comment %} async function refresh() {
   const filters = {
     invitation: document.getElementById('invitationSelect').value,
     channel: document.getElementById('channelSelect').value,
@@ -373,11 +498,24 @@ async function refresh() {
   });
   drawTimeline(data.timeline);
   renderTopInvites(data.top);
-}
+} {% endcomment %}
+// Recipients panel filtreleri
+document.getElementById('rsvpFilter')?.addEventListener('change', refresh);
+document.getElementById('rsvpSearch')?.addEventListener('input', (e)=>{
+  // küçük debounce
+  clearTimeout(window.__rsvpSearchT);
+  window.__rsvpSearchT = setTimeout(()=> refresh(), 300);
+});
+document.getElementById('rsvpExport')?.addEventListener('click', exportRecipientsCSV);
 
 // Events
-document.getElementById('applyFilters').addEventListener('click', refresh);
 document.getElementById('exportCSV').addEventListener('click', () => exportCSV());
+document.getElementById('invitationSelect')?.addEventListener('change', refresh);
+document.getElementById('channelSelect')?.addEventListener('change', refresh);
+document.getElementById('rangeSelect')?.addEventListener('change', refresh);
+
+// Zaten var: Uygula butonu
+document.getElementById('applyFilters')?.addEventListener('click', refresh);
 
 // Basit CSV export
 function exportCSV() {

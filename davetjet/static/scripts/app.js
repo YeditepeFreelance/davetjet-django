@@ -570,3 +570,91 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   app.start();
 });
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".btn--csv");
+  if (!btn) return;
+  btn.classList.add("is-loading");
+  btn.setAttribute("aria-busy", "true");
+  // export tamamlanınca:
+  // btn.classList.remove('is-loading'); btn.removeAttribute('aria-busy');
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const burger = document.getElementById("hamburger");
+  const menu = document.getElementById("siteMenu");
+  const closer = menu?.querySelector(".menu-close");
+  const backdrop = document.getElementById("navBackdrop");
+
+  const toggle = (open) => {
+    const willOpen = open ?? !menu.classList.contains("is-open");
+    menu.classList.toggle("is-open", willOpen);
+    burger?.classList.toggle("is-open", willOpen);
+    burger?.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    backdrop?.classList.toggle("is-show", willOpen);
+    if (willOpen) backdrop?.removeAttribute("hidden");
+    else backdrop?.setAttribute("hidden", "");
+    document.body.classList.toggle("no-scroll", willOpen);
+  };
+
+  burger?.addEventListener("click", () => toggle());
+  closer?.addEventListener("click", () => toggle(false));
+  backdrop?.addEventListener("click", () => toggle(false));
+  menu?.addEventListener("click", (e) => {
+    if (e.target.closest("a")) toggle(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") toggle(false);
+  });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 992) toggle(false);
+  });
+});
+
+(function () {
+  function fitPreview(frame) {
+    const baseW = Number(frame.dataset.baseW || 390); // şablonun tasarım genişliği
+    const maxH = Number(frame.dataset.maxH || 260); // izin verilen maksimum yükseklik
+    const canvas = frame.querySelector(".inv-preview-canvas");
+    if (!canvas) return;
+
+    // önce reset
+    canvas.style.transform = "scale(1)";
+    frame.style.height = "";
+
+    // genişliğe göre ölçek: frame %100 genişliğe yayılıyor
+    const scale = frame.clientWidth / baseW;
+    canvas.style.transform = `scale(${scale})`;
+
+    // oluşan gerçek yükseklik
+    const contentH =
+      (canvas.scrollHeight || canvas.getBoundingClientRect().height) * scale;
+
+    // yükseklik sınırı: maxH’ı aşarsa kırp (overflow: hidden sayesinde)
+    frame.style.height = Math.min(contentH, maxH) + "px";
+  }
+
+  function init() {
+    const frames = document.querySelectorAll(".inv-preview-frame");
+    const rerun = () => frames.forEach(fitPreview);
+
+    // ilk
+    rerun();
+
+    // görseller yüklendikçe
+    frames.forEach((f) => {
+      f.querySelectorAll("img,video").forEach((m) => {
+        m.addEventListener("load", () => fitPreview(f));
+      });
+    });
+
+    // resize
+    window.addEventListener("resize", rerun);
+
+    // font/render sonrası 1 tick
+    requestAnimationFrame(rerun);
+    window.addEventListener("load", rerun);
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();

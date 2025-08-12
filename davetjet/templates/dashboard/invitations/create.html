@@ -340,7 +340,7 @@
               <button type="button" class="btn" id="saveDraftBtn">Taslağa Kaydet</button>
               <button type="button" class="btn btn--primary" id="finishBtn">Yayınla</button>
               <!-- Step 5: Final row içine EK -->
-              <button type="button" class="btn btn--primary hidden" id="updateBtn">Güncelle</button>
+<button id="updateBtn" type="button" class="btn btn--primary hidden">Güncelle</button>
             </div>
             <small class="muted xs">Taslak; alıcı eklenmeden kaydedilir.</small>
           </section>
@@ -487,9 +487,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const draftsGrid = document.getElementById("draftsGrid");
 
   // URL paramları + sunucudan gelen meta
-  const params = new URLSearchParams(location.search);
-  const bootMeta = window.INV_META || null;
-  let editId = params.get("inv") || (bootMeta ? String(bootMeta.id) : null); // LET olmalı (sonradan set ediyoruz)
+ // --- EDIT ID BOOT ---
+const params   = new URLSearchParams(location.search);
+const bootMeta = window.INV_META || null;
+
+// let kullan; akışta güncelleyeceğiz
+let editId = params.get("inv")
+           || (bootMeta && bootMeta.id ? String(bootMeta.id) : document.body.dataset.invId || null);
+
+window.editId = editId;           // handler'lar window.editId'ı kullanıyor
+console.log("[BOOT] editId =", window.editId);
   const forcedDraft = params.get("draft") === "1" || (bootMeta ? bootMeta.is_draft : false);
   let isEditing = !!editId;
   let isEditingDraft = forcedDraft || !!bootMeta?.is_draft;
@@ -614,12 +621,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (rem.quota.used > rem.quota.max){ toast("Kota yetersiz. Seçimi azaltın ya da paketi yükseltin."); return false; }
     return true;
   }
-
-  function ensureRemindersValidOrThrow(){
-    if (!validateReminders()){
-      const e = new Error("REM_INVALID"); e.code = "REM_INVALID"; throw e;
-    }
+function ensureRemindersValidOrThrow(){
+  if (typeof validateReminders === "function" && !validateReminders()){
+    const err = new Error("REM_INVALID");
+    err.code = "REM_INVALID";
+    throw err;
   }
+}
 
   (function initRemindersFromMeta(){
     const meta = window.INV_META || null;
@@ -837,6 +845,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const waNode = document.getElementById("mp-wa-text");
     waNode && waNode.replaceChildren(document.createTextNode(compiled));
   }
+// === Başlangıçta (ilk yüklemede) kilitlenecek alanlar ===
+// ŞİFRE (protect) ve HATIRLATICI kartı HARİÇ hepsi kilitli olsun.
+(function lockInitialSettings(){
+  // Güvenlik: "Süre sınırlaması" (expToggle + tarih alanı) kilitli
+  if (expToggle) {
+    expToggle.disabled = true;
+    expToggle.setAttribute('aria-disabled','true');
+  }
+  if (expiryRow) {
+    expiryRow.classList.add('is-off');
+    expiryRow.querySelectorAll('input,select,button').forEach(el=>{
+      el.disabled = true;
+      el.setAttribute('aria-disabled','true');
+    });
+  }
+
+  // Görünüm: Tema & Dil kilitli
+  const appBody = document.querySelector('.appearance-card .card-body');
+  if (appBody) {
+    appBody.classList.add('is-off');
+    appBody.querySelectorAll('input,select,button').forEach(el=>{
+      el.disabled = true;
+      el.setAttribute('aria-disabled','true');
+    });
+  }
+
+  // HATIRLATICI kartı BİLEREK dokunmuyoruz (aktif kalacak)
+  // ŞİFRE koruma (protectToggle) ve şifre alanları da aktif kalsın
+})();
 
   function updateSmsCounter(text) {
     if (!smsCountEl || !smsLimitEl || !smsSegsEl) return;
@@ -891,40 +928,63 @@ document.addEventListener("DOMContentLoaded", () => {
   closeFullscreenBtn?.addEventListener("click", () => expandModal.classList.add("hidden"));
 
   // ===== UPDATE (Publish edilmiş davetiyeyi güncelle)
-  updateBtn?.addEventListener("click", async () => {
-    if (!editId) return;
-    const old = updateBtn.textContent;
-    updateBtn.disabled = true; updateBtn.textContent = "Güncelleniyor…";
+// GÜNCELLE (event delegation: DOM'a sonradan gelse bile çalışır)
+  document.addEventListener("click", async (evt) => {
+    const btn = evt.target.closest("#updateBtn");
+    if (!btn) return;
+
+    console.log("[UPDATE] click yakalandı");
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    if (!window.editId) { console.warn("[UPDATE] editId yok"); toast && toast("Kayıt yüklenmedi."); return; }
+
+    const old = btn.textContent;
+    btn.disabled = true; btn.textContent = "Güncelleniyor…";
+
     try{
       ensureRemindersValidOrThrow();
+
+      const tplSel = document.querySelector(".template-card.selected");
       const payload = {
-        name: eventTitle.value.trim(),
-        message: eventMessage.value || "",
-        invitation_date: (eventDate.value && eventTime.value) ? `${eventDate.value}T${eventTime.value}:00` : null,
-        template: document.querySelector(".template-card.selected")?.dataset.template, // yayınlanmışta backend ignore edebilir
-        is_password_protected: !!protectToggle?.checked,
-        password: protectToggle?.checked ? (invitePassword?.value || "") : "",
+        name: (document.getElementById("eventTitle")?.value || "").trim(),
+        message: document.getElementById("eventMessage")?.value || "",
+        invitation_date: (document.getElementById("eventDate")?.value && document.getElementById("eventTime")?.value)
+          ? `${document.getElementById("eventDate").value}T${document.getElementById("eventTime").value}:00`
+          : null,
+        template: tplSel ? tplSel.dataset.template : undefined, // published'ta backend ignore edebilir
+        is_password_protected: !!document.getElementById("protectToggle")?.checked,
+        password: document.getElementById("protectToggle")?.checked ? (document.getElementById("invitePassword")?.value || "") : "",
         // reminders
-        reminders: rem.enabled,
-        reminder_config: rem.enabled ? buildReminderConfig() : [],
-        reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
-        delivery_settings: getDeliverySettings(),
+        reminders: window.rem?.enabled ?? false,
+        reminder_config: (window.rem?.enabled ? (typeof buildReminderConfig==="function" ? buildReminderConfig() : []) : []),
+        reminder_message: (document.getElementById("broadcastMessage")?.value || document.getElementById("eventMessage")?.value || "").trim(),
+        // delivery
+        delivery_settings: (typeof getDeliverySettings==="function" ? getDeliverySettings() : {}),
       };
 
-      const url = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", editId);
+      const url = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", String(window.editId));
+      console.log("[UPDATE] PATCH →", url, payload);
+
       const r = await fetch(url, {
         method: "PATCH",
-        headers: { "Content-Type":"application/json", "X-CSRFToken": getCSRF() },
+        headers: { "Content-Type":"application/json", "X-CSRFToken": (document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? "") },
         body: JSON.stringify(payload)
       });
-      const data = await r.json().catch(()=> ({}));
-      if(!r.ok) throw new Error(data?.detail || "Update failed");
-      toast("Güncellendi ✅");
+
+      const isNoContent = r.status === 204 || r.headers.get("content-length") === "0";
+      const data = isNoContent ? {} : await r.json().catch(()=> ({}));
+      if (!r.ok) throw new Error(data?.detail || `HTTP ${r.status}`);
+
+      console.log("[UPDATE] success", data);
+      toast && toast("Güncellendi ✅");
+      // İstersen: data && hydrateFromData(data);
     }catch(e){
-      if (e.code !== "REM_INVALID") console.error(e);
-      if (e.code !== "REM_INVALID") toast("Güncellenemedi");
+      if (e.code === "REM_INVALID") return;
+      console.error("[UPDATE] error", e);
+      toast && toast("Güncellenemedi");
     }finally{
-      updateBtn.disabled = false; updateBtn.textContent = old;
+      btn.disabled = false; btn.textContent = old;
     }
   });
 

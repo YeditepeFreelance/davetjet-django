@@ -1,29 +1,44 @@
 @use '../abstracts/variables';
+@use '../abstracts/mixins' as *;
 
 :root {
   --sidebar-width: 30rem;
-  /* Default sidebar width */
+  /* desktop */
 }
 
-
-
+/* ============ LAYOUT ============ */
 .dashboard {
   display: flex;
   flex-direction: row;
-  height: 100dvh;
-  height: 100vh;
-  background-color: #fff;
+  min-height: 100dvh;
   gap: 3rem;
   padding: 3rem;
+  background: #fff;
+
+  @include respond(1200px) {
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  @include respond(992px) {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.2rem;
+  }
 }
 
 .sidebar {
-  max-width: var(--sidebar-width);
   width: 100%;
-  background-color: #F7F7F7;
+  max-width: var(--sidebar-width);
+  background: #F7F7F7;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   height: 100%;
+
+  @include respond(992px) {
+    max-width: 100%;
+    height: auto;
+  }
 
   .premium-box {
     background: linear-gradient(135deg, map-get(variables.$colors, primary), map-get(variables.$colors, primary-dark) 125%);
@@ -41,15 +56,15 @@
       display: inline-block;
       width: 100%;
       padding-block: 1rem;
-      background-color: map-get(variables.$colors, primary-dark);
+      background: map-get(variables.$colors, primary-dark);
       color: #fff;
       font-size: 1.6rem;
       border-radius: 4px;
       text-decoration: none;
-      transition: background-color 0.3s ease;
+      transition: .3s;
 
       &:hover {
-        background-color: lighten(map-get(variables.$colors, primary-dark), 5%);
+        background: lighten(map-get(variables.$colors, primary-dark), 5%);
       }
     }
   }
@@ -59,91 +74,164 @@
     flex-direction: column;
     padding: 3rem;
     height: 100%;
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
     justify-content: space-between;
+    gap: 2rem;
+    /* 🔼 bölüm aralığı */
 
-    ul {
-      display: flex;
-      flex-direction: column;
-      list-style: none;
-      gap: .8rem;
+    @include respond(992px) {
+      padding: 1.8rem;
+      gap: 2.4rem;
+      /* 🔼 mobilde daha rahat */
+      height: auto;
     }
 
+    /* başlıklar */
     h3 {
       font-size: 1.6rem;
       color: #949494;
       text-transform: uppercase;
       font-weight: 600;
-      margin-bottom: 2.4rem;
+      margin-bottom: 1.2rem;
+      /* 🔽 */
+      letter-spacing: .04em;
     }
 
+    /* listeler */
+    ul {
+      display: flex;
+      flex-direction: column;
+      list-style: none;
+      gap: 1.4rem;
+
+      /* 🔼 satır aralığı */
+      @include respond(768px) {
+        gap: 1.6rem;
+      }
+
+      /* 🔼 mobilde biraz daha */
+    }
+
+    /* menü öğesi */
     li {
-      padding: 0.5rem 1rem;
-      color: #9f9e9e;
-      font-size: 2rem;
-      text-decoration: none;
-      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      padding: 1.05rem 1.2rem;
+      /* 🔼 dikey padding */
+      min-height: 44px;
+      /* 🔼 tıklama alanı (a11y) */
+      border-radius: .9rem;
+      color: #6b7280;
+      font-size: 1.8rem;
+      line-height: 1.35;
+      /* 🔼 satır yüksekliği */
+      transition: background .2s ease, color .2s ease, transform .12s ease;
+
+      @include respond(768px) {
+        font-size: 1.7rem;
+      }
 
       a {
         display: flex;
         align-items: center;
-        gap: 1.6rem;
+        gap: 1.4rem;
+        /* 🔼 ikon-yazı aralığı */
         color: inherit;
         text-decoration: none;
-      }
-
-      span {
-        transition: transform 0.3s ease;
+        inline-size: 100%;
       }
 
       i {
         color: #666;
-        font-size: 2rem;
-        transition: color 0.3s ease;
+        font-size: 2.2rem;
+        /* 🔼 ikon biraz büyük */
+        transition: color .2s ease;
+        flex: 0 0 auto;
       }
 
-      &.active {
+      span {
+        transition: transform .2s ease;
+        flex: 1 1 auto;
+      }
+
+      /* hover/active durumları */
+      &:hover {
         color: map-get(variables.$colors, primary);
+        background: rgba(0, 0, 0, .04);
+
+        span {
+          transform: translateX(.2rem);
+        }
 
         i {
           color: map-get(variables.$colors, primary);
         }
       }
 
-      &:hover {
-
+      &.active {
         color: map-get(variables.$colors, primary);
-
-        span {
-          transform: translateX(.3rem);
-        }
+        background: rgba(map-get(variables.$colors, primary), .10);
 
         i {
           color: map-get(variables.$colors, primary);
         }
       }
     }
+
+    /* bölümler arası ekstra boşluk */
+    .menu-settings+.gen-settings {
+      margin-top: .4rem;
+    }
+  }
+
+  /* İsteğe bağlı: kompakt mod (yoğun görünüm) */
+  &.is-compact {
+    .menu {
+      gap: 1.2rem;
+    }
+
+    .menu ul {
+      gap: .9rem;
+    }
+
+    .menu li {
+      padding: .8rem 1rem;
+      min-height: 38px;
+      font-size: 1.6rem;
+    }
   }
 }
 
+
 .main-content {
   flex: 1;
+  min-width: 0;
 }
 
+/* ============ TOP BAR ============ */
 .top-bar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
   padding: 1rem 2.4rem;
-  background-color: #F7F7F7;
+  background: #F7F7F7;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+
+  @include respond(992px) {
+    flex-wrap: wrap;
+    padding: .9rem 1rem;
+  }
 
   .top-actions {
     display: flex;
     align-items: center;
     gap: 2rem;
+
+    @include respond(768px) {
+      gap: 1.2rem;
+    }
   }
 
   .user-info {
@@ -161,6 +249,11 @@
       height: 6rem;
       border-radius: 50%;
       object-fit: cover;
+
+      @include respond(768px) {
+        width: 4.2rem;
+        height: 4.2rem;
+      }
     }
 
     span {
@@ -169,7 +262,7 @@
 
       small {
         display: block;
-        font-size: 1.6rem;
+        font-size: 1.4rem;
         color: #B4B4B4;
       }
     }
@@ -177,42 +270,50 @@
 
   i {
     font-size: 2rem;
-    color: rgba(#1E1E1E, 0.8);
+    color: rgba(#1E1E1E, .8);
     margin-right: 2rem;
-    transition: color 0.3s ease;
     position: relative;
     z-index: 2;
+    transition: .3s;
 
     &:last-child {
       margin-right: 0;
     }
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
-      top: 50%;
-      z-index: -1;
-      left: 50%;
+      inset: 50% auto auto 50%;
       transform: translate(-50%, -50%);
       width: 4.8rem;
       height: 4.8rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background: #fff;
       border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+      z-index: -1;
     }
 
     &:hover {
       color: map-get(variables.$colors, primary);
     }
+
+    @include respond(768px) {
+      margin-right: 1rem;
+
+      &::after {
+        width: 3.6rem;
+        height: 3.6rem;
+      }
+    }
   }
 
   input {
-    width: 100%;
     width: 40rem;
+    max-width: 100%;
     padding: 1.4rem 1.6rem;
     border: none;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
     border-radius: 1600px;
     font-size: 1.6rem;
     color: #333;
@@ -220,26 +321,48 @@
     &::placeholder {
       color: #999;
     }
+
+    @include respond(1200px) {
+      width: 32rem;
+    }
+
+    @include respond(768px) {
+      width: 100%;
+      order: 3;
+    }
   }
 }
 
+/* ============ OVERVIEW ============ */
 .overview {
   display: flex;
   flex-direction: column;
   margin-top: 3rem;
   gap: 2rem;
   padding: 2.2rem;
-  background-color: #F7F7F7;
+  background: #F7F7F7;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+
+  @include respond(992px) {
+    padding: 1.2rem;
+    gap: 1.2rem;
+  }
 
   .overview-top {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     padding-inline-end: 2.4rem;
 
-    &>div {
+    @include respond(768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .6rem;
+      padding-inline-end: 0;
+    }
+
+    >div {
       display: flex;
       flex-direction: column;
       gap: .4rem;
@@ -249,47 +372,61 @@
       font-size: 1.6rem;
       color: #B4B4B4;
       margin-bottom: 2rem;
+
+      @include respond(768px) {
+        margin-bottom: 1rem;
+      }
     }
   }
 
   h1 {
     font-size: 4rem;
     color: #333;
+
+    @include respond(768px) {
+      font-size: 3rem;
+    }
   }
 
   .cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
-  }
 
-  .card.green {
-    background: linear-gradient(135deg, map-get(variables.$colors, primary), map-get(variables.$colors, primary-dark) 125%);
+    @include respond(1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
 
-    & * {
-      color: #fafafa !important;
+    @include respond(992px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+
+    @include respond(480px) {
+      grid-template-columns: 1fr;
     }
   }
 
   .card {
-    background-color: #fff;
+    position: relative;
+    background: #fff;
     padding: 2rem;
     border-radius: 16px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: .3s;
     will-change: transform;
 
     h2,
     h3 {
-      font-size: 2.8rem;
+      font-size: 2.4rem;
       color: #333;
       font-weight: 400;
     }
 
     .value {
-      font-size: 4.8rem;
+      font-size: 4rem;
       color: #333;
       font-weight: 600;
     }
@@ -299,15 +436,13 @@
       color: map-get(variables.$colors, primary);
     }
 
-    // ✨ Hover Animation
     &:hover {
-      transform: translateY(-8px) scale(1.015);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
     }
 
-    // Optional: Add transition delay stagger for inner text
     * {
-      transition: transform 0.3s ease, color 0.3s ease;
+      transition: .3s;
     }
 
     i {
@@ -319,27 +454,76 @@
       top: 1.2rem;
       transform: rotate(45deg);
     }
+
+    @include respond(768px) {
+      padding: 1.4rem;
+
+      h2,
+      h3 {
+        font-size: 2rem;
+      }
+
+      .value {
+        font-size: 3rem;
+      }
+
+      i {
+        font-size: 2.4rem;
+      }
+    }
+  }
+
+  .card.green {
+    background: linear-gradient(135deg, map-get(variables.$colors, primary), map-get(variables.$colors, primary-dark) 125%);
+
+    * {
+      color: #fafafa !important;
+    }
+  }
+
+  /* Dashboard overview içinde */
+  .overview {
+    .bottom-widgets {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      /* her satırda 2 kutu */
+      gap: 2rem;
+      /* aradaki boşluk */
+
+      /* mobile: tek kolon */
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
   }
 
   .bottom-widgets {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* her satırda 2 kutu */
     gap: 2rem;
+    /* aradaki boşluk */
+
+    /* mobile: tek kolon */
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
   }
+
+
 
   .mini-analysis {
     flex: 1;
     min-width: 30rem;
-    background-color: #fff;
+    background: #fff;
     padding: 2.4rem;
     border-radius: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
 
     h3 {
-      font-size: 2.4rem;
+      font-size: 2.2rem;
       color: #333;
-      margin-bottom: 1.6rem;
+      margin-bottom: 1.2rem;
     }
 
     ul {
@@ -361,6 +545,10 @@
         }
       }
     }
+
+    @include respond(768px) {
+      padding: 1.4rem;
+    }
   }
 
   .invite-preview {
@@ -368,12 +556,20 @@
 
     .content {
       display: flex;
-      flex-direction: row;
       align-items: center;
       justify-content: space-between;
+      gap: 1.2rem;
+
+      @include respond(768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
 
       img {
         max-width: 25rem;
+        width: 100%;
+        height: auto;
       }
 
       .actions {
@@ -385,7 +581,7 @@
       a {
         color: #333;
         font-size: 1.6rem;
-        transition: color 0.3s ease;
+        transition: .3s;
 
         &:hover {
           color: map-get(variables.$colors, primary);
@@ -395,32 +591,34 @@
   }
 }
 
+/* ============ TYPO/ICONS GLOBAL ============ */
 i {
   font-size: 1.6rem;
   color: #1E1E1E;
 }
 
-// Dashboard SETTINGS
-
-// static/scss/pages/_settings.scss
-
+/* ============ SETTINGS PAGE ============ */
 .settings-wrapper {
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  backdrop-filter: blur(20px);
   background: #f7f7f7;
   margin-top: 3rem;
   border-radius: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+
+  @include respond(768px) {
+    padding: 1.2rem;
+    gap: 1.2rem;
+  }
 
   .section-title {
     font-size: 2rem;
     font-weight: 600;
     color: map-get(variables.$colors, primary-dark);
     border-bottom: 2px solid map-get(variables.$colors, primary-light);
-    padding-bottom: 0.5rem;
+    padding-bottom: .5rem;
     margin-bottom: 1rem;
   }
 
@@ -430,55 +628,54 @@ i {
     gap: 2rem;
 
     .form-card {
-      background: rgba(255, 255, 255, 0.45);
+      background: rgba(255, 255, 255, .45);
       border-radius: 1.6rem;
       padding: 2rem;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
+
+      @include respond(768px) {
+        padding: 1.2rem;
+      }
 
       .form-title {
         font-size: 1.4rem;
         font-weight: 500;
         color: map-get(variables.$colors, primary);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.2rem;
       }
 
       .input-group {
         display: flex;
         flex-direction: column;
-        margin-bottom: 1.4rem;
+        margin-bottom: 1.2rem;
 
         label {
-          font-size: 0.95rem;
-          margin-bottom: 0.4rem;
+          font-size: .95rem;
+          margin-bottom: .4rem;
           color: #555;
         }
 
         input,
         select,
         textarea {
-          padding: 0.8rem 1.2rem;
-          border-radius: 0.8rem;
+          padding: .8rem 1.2rem;
+          border-radius: .8rem;
           border: 1px solid #ccc;
           font-size: 1rem;
-          background-color: #fff;
+          background: #fff;
         }
       }
 
       .image-upload {
         align-items: center;
-        justify-content: flex-start;
         gap: 1rem;
-
-        input[type="file"] {
-          display: none;
-        }
 
         .avatar-preview {
           width: 6rem;
           height: 6rem;
           border-radius: 50%;
           object-fit: cover;
-          box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 0 8px rgba(0, 0, 0, .1);
           border: 2px solid map-get(variables.$colors, primary-light);
         }
       }
@@ -491,11 +688,11 @@ i {
       .save-btn {
         background: map-get(variables.$colors, primary);
         color: #fff;
-        padding: 0.8rem 2rem;
+        padding: .8rem 2rem;
         border: none;
         border-radius: 1rem;
         font-size: 1rem;
-        transition: background 0.3s ease;
+        transition: .3s;
 
         &:hover {
           background: map-get(variables.$colors, primary-dark);
@@ -505,8 +702,7 @@ i {
   }
 }
 
-// Dashboard RECIPIENTS
-
+/* ============ RECIPIENTS TABLE ============ */
 .recipient-tracking {
   table {
     width: 100%;
@@ -526,20 +722,36 @@ i {
     }
 
     th {
-      background-color: #f7f7f7;
+      background: #f7f7f7;
       color: #333;
     }
 
-
     tr:hover {
-      background-color: #f1f1f1;
+      background: #f1f1f1;
+    }
+
+    @include respond(768px) {
+
+      th,
+      td {
+        padding: .7rem;
+        font-size: 1.25rem;
+      }
+    }
+
+    @include respond(480px) {
+
+      th,
+      td {
+        padding: .6rem;
+        font-size: 1.1rem;
+      }
     }
 
     .actions {
       display: flex;
-      gap: 0.5rem;
+      gap: .5rem;
       color: map-get(variables.$colors, primary);
-
 
       a {
         text-decoration: none;
@@ -552,14 +764,7 @@ i {
   }
 }
 
-// Notifications
-
-.notification-wrapper.hidden {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
-}
-
+/* ============ NOTIFICATIONS ============ */
 .notification-wrapper {
   position: fixed;
   top: 10.5rem;
@@ -567,82 +772,99 @@ i {
   z-index: 9999;
   max-width: 360px;
 
-  .notification-list {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(18px);
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  @include respond(1200px) {
+    right: 2rem;
   }
 
-  .notification {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 1rem 1.2rem;
-    color: #333;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    position: relative;
-    animation: fadeInSlide 0.3s ease forwards;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s ease;
+  @include respond(768px) {
+    top: 7rem;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(92vw, 360px);
+  }
+}
 
-    &.slide-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
+.notification-wrapper.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s, visibility .25s;
+}
 
-    &.fade-out {
-      opacity: 0 !important;
-      transform: translateY(-10px);
-    }
+.notification-wrapper .notification-list {
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .14);
+  backdrop-filter: blur(18px);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+}
 
-    &:last-child {
-      border-bottom: none;
-    }
+.notification-wrapper .notification {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: 1rem 1.2rem;
+  color: #333;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+  position: relative;
+  animation: fadeInSlide .3s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: .3s;
 
-    &.unread {
-      border-left: 4px solid map-get(variables.$colors, primary);
-    }
+  &:last-child {
+    border-bottom: none;
+  }
 
-    .icon {
-      font-size: 1.3rem;
-      margin-top: 2px;
-    }
+  &.unread {
+    border-left: 4px solid map-get(variables.$colors, primary);
+  }
 
-    .message {
-      flex: 1;
+  .icon {
+    font-size: 1.3rem;
+    margin-top: 2px;
+  }
 
-      p {
-        margin: 0 0 0.2rem;
-        font-weight: 500;
-        font-size: 1.2rem;
-      }
+  .message {
+    flex: 1;
 
-      small {
-        font-size: 1rem;
-        opacity: 0.75;
-      }
-    }
-
-    .notification-close-btn {
-      background: none;
-      border: none;
-      color: #565656;
+    p {
+      margin: 0 0 .2rem;
+      font-weight: 500;
       font-size: 1.2rem;
-      font-weight: 300;
-      padding: 0;
-      transition: opacity 0.2s ease;
+    }
 
-      &:hover {
-        opacity: 0.5;
-      }
+    small {
+      font-size: 1rem;
+      opacity: .75;
+    }
+  }
+
+  .notification-close-btn {
+    background: none;
+    border: none;
+    color: #565656;
+    font-size: 1.2rem;
+    font-weight: 300;
+    padding: 0;
+    transition: opacity .2s;
+
+    &:hover {
+      opacity: .5;
     }
   }
 }
 
+.notification-wrapper .notification.slide-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification-wrapper .notification.fade-out {
+  opacity: 0 !important;
+  transform: translateY(-10px);
+}
 
 .notification-trigger {
   position: relative;
@@ -654,7 +876,6 @@ i {
 .badge-pulse {
   position: absolute;
   top: -4px;
-  z-index: 9999;
   right: 2rem;
   width: 10px;
   height: 10px;
@@ -677,8 +898,8 @@ i {
 
 @keyframes pulse {
   0% {
-    transform: scale(0.9);
-    opacity: 0.7;
+    transform: scale(.9);
+    opacity: .7;
   }
 
   70% {
@@ -687,55 +908,54 @@ i {
   }
 
   100% {
-    transform: scale(0.9);
+    transform: scale(.9);
     opacity: 0;
   }
 }
 
-// Search Bar
-
-
-/* Input with light background */
+/* ============ SEARCH (top-bar) ============ */
 .search-input {
   width: 300px;
+  max-width: 100%;
   padding: 10px 16px;
   font-size: 16px;
   color: #222;
   background: #fafafa;
-  /* solid light background */
   border: 1px solid #ddd;
   border-radius: 12px;
   outline: none;
-  transition: box-shadow 0.3s ease;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+  transition: box-shadow .3s;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, .05);
+
+  &::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  &:focus {
+    box-shadow: 0 0 8px #3a86ff;
+    border-color: #3a86ff;
+  }
+
+  @include respond(768px) {
+    width: 100%;
+  }
 }
 
-.search-input::placeholder {
-  color: #999;
-  font-style: italic;
-}
-
-.search-input:focus {
-  box-shadow: 0 0 8px #3a86ff;
-  border-color: #3a86ff;
-}
-
-/* Suggestions glassmorphic with blur + translucency */
 .suggestions-list {
   position: absolute;
   top: 100%;
   left: 0;
   width: 100%;
   max-height: 180px;
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
   padding: 8px 0;
   list-style: none;
-  background: rgba(255 255 255 / 0.2);
+  background: rgba(255 255 255 / .2);
   border-radius: 16px;
-  border: 1px solid rgba(255 255 255 / 0.3);
-  box-shadow: 0 8px 24px rgba(58, 134, 255, 0.15);
+  border: 1px solid rgba(255 255 255 /.3);
+  box-shadow: 0 8px 24px rgba(58, 134, 255, .15);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   overflow-y: auto;
   z-index: 9999;
   font-size: 15px;
@@ -744,35 +964,336 @@ i {
   display: none;
 }
 
-
 .suggestions-list li {
   padding: 10px 20px;
   border-radius: 12px;
-  transition: background-color 0.25s ease;
+  transition: background-color .25s;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: none !important;
+  cursor: default;
 }
 
-/* Keyboard selection style */
 .suggestions-list li[aria-selected="true"] {
   background: map-get(variables.$colors, primary);
   color: map-get(variables.$colors, light);
   box-shadow: 0 0 8px map-get(variables.$colors, primary);
-  z-index: 1;
-  /* Make sure selected is on top */
 }
 
-/* Hover style only applies if not keyboard-selected */
 .suggestions-list:not(.selected) li:hover {
   background: map-get(variables.$colors, primary);
-  color: map-get(variables.$colors, light);
-  box-shadow: 0 0 8px map-get(variables.$colors, primary);
+  color: #fff;
 }
 
-/* Container label */
+/* Container label generic */
 label {
   position: relative;
   display: inline-block;
+}
+
+.card.invite-preview {
+  position: relative;
+}
+
+.card.invite-preview>.stretched-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.card.invite-preview .actions {
+  position: relative;
+  z-index: 2;
+}
+
+.card.invite-preview .actions a,
+.card.invite-preview .actions button {
+  position: relative;
+  z-index: 3;
+}
+
+
+$accent: map-get(variables.$colors, 'success'); // yoksa 'primary'ye çekebilirsin
+
+.btn {
+  &--sm {
+    padding: .6rem 1.2rem;
+    font-size: 1.3rem;
+    border-radius: .8rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+  }
+
+  &--csv {
+    background: rgba($accent, .10);
+    color: $accent;
+    border: 1px solid rgba($accent, .25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+
+    i {
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    &:hover {
+      background: rgba($accent, .14);
+      border-color: rgba($accent, .35);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .10);
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba($accent, .55);
+      outline-offset: 2px;
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+    }
+
+    &:disabled,
+    &[aria-busy="true"] {
+      opacity: .6;
+      pointer-events: none;
+    }
+
+    // Opsiyonel: loading spinner
+    &.is-loading::after {
+      content: "";
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+      margin-left: .6rem;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      display: inline-block;
+      animation: csvspin .7s linear infinite;
+    }
+  }
+}
+
+@keyframes csvspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Kart aksiyon şeridi */
+.btn-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .8rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    /* mobilde tek kolon, tam genişlik */
+  }
+}
+
+/* Boyut/pil şekli */
+.btn--sm {
+  padding: .9rem 1.4rem;
+  font-size: 1.4rem;
+  border-radius: .9rem;
+}
+
+.btn--pill {
+  border-radius: 9999px;
+}
+
+/* İkonlar */
+.btn i {
+  margin-right: .6rem;
+  font-size: 1.4rem;
+  line-height: 0;
+}
+
+/* Soft (nazik arkaplanlı) */
+.btn--soft {
+  background: rgba(map-get($colors, primary), .10);
+  color: map-get($colors, primary-dark);
+  border: 1px solid rgba(map-get($colors, primary), .20);
+  transition: background .2s ease, border-color .2s ease, transform .15s ease;
+
+  &:hover {
+    background: rgba(map-get($colors, primary), .16);
+    border-color: rgba(map-get($colors, primary), .32);
+    transform: translateY(-1px);
+  }
+}
+
+/* Outlined (zaten var—küçük dokunuş) */
+.btn--outlined {
+  border-width: 1.5px;
+  transition: background .2s ease, transform .15s ease, border-color .2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Primary + hafif yükselti */
+.btn--elevated {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .10);
+  transition: box-shadow .2s ease, transform .15s ease, background .2s ease;
+
+  &:hover {
+    box-shadow: 0 10px 22px rgba(0, 0, 0, .14);
+    transform: translateY(-1px);
+  }
+}
+
+/* Kart içi spacing */
+.card.invite-preview .actions {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+// MINI ANALYSIS
+
+
+.card.mini-analysis {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 1.8rem;
+
+  .ma-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .8rem;
+
+
+    .ma-badge {
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: .35rem .8rem;
+      border-radius: .6rem;
+      line-height: 1;
+      background: rgba(0, 0, 0, .05);
+      color: #222;
+
+      &.up {
+        background: rgba(map-get(variables.$colors, success), .12);
+        color: map-get(variables.$colors, success);
+      }
+
+      &.down {
+        background: rgba(map-get(variables.$colors, danger), .12);
+        color: map-get(variables.$colors, danger);
+      }
+    }
+  }
+
+  .ma-list {
+    margin: .2rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .ma-row {
+    display: grid;
+    grid-template-columns: 88px 1fr max-content;
+    align-items: center;
+    gap: 1rem;
+
+    .ma-label {
+      font-size: 1.35rem;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    .ma-bar {
+      height: .75rem;
+      border-radius: 999px;
+      background: #eef2f6;
+      position: relative;
+      overflow: hidden;
+
+      .ma-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        border-radius: inherit;
+        transition: width .35s ease;
+
+        &.is-yes {
+          background: map-get(variables.$colors, success);
+        }
+
+        &.is-no {
+          background: map-get(variables.$colors, danger);
+        }
+
+        &.is-pending {
+          background: #9aa0a6;
+        }
+      }
+    }
+
+    .ma-val {
+      font-size: 1.35rem;
+      color: #111;
+      min-width: 56px;
+      text-align: right;
+    }
+  }
+
+  .ma-footer {
+    margin-top: .4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .8rem;
+
+    small {
+      color: #6b7280;
+      font-size: 1.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+/* Küçük buton varyantı */
+.btn.btn--sm {
+  padding: .6rem 1.2rem;
+  font-size: 1.2rem;
+  border-radius: .6rem;
+  // color: map-get(variables.$colors, primary) !important;
+}
+
+/* frame: container'ı %100 kaplar, yüksekliği sınırlı, taşanı gizler */
+.inv-preview-frame {
+  width: 100%;
+  max-height: 260px;
+  /* data-max-h ile JS’te override ediliyor */
+  overflow: hidden;
+  /* fazla yükseklik kırpılsın */
+  border-radius: 12px;
+  background: #fff;
+  position: relative;
+}
+
+/* canvas: şablonun baz genişliği (scale ile genişliğe oturtacağız) */
+.inv-preview-canvas {
+  width: 390px;
+  /* data-base-w ile JS’te okunur */
+  transform-origin: top left;
+
+  /* güvenlik için */
+  & * {
+    max-width: 100%;
+  }
 }

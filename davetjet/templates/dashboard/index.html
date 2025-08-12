@@ -8,27 +8,25 @@
           Bu ekrandan davetiyelerinize ve daha fazlasına göz atabilirsiniz
         </p>
       </div>
-      <a href="#" class="btn btn--create">
-        <i class="fa-solid fa-plus"></i>
-      </a>
+      
     </div>
       <!-- Cards -->
       <div class="cards">
         <div class="card green">
           <h2>Davetli Sayısı</h2>
           <span class="value">{{ statistics.invitee_count }}</span>
-          <p>Son 24 saatte %10 artış!</p>
-          
+          <p>Son 24 saatte {{ statistics.recipient_count_change_pct }} artış!</p>
+
         </div>
         <div class="card">
           <h2>RSVP Durumu</h2>
-          <span class="value">{{ statistics.rsvp_ratio }}</span>
-          <p>Son 24 saatte %10 artış!</p>
+          <span class="value">%{{ statistics.rsvp_ratio }}</span>
+          <p>Son 24 saatte %{{ statistics.rsvp_ratio_change }} artış!</p>
         </div>
         <div class="card">
           <h2>Son Hatırlatma</h2>
           <span class="value">{{ statistics.last_reminder_sent }}</span>
-          <p>Hatırlatma ekle!</p>
+          <p>Şimdi hatırlatma gönder!</p>
         </div>
         <div class="card">
           <h2>Düğün Tarihi</h2>
@@ -40,16 +38,17 @@
       <!-- Bottom Section -->
       <div class="bottom-widgets">
         <div class="card invite-preview">
-          <h3>Birincil Davetiye</h3>
+          <h3>{{ invitation.name }}</h3>
           <div class="content">
-            <img
-              src="{% static 'images/invitation-sample.png' %}"
-              alt="Davetiye"
-            />
+            <div class="inv-preview-frame" data-base-w="390" data-max-h="140">
+            <div class="inv-preview-canvas">
+              {% include invitation.preview_template_path with invitation=invitation only %}
+            </div>
+          </div>
             <div class="actions">
               <a>PDF İndir</a>
-              <a>Gönderime Geç</a>
-              <a>Düzenle</a>
+              <a href="{% url 'core:analytics' %}">İstatistikler</a>
+              <a href="{% url 'core:edit-invitation-api' invitation.id %}">Düzenle</a>
               <p>Link: Kopyala</a></p>
             </div>
           </div>
@@ -57,17 +56,112 @@
 
         </div>
 
-        <div class="card mini-analysis">
-          <h3>Mini Analiz</h3>
-          <ul>
-            <li>Katılım: <strong>25.7%</strong></li>
-            <li>Red: <strong>25.7%</strong></li>
-            <li>Cevapsız: <strong>25.7%</strong></li>
-          </ul>
-          <small>Öngörü: %85’i mobil cihazlardan</small>
-          <i class="fa-solid fa-circle-chevron-up"></i>
+        <div class="card mini-analysis" id="miniAnalysis">
+          <div class="ma-header">
+            <h3>Mini Analiz</h3>
+            <span class="ma-badge up" id="maTrend">+0%</span>
+          </div>
 
+          <ul class="ma-list">
+            <li class="ma-row">
+              <span class="ma-label">Katılım</span>
+              <div class="ma-bar"><span class="ma-fill is-yes" id="maYesBar" style="width:0%"></span></div>
+              <strong class="ma-val" id="maYesVal">–</strong>
+            </li>
+            <li class="ma-row">
+              <span class="ma-label">Red</span>
+              <div class="ma-bar"><span class="ma-fill is-no" id="maNoBar" style="width:0%"></span></div>
+              <strong class="ma-val" id="maNoVal">–</strong>
+            </li>
+            <li class="ma-row">
+              <span class="ma-label">Cevapsız</span>
+              <div class="ma-bar"><span class="ma-fill is-pending" id="maPendingBar" style="width:0%"></span></div>
+              <strong class="ma-val" id="maPendingVal">–</strong>
+            </li>
+          </ul>
+
+          <div class="ma-footer">
+            <small id="maForecast">Öngörü: —</small>
+            <a href="{% url 'core:analytics' %}" class="btn btn--outline btn--sm" id="maDetailsBtn" type="button">Detay</a>
+          </div>
         </div>
+
       </div>
     </section>
+{% endblock %}
+{% block extra_js %}
+{{ statistics|json_script:"stats-json" }}
+<script>
+  function fillMiniAnalysisFromStats(stats) {
+    if (!stats || typeof stats !== 'object') return;
+
+    // helpers
+    const $ = (id) => document.getElementById(id);
+    const setText = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    const setWidthPct = (id, pct) => {
+      const el = $(id);
+      if (!el) return;
+      const n = Math.max(0, Math.min(100, Math.round(Number(pct) || 0)));
+      el.style.width = n + '%';
+    };
+
+    const total   = Number(stats.invitee_count) || 0;
+    const yes     = Number(stats.status_counts?.yes) || 0;
+    const no      = Number(stats.status_counts?.no) || 0;
+    const pending = Number(stats.status_counts?.pending) || 0;
+
+    const pct = (v, t) => (t > 0 ? Math.round((v / t) * 100) : 0);
+
+    const yesPct     = pct(yes, total);
+    const noPct      = pct(no, total);
+    const pendingPct = pct(pending, total);
+
+    // Bars
+    setWidthPct('maYesBar', yesPct);
+    setWidthPct('maNoBar', noPct);
+    setWidthPct('maPendingBar', pendingPct);
+
+    // Texts
+    setText('maYesVal',     `${yesPct}%`);
+    setText('maNoVal',      `${noPct}%`);
+    setText('maPendingVal', `${pendingPct}%`);
+
+    // Trend (assumed percent already; if it's 0–1 ratio, multiply by 100)
+    const trendEl = $('maTrend');
+    if (trendEl) {
+      let delta = Number(stats.rsvp_ratio_change ?? 0);
+      // If backend sends 0–1, uncomment next line:
+      // if (Math.abs(delta) <= 1) delta *= 100;
+      delta = Math.round(delta);
+      const sign = delta > 0 ? '+' : '';
+      trendEl.textContent = `${sign}${delta}%`;
+      trendEl.classList.toggle('up', delta >= 0);
+      trendEl.classList.toggle('down', delta < 0);
+    }
+
+    // Forecast line
+    const forecastEl = $('maForecast');
+    if (forecastEl) {
+      if (typeof stats.device_mobile_share === 'number') {
+        forecastEl.textContent = `Öngörü: %${Math.round(stats.device_mobile_share)}’i mobil cihazlardan`;
+      } else {
+        const rsvpPct = Math.round(Number(stats.rsvp_ratio ?? 0));
+        forecastEl.textContent = `Genel RSVP: %${rsvpPct}`;
+      }
+    }
+  }
+document.addEventListener('DOMContentLoaded', () => {
+  const node = document.getElementById('stats-json');
+  if (!node) return;
+  try {
+    const stats = JSON.parse(node.textContent || '{}');
+    fillMiniAnalysisFromStats(stats);
+  } catch (e) {
+    console.warn('[mini-analysis] stats-json parse failed:', e);
+  }
+});
+// Auto-init from a <script type="application/json" id="stats-json 
+
+</script>
+
 {% endblock %}

@@ -6,7 +6,7 @@
     <!-- Basic Meta -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
     <!-- SEO -->
     <title>
@@ -84,71 +84,117 @@
     {% block top_content %} {% endblock %}
 
     <div class="dashboard">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="menu">
-          <div class="menu-settings">
-            <h3>MENU</h3>
-            <ul>
-              <li class="active">
-                <a href="{% url 'core:dashboard' %}">
-                  <i class="fa-regular fa-house"></i>
-                  <span>Genel Bakış</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'core:invitations' %}">
-                  <i class="fa-regular fa-envelope"></i>
-                  <span>Davetiyeler</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'core:recipients' %}">
-                  <i class="fa-solid fa-users"></i>
-                  <span>Davetli Listesi</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'core:dashboard' %}">
-                  <i class="fa-regular fa-paper-plane"></i>
-                  <span>Gönderim</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'core:dashboard' %}">
-                  <i class="fa-solid fa-chart-simple"></i>
-                  <span>İstatistikler</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div class="gen-settings">
-            <h3>GENEL</h3>
-            <ul>
-              <li>
-                <a href="{% url 'core:package' %}">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                <span>Paketim</span>
-                </a></li>
-              <li><a href="{% url 'core:settings' %}">
-                <i class="fa-solid fa-gear"></i>
-                <span>Ayarlar</span></a></li>
-              <li><a href="{% url 'core:logout' %}">
-                <i class="fa-solid fa-power-off"></i>
-                <span>Oturumu Kapat</span></a></li>
-            </ul>
-          </div>
-          <div class="premium-box">
-            <p>
-              Daha yüksek davet limiti, otomasyonlar ve daha fazlası için...
-            </p>
-            <a href="{% url 'core:subscribe' %}">Şimdi Premium Ol!</a>
-          </div>
-        </div>
-      </aside>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar" data-collapsed="false" aria-label="Kenar Menü">
+
+
+ {% with name=request.resolver_match.url_name %}
+
+<div class="menu">
+  <div class="menu-settings">
+    <h3>MENU</h3>
+    <ul>
+      <li class="{% if name == 'dashboard' %}active{% endif %}">
+        <a href="{% url 'core:dashboard' %}" class="sb-item" {% if name == 'dashboard' %}aria-current="page"{% endif %}>
+          <i class="fa-regular fa-house"></i>
+          <span class="label">Genel Bakış</span>
+        </a>
+      </li>
+
+      {# Davetiyeler: liste/oluştur/düzenle/detay/drafts #}
+      {% with name=request.resolver_match.url_name %}
+        <li class="{% if name == 'invitations' or name == 'invitation_detail' or name == 'create_invitation' or name == 'edit_invitation' or name == 'invitation_drafts' %}active{% endif %}">
+          <a href="{% url 'core:invitations' %}" class="sb-item" {% if name == 'invitations' or name == 'invitation_detail' or name == 'create_invitation' or name == 'edit_invitation' or name == 'invitation_drafts' %}aria-current="page"{% endif %}>
+            <i class="fa-regular fa-envelope"></i>
+            <span class="label">Davetiyeler</span>
+          </a>
+        </li>
+      {% endwith %}
+
+
+      {# Davetli listesi: ana/editle/upload vs. #}
+      {% with name=request.resolver_match.url_name %}
+<li class="{% if name == 'recipients' or name == 'edit_recipients' or name == 'recipients_upload' or name == 'project_recipients' %}active{% endif %}">
+  <a href="{% url 'core:recipients' %}" class="sb-item"
+     {% if name == 'recipients' or name == 'edit_recipients' or name == 'recipients_upload' or name == 'project_recipients' %}aria-current="page"{% endif %}>
+    <i class="fa-solid fa-users"></i>
+    <span class="label">Davetli Listesi</span>
+  </a>
+</li>
+{% endwith %}
+
+
+      <li class="{% if name == 'send' %}active{% endif %}">
+        <a href="{% url 'core:dashboard' %}" class="sb-item" {% if name == 'send' %}aria-current="page"{% endif %}>
+          <i class="fa-regular fa-paper-plane"></i>
+          <span class="label">Gönderim</span>
+        </a>
+      </li>
+
+      {% with name=request.resolver_match.url_name %}
+<li class="{% if name == 'analytics' or name == 'analytics_detail' %}active{% endif %}">
+  <a href="{% url 'core:analytics' %}" class="sb-item"
+     {% if name == 'analytics' or name == 'analytics_detail' %}aria-current="page"{% endif %}>
+    <i class="fa-solid fa-chart-simple"></i>
+    <span class="label">İstatistikler</span>
+  </a>
+</li>
+{% endwith %}
+
+    </ul>
+  </div>
+
+  <div class="gen-settings">
+    <h3>GENEL</h3>
+    <ul>
+      <li class="{% if name == 'package' %}active{% endif %}">
+        <a href="{% url 'core:package' %}" class="sb-item" {% if name == 'package' %}aria-current="page"{% endif %}>
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="label">Paketim</span>
+        </a>
+      </li>
+
+      <li class="{% if name == 'settings' %}active{% endif %}">
+        <a href="{% url 'core:settings' %}" class="sb-item" {% if name == 'settings' %}aria-current="page"{% endif %}>
+          <i class="fa-solid fa-gear"></i>
+          <span class="label">Ayarlar</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="{% url 'core:logout' %}" class="sb-item">
+          <i class="fa-solid fa-power-off"></i>
+          <span class="label">Oturumu Kapat</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="premium-box {% if name == 'subscribe' %}active{% endif %}">
+    <p>Daha yüksek davet limiti, otomasyonlar ve daha fazlası için...</p>
+    <a href="{% url 'core:subscribe' %}" class="sb-item" {% if name == 'subscribe' %}aria-current="page"{% endif %}>
+      <i class="fa-solid fa-crown"></i>
+      <span class="label">Şimdi Premium Ol!</span>
+    </a>
+  </div>
+</div>
+
+{% endwith %}
+
+
+  <!-- Desktop daraltma düğmesi -->
+  <button id="sbCollapse" class="sb-collapse" type="button" aria-label="Menüyü daralt/genişlet">⟷</button>
+</aside>
+        <div id="sidebarBackdrop" class="sidebar-backdrop" hidden></div>
+
+
       <!-- Main Content -->
       <main class="main-content">
         <header class="top-bar">
+          <button id="dashHamburger" class="hamburger-btn" aria-controls="sidebar" aria-expanded="false" aria-label="Menüyü aç/kapat">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          </button>
           <label for="search-input" style="position: relative; display: inline-block;">
           <input
             type="text"
@@ -162,6 +208,8 @@
           
           <ul id="search-suggestions" class="suggestions-list" role="listbox" aria-label="Search suggestions"></ul>
         </label>
+
+
 
           <div class="top-actions">
             <i class="fa-regular fa-envelope"></i>
@@ -187,6 +235,7 @@
     <script src="{% static 'scripts/searchBar.js' %}" defer></script>
     <script src="{% static 'scripts/modal.js' %}" defer></script>
     <script src="{% static 'scripts/notifications.js' %}" defer></script>
+    <script src="{% static 'scripts/sidebar.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

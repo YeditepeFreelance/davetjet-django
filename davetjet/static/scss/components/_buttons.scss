@@ -1,122 +1,369 @@
 @use '../abstracts/variables';
-@use '../abstracts/animations';
+@use '../abstracts/mixins' as *;
 
-.btn {
-  display: inline-block;
-  padding: 1.2rem 2.4rem;
-  font-size: 1.6rem;
-  border: none;
-  border-radius: .8rem;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-
-  &--create {
-    background-color: darken(map-get(variables.$colors, primary-aqua), 20%);
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-    width: 6rem;
-    height: 6rem;
-    border-radius: 50%;
-    display: flex;
+/* ===== Buttons (mobile-first) ====--= */
+.dashboard {
+  .btn {
+    /* reset + layout */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: .8rem;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    text-align: center;
+    border: 0;
+    border-radius: .8rem;
 
+    /* type */
+    font-weight: 600;
+    font-size: 1.6rem;
+    line-height: 1;
 
-    i {
-      font-size: 2.4rem;
-      color: rgba(map-get(variables.$colors, light), 1);
+    /* box */
+    padding: 1.2rem 2.4rem;
+    transition: transform .12s ease, box-shadow .25s ease, background-color .25s ease, color .25s ease;
+
+    /* focus & a11y */
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 .3rem rgba(map-get(variables.$colors, primary-aqua), .25);
     }
 
-    &:hover {
-      background-color: darken(map-get(variables.$colors, primary-aqua), 10%);
-      color: lighten(map-get(variables.$colors, dark), 10%);
-      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-      transform: translateY(-0.1rem);
+    /* press micro-interaction */
+    &:active {
+      transform: translateY(1px) scale(.995);
+    }
+
+    /* disabled */
+    &:disabled,
+    &[aria-disabled="true"] {
+      opacity: .55;
+      cursor: not-allowed;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+
+    /* loading */
+    &[aria-busy="true"] {
+      pointer-events: none;
+      position: relative;
+    }
+
+    &[aria-busy="true"] .btn__spinner {
+      inline-size: 1.4rem;
+      block-size: 1.4rem;
+      border: .2rem solid rgba(0, 0, 0, .1);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: btn-spin .8s linear infinite;
     }
   }
 
-  &--danger {
-    background-color: map-get(variables.$colors, danger);
+}
+
+/* sizes */
+.btn--xs {
+  padding: .6rem 1.2rem;
+  font-size: 1.2rem;
+  border-radius: .6rem;
+}
+
+.btn--sm {
+  padding: .9rem 1.6rem;
+  font-size: 1.4rem;
+  border-radius: .7rem;
+}
+
+.btn--md {
+  /* default */
+}
+
+.btn--lg {
+  padding: 1.6rem 3.2rem;
+  font-size: 1.8rem;
+  border-radius: .9rem;
+}
+
+.btn--xl {
+  padding: 1.8rem 3.8rem;
+  font-size: 2rem;
+  border-radius: 1rem;
+}
+
+/* block (mobilde tam genişlik) */
+.btn--block {
+  inline-size: 100%;
+}
+
+@include respond(768px) {
+  .btn--mobile-block {
+    inline-size: 100%;
+  }
+}
+
+/* icon-only */
+.btn--icon {
+  inline-size: 3.6rem;
+  block-size: 3.6rem;
+  padding: 0;
+  border-radius: .8rem;
+  font-size: 1.8rem;
+}
+
+/* variants */
+.btn--primary {
+  background-color: map-get(variables.$colors, primary-aqua);
+  color: map-get(variables.$colors, light) !important;
+  box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
+  padding: 1.6rem 4.8rem;
+
+  &:hover {
+    background-color: darken(map-get(variables.$colors, primary-aqua), 10%);
+    color: lighten(map-get(variables.$colors, dark), 10%);
+    box-shadow: 0 .4rem .8rem rgba(0, 0, 0, .18);
+  }
+}
+
+.btn--outlined {
+  background-color: transparent;
+  color: map-get(variables.$colors, primary);
+  border: .1rem solid map-get(variables.$colors, primary);
+  padding: 1.6rem 4.8rem;
+
+  &:hover {
+    background-color: rgba(map-get(variables.$colors, primary-aqua), .08);
+    color: darken(map-get(variables.$colors, primary-aqua), 10%);
+    box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .08);
+    transform: translateY(-.1rem);
+  }
+}
+
+.btn--secondary {
+  background-color: map-get(variables.$colors, light);
+  color: map-get(variables.$colors, dark);
+
+  &:hover {
+    background-color: darken(map-get(variables.$colors, light), 10%);
+    color: lighten(map-get(variables.$colors, dark), 10%);
+    box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
+    transform: translateY(-.1rem);
+  }
+}
+
+.btn--success {
+  background-color: map-get(variables.$colors, primary);
+  color: map-get(variables.$colors, light);
+  box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
+  padding: 1.2rem 3.6rem;
+
+  &:hover {
+    background-color: darken(map-get(variables.$colors, success), 10%);
+    color: lighten(map-get(variables.$colors, light), 10%);
+    box-shadow: 0 .4rem .8rem rgba(0, 0, 0, .18);
+  }
+}
+
+.btn--danger {
+  background-color: map-get(variables.$colors, danger);
+  color: map-get(variables.$colors, light);
+  box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
+  padding: 1.2rem 3.6rem;
+
+  &:hover {
+    background-color: darken(map-get(variables.$colors, danger), 10%);
+    color: lighten(map-get(variables.$colors, light), 10%);
+    box-shadow: 0 .4rem .8rem rgba(0, 0, 0, .18);
+  }
+}
+
+/* floating create (daire FAB) */
+.btn--create {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 6rem;
+  block-size: 6rem;
+  border-radius: 50%;
+  background-color: darken(map-get(variables.$colors, primary-aqua), 20%);
+  box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
+
+  i {
+    font-size: 2.4rem;
     color: map-get(variables.$colors, light);
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-    padding: 1.2rem 3.6rem;
-
-    &:hover {
-      background-color: darken(map-get(variables.$colors, danger), 10%);
-      color: lighten(map-get(variables.$colors, light), 10%);
-      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-    }
   }
 
-  &--success {
-    background-color: map-get(variables.$colors, success);
-    color: map-get(variables.$colors, light);
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-    padding: 1.2rem 3.6rem;
+  &:hover {
+    background-color: darken(map-get(variables.$colors, primary-aqua), 10%);
+    color: lighten(map-get(variables.$colors, dark), 10%);
+    box-shadow: 0 .4rem .8rem rgba(0, 0, 0, .2);
+    transform: translateY(-.1rem);
+  }
+}
 
-    &:hover {
-      background-color: darken(map-get(variables.$colors, success), 10%);
-      color: lighten(map-get(variables.$colors, light), 10%);
-      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-    }
+/* subtle / ghost / link */
+.btn--ghost {
+  background: transparent;
+  color: map-get(variables.$colors, dark);
+
+  &:hover {
+    background: rgba(0, 0, 0, .05);
+  }
+}
+
+.btn--link {
+  background: transparent;
+  border: 0;
+  color: map-get(variables.$colors, primary-aqua);
+  padding: 0;
+
+  &:hover {
+    color: darken(map-get(variables.$colors, primary-aqua), 8%);
+    text-decoration: underline;
+  }
+}
+
+/* button group */
+.btn-group {
+  display: inline-flex;
+  gap: .6rem;
+
+  .btn {
+    border-radius: .6rem;
   }
 
-  &--cancel {
-    background-color: map-get(variables.$colors, light);
-    color: map-get(variables.$colors, dark);
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-    padding: 1.2rem 3.6rem;
+  &.stack {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
 
-    &:hover {
-      background-color: darken(map-get(variables.$colors, light), 10%);
-      color: lighten(map-get(variables.$colors, dark), 10%);
-      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+    @include respond(768px) {
+      .btn {
+        inline-size: 100%;
+      }
     }
   }
+}
 
-  &--primary {
-    background-color: map-get(variables.$colors, primary-aqua);
-    color: map-get(variables.$colors, dark);
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
+/* motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+
+  .btn__spinner {
+    animation: none !important;
+  }
+}
+
+/* spinner anim */
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+.landing {
+
+  /* Basit buton tabanı */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
     padding: 1.6rem 4.8rem;
+    border-radius: .8rem;
+    border: 1px solid transparent;
+    font-weight: 600;
+    line-height: 1;
+    font-size: 1.4rem;
+    /* “orta-küçük arası” */
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .06s ease;
+    -webkit-tap-highlight-color: transparent;
 
-    &:hover {
-      background-color: darken(map-get(variables.$colors, primary-aqua), 10%);
-      color: lighten(map-get(variables.$colors, dark), 10%);
-      box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+    &:active {
+      transform: translateY(1px);
+    }
+
+    &:disabled {
+      opacity: .55;
+      cursor: not-allowed;
     }
   }
 
-  &--outlined {
-    background-color: transparent;
-    color: map-get(variables.$colors, primary-aqua);
-    border: 0.1rem solid map-get(variables.$colors, primary-aqua);
-    transition: all 0.3s ease-in-out;
-    padding: 1.6rem 4.8rem;
+  /* Primary: klasik success/primary gibi, düz renk */
+  .btn--primary {
+    $bg: map-get(variables.$colors, primary);
+    background-color: $bg;
+    color: #fff;
+    border-color: rgba(0, 0, 0, .0);
 
     &:hover {
-      background-color: rgba(map-get(variables.$colors, primary-aqua), 0.1);
-      color: darken(map-get(variables.$colors, primary-aqua), 10%);
-      box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-      transform: translateY(-0.1rem);
+      background-color: darken($bg, 6%);
+    }
+
+    &:active {
+      background-color: darken($bg, 10%);
     }
   }
 
-  &--secondary {
-    background-color: map-get(variables.$colors, light);
-    color: map-get(variables.$colors, dark);
-    transition: all 0.3s ease-in-out;
+  /* Açık zemin butonu (opsiyonel) */
+  .btn--light {
+    background: #fff;
+    color: #111;
+    border-color: #e6e6e6;
 
     &:hover {
-      background-color: darken(map-get(variables.$colors, light), 10%);
-      color: lighten(map-get(variables.$colors, dark), 10%);
-      box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
-      transform: translateY(-0.1rem);
+      background: #f7f7f7;
     }
+
+    &:active {
+      background: #f1f1f1;
+    }
+  }
+
+  /* Çerçeveli / ghost (opsiyonel) */
+  .btn--outline {
+    $c: map-get(variables.$colors, primary);
+    background: transparent;
+    color: $c;
+    border-color: rgba($c, .55);
+
+    &:hover {
+      background: rgba($c, .08);
+    }
+
+    &:active {
+      background: rgba($c, .12);
+    }
+  }
+
+  /* Boyutlar */
+  .btn--sm {
+    padding: .7rem 1.2rem;
+    font-size: 1.3rem;
+  }
+
+  .btn--md {
+    padding: .9rem 1.6rem;
+    font-size: 1.4rem;
+  }
+
+  /* default */
+  .btn--lg {
+    padding: 1.1rem 2rem;
+    font-size: 1.6rem;
+  }
+
+  /* Navbar butonları için kompakt versiyon (istersen) */
+  .navbar .btn {
+    padding: .7rem 1.2rem;
+    font-size: 1.35rem;
   }
 }
