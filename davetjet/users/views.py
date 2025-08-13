@@ -87,7 +87,7 @@ class DashboardSettingsView(LoginRequiredMixin, View):
 class CustomRegisterView(View):
     form_class = CustomRegisterForm
     template_name = 'dashboard/register.html'
-    success_url = reverse_lazy('core:dashboard')
+    success_url = reverse_lazy('core:create-invitation')
     redirect_authenticated_user = True
 
     def get(self, request, *args, **kwargs):

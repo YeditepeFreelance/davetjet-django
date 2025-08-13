@@ -42,7 +42,7 @@
   </button>
 
   <a class="btn btn--primary btn--sm btn--pill"
-     href="{% url 'core:edit-invitation' invitation.id %}" data-stop>
+     href="{% url 'core:edit-invitation-api' invitation.id %}" data-stop>
     Düzenle
   </a>
 </div>
@@ -51,8 +51,15 @@
     </div>
   {% endfor %}
 {% endfor %}
+{% if not projects or projects|length < 1 or not project.invitations or project.invitations|length < 1 %}
+  <div class="empty-state">
+    {% comment %} <p style="color: #333; font-size: 1.6re">Henüz davetiyeniz yok.</p> {% endcomment %}
+    <a href="{% url 'core:create-invitation' %}" class="btn btn--primary">
+      <i class="fa-solid fa-plus"></i> Yeni Davetiye Oluştur
+    </a>
 
   </div>
+  {%endif%}
 </section>
 {% endblock %}
 

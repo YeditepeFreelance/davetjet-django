@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateRecipientView, ExportRecipientsView, ImportRecipientsView, EditRecipientView, DeleteRecipientView, recipient_autocomplete, recipients_handler, rsvp_update
+from .views import CreateRecipientView, ExportRecipientsView, ImportRecipientsView, EditRecipientView, DeleteRecipientView, RecipientQuotaView, recipient_autocomplete, recipients_handler, rsvp_update
 
 app_name = 'recipients'
 
@@ -11,6 +11,8 @@ urlpatterns = [
   path('edit', EditRecipientView.as_view(), name='edit'),
   path('delete/<int:pk>/', DeleteRecipientView.as_view(), name='delete'),
   path('autocomplete/', recipient_autocomplete, name='recipient_autocomplete'),
+    path("quota/", RecipientQuotaView.as_view(), name="recipient-quota"),
+
   path('rsvp/', rsvp_update, name='rsvp_update'),
   path('<slug:invitation_slug>/', recipients_handler, name='recipients_handler'),
 

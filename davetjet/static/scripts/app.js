@@ -100,8 +100,8 @@ class App {
     });
 
     const animate = () => {
-      currentX += (mouseX - currentX) * speed;
-      currentY += (mouseY - currentY) * speed;
+      currentX += mouseX - currentX;
+      currentY += mouseY - currentY;
       cursor.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
       requestAnimationFrame(animate);
     };

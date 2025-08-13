@@ -71,81 +71,79 @@
       </form>
 
       <!-- Step 3: Settings (Reminders / Channels / Quiet hours) -->
-      <div class="wizard-step step-2 hidden" data-step="3" id="step-settings">
-        <div class="step-head">
-          <h2 class="step-title">Davet Ayarları</h2>
-          <p class="muted">Hatırlatıcı, kanal ve saat aralığı ayarları.</p>
+     <!-- Step 3: Settings (Reminders / Channels) -->
+<div class="wizard-step step-2 hidden" data-step="3" id="step-settings">
+  <div class="step-head">
+    <h2 class="step-title">Davet Ayarları</h2>
+    <p class="muted">Hatırlatıcı ve kanal ayarları.</p>
+  </div>
+
+  <div class="settings-grid">
+    <!-- Reminders -->
+    <section class="card soft rem-card" aria-labelledby="rem-title">
+      <header class="card-head">
+        <div class="head-left">
+          <div class="icon-badge" aria-hidden="true"><i class="fas fa-bell"></i></div>
+          <div>
+            <h3 id="rem-title">Hatırlatıcılar</h3>
+            <p class="muted">Etkinlikten önce otomatik bilgilendirme gönder.</p>
+          </div>
+        </div>
+        <div class="head-right">
+          <label class="switch">
+            <input type="checkbox" id="remindersEnabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </header>
+
+      <div class="card-body" id="reminderControls">
+        <!-- Kota: çoklu seçim -->
+        <div class="quota" aria-live="polite">
+          <div class="quota-top">
+            <span class="label">Seçili hatırlatıcı</span>
+            <span class="value"><strong id="remSelValue">0</strong>/<span id="remMaxValue">—</span></span>
+          </div>
+          <div class="quota-bar" aria-hidden="true">
+            <div class="quota-fill" id="remFill" style="width:0%"></div>
+          </div>
         </div>
 
-        <div class="settings-grid">
-          <!-- Reminders -->
-          <section class="card soft rem-card" aria-labelledby="rem-title">
-            <header class="card-head">
-              <div class="head-left">
-                <div class="icon-badge" aria-hidden="true"><i class="fas fa-bell"></i></div>
-                <div>
-                  <h3 id="rem-title">Hatırlatıcılar</h3>
-                  <p class="muted">Etkinlikten önce otomatik bilgilendirme gönder.</p>
-                </div>
-              </div>
-              <div class="head-right">
-                <label class="switch">
-                  <input type="checkbox" id="remindersEnabled">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </header>
+        <!-- Gün bazlı çoklu seçim -->
+        <div class="timeline days-multi">
+          <div class="chips" id="presetDays">
+            <label class="chip"><input type="checkbox" class="remDay" value="1"> <span>1 gün</span></label>
+            <label class="chip"><input type="checkbox" class="remDay" value="3"> <span>3 gün</span></label>
+            <label class="chip"><input type="checkbox" class="remDay" value="7"> <span>7 gün</span></label>
+            <label class="chip"><input type="checkbox" class="remDay" value="14"> <span>14 gün</span></label>
+          </div>
 
-            <div class="card-body" id="reminderControls">
-              <!-- Kota basit: tek seçim (gün) -->
-              <div class="quota" aria-live="polite">
-                <div class="quota-top">
-                  <span class="label">Seçili hatırlatıcı</span>
-                  <span class="value"><strong id="remindersLeftValue">0/1</strong></span>
-                </div>
-                <div class="quota-bar" aria-hidden="true">
-                  <div class="quota-fill" id="remindersLeftBar" style="width:0%"></div>
-                </div>
-              </div>
+          <div class="custom-inline">
+            <label for="remAddDay" class="muted">Özel gün</label>
+            <input type="number" id="remAddDay" min="1" max="30" placeholder="1–30" inputmode="numeric" style="max-width:120px">
+            <button type="button" id="remAddBtn" class="btn-ghost">Ekle</button>
+          </div>
 
-              <!-- Gün bazlı tek alan -->
-              <div class="timeline days-only">
-                <label for="reminderDays" class="muted">Etkinlikten kaç gün önce?</label>
-                <input type="number" id="reminderDays" min="1" max="30" placeholder="1–30" inputmode="numeric" style="max-width:140px">
-                <span class="muted">gün önce hatırlatma gönder.</span>
-              </div>
+          <div class="selected-days" id="selectedDays"></div>
+        </div>
 
-              <div class="channels">
-                <span class="channels-title">Kanal</span>
-                <div class="channel-badges">
-                  <label class="badge"><input type="checkbox" class="reminderChannel" value="email" checked> <i class="fas fa-envelope"></i> E-posta</label>
-                  <label class="badge"><input type="checkbox" class="reminderChannel" value="sms"> <i class="fas fa-sms"></i> SMS</label>
-                </div>
-                <p class="muted xs">Paketinizde olmayan kanallar otomatik devre dışıdır.</p>
-              </div>
+        <div class="channels">
+          <span class="channels-title">Kanal</span>
+          <div class="channel-badges">
+            <label class="badge"><input type="checkbox" class="reminderChannel" value="email" checked> <i class="fas fa-envelope"></i> E-posta</label>
+            <label class="badge"><input type="checkbox" class="reminderChannel" value="sms"> <i class="fas fa-sms"></i> SMS</label>
+          </div>
+          <p class="muted xs">Paketinizde olmayan kanallar otomatik devre dışıdır.</p>
+        </div>
 
-              <div class="quiet-hours">
-                <span class="muted">Mesaj gönderilebilecek saat aralığı</span>
-                <div class="qh-inline">
-                  <select id="qhStart">
-                    <option selected>07:00</option><option>08:00</option><option>09:00</option><option>10:00</option>
-                  </select>
-                  <span class="sep">–</span>
-                  <select id="qhEnd">
-                    <option>20:00</option><option>21:00</option><option selected>23:00</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="warn hidden" id="reminderWarning">
-                <i class="fas fa-exclamation-triangle"></i> Lütfen 1–30 gün arasında bir değer girin.
-              </div>
-            </div>
-          </section>
-
-          <!-- (Appearance/Theme/Dil kartı tamamen kaldırıldı) -->
+        <div class="warn hidden" id="reminderWarning">
+          <i class="fas fa-exclamation-triangle"></i> Lütfen 1–30 gün arası seçin. Kota dolduysa daha fazla ekleyemezsiniz.
         </div>
       </div>
+    </section>
+  </div>
+</div>
+
 
       <!-- Step 4: Message & Multi-Channel Preview -->
       <div class="wizard-step step-3 hidden" data-step="4">
@@ -198,7 +196,6 @@
       <div class="wizard-step step-4 hidden" data-step="5">
         <div class="step-head">
           <h2>Paylaş & Aksiyonlar</h2>
-          <p class="muted">Bağlantıyı paylaşın, QR kodla hızlıca iletin veya yayınlayın.</p>
         </div>
 
         <div class="share-actions pretty">
@@ -218,9 +215,7 @@
               <button class="pill email" id="quickEmail"><i class="fas fa-envelope"></i> E-posta</button>
               <button class="pill sms" id="quickSms"><i class="fas fa-sms"></i> SMS</button>
             </div>
-            <div class="qr-row">
-              <img src="{% static 'images/qr-placeholder.png' %}" class="qr-code" alt="QR">
-            </div>
+            
           </section>
 
           <!-- Final -->
@@ -228,7 +223,7 @@
             <header><i class="fas fa-flag-checkered"></i> Son</header>
             <div class="final-row">
               <button type="button" class="btn" id="saveDraftBtn">Taslağa Kaydet</button>
-              <button type="button" class="btn btn--primary" id="finishBtn">Yayınla</button>
+              <button type="button" class="btn btn--primary" id="finishBtn">Kaydet</button>
               <button id="updateBtn" type="button" class="btn btn--primary hidden">Güncelle</button>
             </div>
             <small class="muted xs">Taslak; alıcı eklenmeden kaydedilir.</small>
@@ -318,16 +313,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventLocation = document.getElementById("eventLocation");
   const eventMessage = document.getElementById("eventMessage");
 
-  // Reminders / channels / hours
+  // Reminders / channels (MULTI) — quiet hours kaldırıldı
   const remEnabledEl = document.getElementById("remindersEnabled");
   const remCtrEl     = document.getElementById("reminderControls");
-  const reminderDays = document.getElementById("reminderDays");
+  const quotaSelVal  = document.getElementById("remSelValue");
+  const quotaMaxVal  = document.getElementById("remMaxValue");
+  const quotaFillEl  = document.getElementById("remFill");
+  const warnEl       = document.getElementById("reminderWarning");
+  const presetDayEls = Array.from(document.querySelectorAll(".remDay"));
+  const remAddDay    = document.getElementById("remAddDay");
+  const remAddBtn    = document.getElementById("remAddBtn");
+  const selectedDaysWrap = document.getElementById("selectedDays");
   const channelEls   = Array.from(document.querySelectorAll(".reminderChannel"));
-  const qhStartEl    = document.getElementById("qhStart");
-  const qhEndEl      = document.getElementById("qhEnd");
-  const quotaValEl   = document.getElementById("remindersLeftValue");
-  const quotaBarEl   = document.getElementById("remindersLeftBar");
-  const quotaWarnEl  = document.getElementById("reminderWarning");
 
   // Message preview
   const broadcastMessage = document.getElementById("broadcastMessage");
@@ -342,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const quickEmail = document.getElementById("quickEmail");
   const quickSms = document.getElementById("quickSms");
 
-  // Drafts modal (unchanged refs)
+  // Drafts modal
   const draftsModal = document.getElementById("draftsModal");
   const openDraftsBtn = document.getElementById("openDraftsBtn");
   const closeDraftsModal = document.getElementById("closeDraftsModal");
@@ -378,55 +375,124 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // ===== Reminders STATE (sadeleştirilmiş)
+  // ===== Reminders STATE (çoklu seçim + kota)
   const rem = {
     enabled: false,
-    days: null,                          // 1..30
+    presetDays: new Set(),   // {1,3,7,14}
+    customDays: new Set(),   // {n}
     channels: { email: true, sms: false },
-    quietHours: { start: "07:00", end: "23:00" },
-    quota: { max: 1, used: 0 },          // tek seçim
+    quota: { max: 0, used: 0 },   // max user’dan
   };
 
-  function minutesFromDays(d){
-    const n = parseInt(d, 10);
-    return (!Number.isNaN(n) && n >= 1 && n <= 30) ? n * 1440 : null;
+  // — Kota: User modelinden çek (endpoint yoksa INV_META -> fallback)
+  async function fetchReminderQuota() {
+    // 1) INV_META’dan dene
+    if (window.INV_META && typeof window.INV_META.max_reminders === "number") {
+      rem.quota.max = window.INV_META.max_reminders;
+    }
+    // 2) API dene (varsa)
+    try {
+      const r = await fetch("/invitations/api/reminders-quota/", { headers: {"X-Requested-With":"XMLHttpRequest"} });
+      if (r.ok) {
+        const data = await r.json();
+        if (typeof data.max === "number") rem.quota.max = data.max;
+      }
+    } catch(_) {}
+
+    // 3) fallback
+    if (!rem.quota.max || rem.quota.max < 1) rem.quota.max = 3;
+
+    if (quotaMaxVal) quotaMaxVal.textContent = String(rem.quota.max);
+    updateQuotaUI();
   }
 
+  function totalSelected() {
+    return new Set([...rem.presetDays, ...rem.customDays]).size;
+  }
   function buildReminderConfig(){
-    const mins = minutesFromDays(rem.days);
-    return (rem.enabled && mins) ? [mins] : [];
+    // seçili günleri (1..30) dakikaya çevir
+    let days = [...new Set([...rem.presetDays, ...rem.customDays])].sort((a,b)=>a-b);
+    // kota aşmamak için ilk N gün
+    days = days.slice(0, Math.max(0, rem.quota.max));
+    return rem.enabled ? days.map(d => d * 1440) : [];
   }
-
   function getDeliverySettings(){
     return {
       email: !!rem.channels.email,
       sms: !!rem.channels.sms,
-      quiet_hours: { ...rem.quietHours }
     };
   }
-
   function applyRemindersUIEnabled(on){
     if (!remCtrEl) return;
     remCtrEl.classList.toggle("is-off", !on);
     remCtrEl.querySelectorAll("input,select,button").forEach(el=>{
-      if (el === remEnabledEl) return;
+      if (el.id === "remindersEnabled") return;
       el.disabled = !on;
     });
   }
-
   function updateQuotaUI(){
-    const used = (rem.enabled && minutesFromDays(rem.days)) ? 1 : 0;
+    const used = totalSelected();
     rem.quota.used = used;
-    if (quotaValEl) quotaValEl.textContent = `${used}/1`;
-    if (quotaBarEl) quotaBarEl.style.width = (used ? "100%" : "0%");
-    if (quotaWarnEl) quotaWarnEl.classList.toggle("hidden", !(rem.enabled && !minutesFromDays(rem.days)));
+    if (quotaSelVal) quotaSelVal.textContent = String(used);
+    if (quotaMaxVal && quotaFillEl) {
+      const max = Math.max(1, rem.quota.max || 1);
+      quotaFillEl.style.width = `${Math.min(100, (used / max) * 100)}%`;
+    }
+    if (warnEl) warnEl.classList.toggle("hidden", !(rem.enabled && (used === 0 || used > rem.quota.max)));
   }
-
   function validateReminders(){
     if (!rem.enabled) return true;
-    const ok = !!minutesFromDays(rem.days);
-    if (!ok){ toast("Hatırlatıcı: 1–30 gün arasında bir değer giriniz."); }
-    return ok;
+    const used = totalSelected();
+    if (used === 0) { toast("En az bir hatırlatıcı günü seçin."); return false; }
+    if (used > rem.quota.max) { toast("Hatırlatıcı kotası doldu."); return false; }
+    return true;
+  }
+  function renderSelectedDays(){
+    if (!selectedDaysWrap) return;
+    selectedDaysWrap.innerHTML = "";
+    const days = [...new Set([...rem.presetDays, ...rem.customDays])].sort((a,b)=>a-b);
+    days.forEach(d => {
+      const chip = document.createElement("span");
+      chip.className = "chip selected";
+      chip.innerHTML = `${d} gün <button type="button" class="x" aria-label="Kaldır">×</button>`;
+      chip.querySelector("button.x").addEventListener("click", () => {
+        rem.presetDays.delete(d); rem.customDays.delete(d);
+        const cb = document.querySelector(`.remDay[value="${d}"]`);
+        if (cb) cb.checked = false;
+        renderSelectedDays(); updateQuotaUI();
+      });
+      selectedDaysWrap.appendChild(chip);
+    });
+  }
+  function hydrateRemindersFromData(meta){
+    rem.enabled = !!meta?.reminders;
+    if (remEnabledEl) remEnabledEl.checked = rem.enabled;
+
+    // kota
+    if (typeof meta?.max_reminders === "number" && meta.max_reminders > 0) {
+      rem.quota.max = meta.max_reminders;
+      if (quotaMaxVal) quotaMaxVal.textContent = String(rem.quota.max);
+    }
+
+    // dakika -> gün
+    const cfg = Array.isArray(meta?.reminder_config) ? meta.reminder_config : [];
+    const days = cfg.map(m => Math.round((m || 0) / 1440)).filter(d => d >= 1 && d <= 30);
+    days.forEach(d => {
+      const cb = document.querySelector(`.remDay[value="${d}"]`);
+      if (cb) { cb.checked = true; rem.presetDays.add(d); }
+      else { rem.customDays.add(d); }
+    });
+
+    // kanallar
+    const ds = meta?.delivery_settings || {};
+    rem.channels.email = ds.email !== false;
+    rem.channels.sms   = !!ds.sms;
+    channelEls.forEach(cb=>{
+      if (cb.value in rem.channels) cb.checked = !!rem.channels[cb.value];
+    });
+
+    applyRemindersUIEnabled(rem.enabled);
+    renderSelectedDays(); updateQuotaUI();
   }
 
   // ===== Template load + bindings
@@ -596,7 +662,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (navigator.share) {
       try { await navigator.share({ text }); } catch(e){}
     } else {
-      // Desktop fallback
       window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
     }
   });
@@ -664,7 +729,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== DRAFTS MODAL (kısaltılmış: list/handlers eskisiyle aynı)
+  // ===== DRAFTS MODAL
   const openDrafts = async () => {
     document.body.classList.add("modal-open");
     draftsModal.classList.remove("hidden");
@@ -797,6 +862,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data?.share_url || data?.url || data?.public_url || data?.link) {
         shareLink.value = data.share_url || data.url || data.public_url || data.link;
       }
+      window.location.replace("{% url 'core:edit-recipients' 0 %}".replace("0", editId));
       toast(editId ? "Taslak güncellendi ✅" : "Taslak kaydedildi ✅");
     } catch (err) {
       console.error("[draft save] error:", err);
@@ -899,9 +965,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Yanıt vermeyenlere SMS (buton iskeleti)
-
-
   // ===== Hydrate helper
   function hydrateFromData(data){
     eventTitle.value = data.name || "";
@@ -918,24 +981,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(`.template-card[data-template="${tpl}"]`)?.classList.add("selected");
     loadTemplate(tpl);
 
-    // Reminders hydrate
-    rem.enabled = !!data.reminders;
-    remEnabledEl.checked = rem.enabled;
-    const cfg = Array.isArray(data.reminder_config) ? data.reminder_config : [];
-    if (cfg.length){
-      const days = Math.round((cfg[0] || 0) / 1440);
-      if (days >= 1 && days <= 30){ rem.days = days; if (reminderDays) reminderDays.value = String(days); }
-    }
-    const ds = data.delivery_settings || {};
-    rem.channels.email = ds.email !== false;
-    rem.channels.sms = !!ds.sms;
-    channelEls.forEach(cb=>{ if (cb.value in rem.channels) cb.checked = !!rem.channels[cb.value]; });
-    if (ds.quiet_hours){
-      rem.quietHours.start = ds.quiet_hours.start || rem.quietHours.start;
-      rem.quietHours.end   = ds.quiet_hours.end   || rem.quietHours.end;
-    }
-    if (qhStartEl) qhStartEl.value = rem.quietHours.start;
-    if (qhEndEl)   qhEndEl.value   = rem.quietHours.end;
+    // Reminders hydrate (yeni çoklu sistem)
+    hydrateRemindersFromData(data);
 
     // UI modu
     if (data.is_draft){
@@ -952,8 +999,6 @@ document.addEventListener("DOMContentLoaded", () => {
     isEditingDraft = !!data.is_draft;
     editId = String(data.id);
 
-    applyRemindersUIEnabled(rem.enabled);
-    updateQuotaUI();
     refreshMultiChannel();
   }
 
@@ -964,13 +1009,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Reminders bindings
   remEnabledEl?.addEventListener("change", (e)=>{ rem.enabled = !!e.target.checked; applyRemindersUIEnabled(rem.enabled); updateQuotaUI(); });
-  reminderDays?.addEventListener("input", (e)=>{ const v = parseInt(e.target.value,10); rem.days = Number.isNaN(v) ? null : Math.max(1, Math.min(30, v)); updateQuotaUI(); });
+  presetDayEls.forEach(cb => cb.addEventListener("change", (e)=>{
+    const v = parseInt(e.target.value, 10);
+    if (e.target.checked) {
+      const will = totalSelected() + (rem.presetDays.has(v) ? 0 : 1);
+      if (will > rem.quota.max) { e.target.checked = false; toast("Kota dolu"); return; }
+      rem.presetDays.add(v);
+    } else {
+      rem.presetDays.delete(v);
+    }
+    renderSelectedDays(); updateQuotaUI();
+  }));
+  remAddBtn?.addEventListener("click", ()=>{
+    const v = parseInt(remAddDay.value, 10);
+    if (Number.isNaN(v) || v < 1 || v > 30) { toast("1–30 gün arası girin"); return; }
+    if (!rem.customDays.has(v) && !rem.presetDays.has(v) && totalSelected() >= rem.quota.max) {
+      toast("Kota dolu"); return;
+    }
+    rem.customDays.add(v);
+    remAddDay.value = "";
+    renderSelectedDays(); updateQuotaUI();
+  });
   channelEls.forEach(cb=> cb.addEventListener("change", (e)=>{ rem.channels[e.target.value] = !!e.target.checked; }));
-  qhStartEl?.addEventListener("change", (e)=> rem.quietHours.start = e.target.value);
-  qhEndEl?.addEventListener("change",  (e)=> rem.quietHours.end   = e.target.value);
 
+  // Kota bilgisi getir
+  fetchReminderQuota();
+
+  // INV_META’dan hydrate (varsa) — fetchReminderQuota’dan bağımsız
   if (bootMeta) { hydrateFromData(bootMeta); }
   else if (editId) { loadInvitationById(editId).catch(err => { console.error(err); toast("Kayıt yüklenemedi"); }); }
 });
 </script>
+
 {% endblock %}

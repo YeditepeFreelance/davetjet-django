@@ -48,3 +48,24 @@ def process_recipient_file(uploaded_file, project=None):
         raise ValueError("No valid recipients found in the file.")
 
     return recipients
+
+def get_user_recipient_limit(user):
+    # 1) User.recipient_quota_limit alanı varsa onu kullan
+    if hasattr(user, "recipient_quota_limit") and isinstance(user.recipient_quota_limit, int):
+        return max(0, user.recipient_quota_limit)
+    # 2) Profile varsa oradan dene
+    profile = getattr(user, "profile", None)
+    if profile and hasattr(profile, "recipient_quota_limit"):
+        try:
+            return max(0, int(profile.recipient_quota_limit))
+        except Exception:
+            pass
+    # 3) settings default
+    return 0
+
+def get_recipient_usage(user):
+    # Tüm projelerindeki toplam davetli sayısı (hesap genelinde limit)
+    used = Recipient.objects.filter(project__owner=user).count()
+    limit = get_user_recipient_limit(user)
+    remaining = max(0, limit - used)
+    return {"limit": limit, "used": used, "remaining": remaining}

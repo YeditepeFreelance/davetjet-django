@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Davetiye – Asya & Barış</title>
+
+    <!-- Fonts: script başlık + zarif serif -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --cream: #f6efe6;
+        --green: #1c4a30;
+        --ink: #1f1f1f;
+        --string: #6a3b2d;
+        --bulb: #f7b73e;
+        --leaf: #3c6b53;
+        --muted: #345346;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: #ececec;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink);
+        font-family: "Cormorant Garamond", serif;
+      }
+
+      .card {
+        width: min(980px, 95vw);
+        aspect-ratio: 3/4; /* görsele yakın oran */
+        background: var(--cream);
+        border-radius: 22px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.18);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* yumuşak yaprak/çiçek doku – köşeler */
+      .bg-corner {
+        position: absolute;
+        inset: -8% -8% auto -8%;
+        height: 66%;
+        background: radial-gradient(
+            600px 420px at 0% 0%,
+            rgba(60, 107, 83, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            700px 520px at 100% 10%,
+            rgba(60, 107, 83, 0.06),
+            transparent 65%
+          );
+        pointer-events: none;
+        filter: blur(0.4px);
+      }
+      .bg-corner.bottom {
+        inset: auto -10% -12% -10%;
+        height: 70%;
+        background: radial-gradient(
+            900px 600px at 10% 100%,
+            rgba(60, 107, 83, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 500px at 90% 100%,
+            rgba(60, 107, 83, 0.05),
+            transparent 65%
+          );
+      }
+
+      /* ışık şeritleri */
+      svg.garlands {
+        position: absolute;
+        left: -6%;
+        right: -6%;
+        top: 0%;
+        height: 36%;
+        overflow: visible;
+        pointer-events: none;
+      }
+      .wire {
+        stroke: var(--string);
+        stroke-width: 4;
+        fill: none;
+        stroke-linecap: round;
+      }
+      .bulb {
+        fill: var(--bulb);
+      }
+      .glow {
+        fill: rgba(247, 183, 62, 0.28);
+      }
+
+      .content {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 8px;
+        padding: clamp(18px, 2.8vw, 34px);
+      }
+
+      /* ÜST kısım: isimler solda, metin sağda */
+      .top {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        align-items: start;
+        gap: clamp(12px, 3vw, 32px);
+        padding-top: clamp(6px, 1.2vw, 14px);
+      }
+      #event-title {
+        font-family: "Great Vibes", cursive;
+        color: var(--green);
+        font-size: clamp(52px, 9vw, 110px);
+        line-height: 0.9;
+        margin: 0;
+        white-space: pre-line;
+      }
+      .amp {
+        font-size: 0.75em;
+        vertical-align: 0.06em;
+      }
+
+      #event-message {
+        align-self: center;
+        justify-self: end;
+        font-size: clamp(18px, 2.2vw, 30px);
+        line-height: 1.45;
+        color: #2c3b32;
+        max-width: 42ch;
+      }
+
+      /* orta: çizimler şeridi */
+      .doodles {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(10px, 2vw, 24px);
+        margin-top: clamp(6px, 1.6vw, 18px);
+      }
+      .doodles svg {
+        stroke: #1b1b1b;
+        stroke-width: 2;
+        fill: none;
+      }
+
+      /* alt şerit: sol venue + qr, orta tarih/saat/not */
+      .bottom {
+        margin-top: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: end;
+      }
+
+      .venue {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .venue .qr {
+        width: 100px;
+        height: 100px;
+        border: 2px solid rgba(0, 0, 0, 0.28);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: repeating-linear-gradient(
+            90deg,
+            #111 0 8px,
+            transparent 8px 16px
+          ),
+          repeating-linear-gradient(0deg, #111 0 8px, transparent 8px 16px);
+        background-size: 16px 16px;
+        background-blend-mode: multiply;
+        overflow: hidden;
+      }
+      .venue .qr img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+      }
+      #event-location {
+        font-size: clamp(16px, 2.1vw, 24px);
+        color: var(--green);
+      }
+
+      .center-bottom {
+        text-align: center;
+      }
+      #event-date {
+        font-weight: 600;
+        color: var(--green);
+        font-size: clamp(22px, 3vw, 34px);
+      }
+      #event-time {
+        margin-top: 6px;
+        font-size: clamp(18px, 2.4vw, 24px);
+      }
+      #event-note {
+        margin-top: 6px;
+        color: var(--muted);
+        font-style: italic;
+        font-size: clamp(16px, 2vw, 20px);
+      }
+
+      /* contenteditable odak */
+      [contenteditable="true"]:focus {
+        outline: 2px dashed #3a6b4c;
+        outline-offset: 6px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="card" aria-label="Davetiye">
+      <div class="bg-corner" aria-hidden="true"></div>
+
+      <!-- ışık şeritleri -->
+      <svg class="garlands" viewBox="0 0 1000 360" aria-hidden="true">
+        <defs>
+          <g id="lamp">
+            <circle class="bulb" cx="0" cy="0" r="8" />
+            <circle class="glow" cx="0" cy="0" r="10.5" />
+          </g>
+        </defs>
+        <path
+          class="wire"
+          d="M-20,56 C220,160 410,-40 630,50 C800,118 930,92 1020,60"
+        />
+        <path
+          class="wire"
+          d="M-20,140 C180,250 420,60 660,145 C820,205 940,182 1020,150"
+        />
+        <path
+          class="wire"
+          d="M-20,230 C160,330 420,170 680,240 C840,290 950,275 1020,240"
+        />
+
+        <!-- üst sıra -->
+        <g transform="translate(0,0)">
+          <g transform="translate(70,78)"><use href="#lamp" /></g>
+          <g transform="translate(150,96)"><use href="#lamp" /></g>
+          <g transform="translate(230,86)"><use href="#lamp" /></g>
+          <g transform="translate(310,70)"><use href="#lamp" /></g>
+          <g transform="translate(390,88)"><use href="#lamp" /></g>
+          <g transform="translate(470,82)"><use href="#lamp" /></g>
+          <g transform="translate(550,98)"><use href="#lamp" /></g>
+          <g transform="translate(630,90)"><use href="#lamp" /></g>
+          <g transform="translate(710,78)"><use href="#lamp" /></g>
+          <g transform="translate(790,92)"><use href="#lamp" /></g>
+          <g transform="translate(870,86)"><use href="#lamp" /></g>
+          <g transform="translate(950,98)"><use href="#lamp" /></g>
+        </g>
+        <!-- orta sıra -->
+        <g transform="translate(0,0)">
+          <g transform="translate(90,170)"><use href="#lamp" /></g>
+          <g transform="translate(180,188)"><use href="#lamp" /></g>
+          <g transform="translate(270,172)"><use href="#lamp" /></g>
+          <g transform="translate(360,176)"><use href="#lamp" /></g>
+          <g transform="translate(450,192)"><use href="#lamp" /></g>
+          <g transform="translate(540,180)"><use href="#lamp" /></g>
+          <g transform="translate(630,196)"><use href="#lamp" /></g>
+          <g transform="translate(720,182)"><use href="#lamp" /></g>
+          <g transform="translate(810,196)"><use href="#lamp" /></g>
+          <g transform="translate(900,184)"><use href="#lamp" /></g>
+        </g>
+        <!-- alt sıra -->
+        <g transform="translate(0,0)">
+          <g transform="translate(120,258)"><use href="#lamp" /></g>
+          <g transform="translate(220,276)"><use href="#lamp" /></g>
+          <g transform="translate(320,266)"><use href="#lamp" /></g>
+          <g transform="translate(420,278)"><use href="#lamp" /></g>
+          <g transform="translate(520,262)"><use href="#lamp" /></g>
+          <g transform="translate(620,280)"><use href="#lamp" /></g>
+          <g transform="translate(720,270)"><use href="#lamp" /></g>
+          <g transform="translate(820,282)"><use href="#lamp" /></g>
+          <g transform="translate(920,270)"><use href="#lamp" /></g>
+        </g>
+      </svg>
+
+      <div class="content">
+        <!-- ÜST -->
+        <div class="top">
+          <h1 id="event-title" contenteditable="true">
+            Asya<span class="amp"> &amp; </span>Barış
+          </h1>
+
+          <div id="event-message" contenteditable="true">
+            Özel günler birlikte güzel, <br />
+            gelin beraber kutlayalım! <br />
+            Nişanımıza davetlisiniz.
+          </div>
+        </div>
+
+        <!-- ORTA: basitleştirilmiş çizimler -->
+        <div class="doodles" aria-hidden="true">
+          <!-- gelin -->
+          <svg width="92" viewBox="0 0 120 160">
+            <path
+              d="M60 40c-10 8-22-6-24-14 2-8 14-14 24-10 10-4 22 2 24 10-2 8-14 22-24 14z"
+            />
+            <path d="M50 55c-12 18-18 56-18 56h56s-6-38-18-56" />
+            <path d="M35 111c8 9 50 9 58 0" />
+            <path d="M60 74v28" />
+          </svg>
+          <!-- köpek -->
+          <svg width="70" viewBox="0 0 120 90">
+            <path
+              d="M20 60c10 14 36 16 50 0 6-7 14-8 20-4 6 5 8 16 2 22-10 12-30 10-44 8-12-2-24-4-28-12-3-6-2-10 0-14z"
+            />
+            <circle cx="60" cy="44" r="8" />
+          </svg>
+          <!-- damat -->
+          <svg width="92" viewBox="0 0 120 160">
+            <path
+              d="M60 46c-8 0-16-8-16-16 0-10 8-18 16-18s16 8 16 18c0 8-8 16-16 16z"
+            />
+            <path d="M42 66h36l8 48H34l8-48z" />
+            <path d="M60 72v30" />
+          </svg>
+          <!-- dans edenler -->
+          <svg width="380" viewBox="0 0 380 110">
+            <g transform="translate(0,0)">
+              <circle cx="20" cy="16" r="8" />
+              <path d="M20 24v36m-12 8h24M20 40l14-10M20 40l-14-8" />
+            </g>
+            <g transform="translate(76,0)">
+              <circle cx="20" cy="16" r="8" />
+              <path d="M20 24v36m-12 8h24M18 42l-12-8M22 42l12-10" />
+            </g>
+            <g transform="translate(152,0)">
+              <circle cx="20" cy="16" r="8" />
+              <path d="M20 24v36m-12 8h24M20 40l14-10M20 40l-14-8" />
+            </g>
+            <g transform="translate(228,0)">
+              <circle cx="20" cy="16" r="8" />
+              <path d="M20 24v36m-12 8h24M22 42l12-10M18 42l-12-8" />
+            </g>
+            <g transform="translate(304,0)">
+              <circle cx="20" cy="16" r="8" />
+              <path d="M20 24v36m-12 8h24M22 42l12-10M18 42l-12-8" />
+            </g>
+          </svg>
+          <!-- uzun masa -->
+          <svg width="170" viewBox="0 0 220 120">
+            <path d="M10 100c40-80 160-80 200 0" />
+            <path d="M18 96c38-68 146-68 184 0" />
+            <circle cx="60" cy="72" r="5" />
+            <circle cx="100" cy="58" r="5" />
+            <circle cx="140" cy="56" r="5" />
+            <circle cx="172" cy="70" r="5" />
+          </svg>
+        </div>
+
+        <!-- ALT -->
+        <div class="bottom">
+          <div class="venue">
+            <div class="qr"><img id="qr-img" alt="QR" /></div>
+            <div id="event-location" contenteditable="true">
+              Ella Jarden Beykoz
+            </div>
+          </div>
+
+          <div class="center-bottom">
+            <div id="event-date" contenteditable="true">29.08.25</div>
+            <div id="event-time" contenteditable="true">
+              Başlama Saati 19:00
+            </div>
+            <div id="event-note" contenteditable="true">
+              Çocuklara tatlı rüyalar dileriz.
+            </div>
+          </div>
+
+          <div></div>
+        </div>
+      </div>
+
+      <div class="bg-corner bottom" aria-hidden="true"></div>
+    </article>
+
+    <!-- slug taşıyıcı (opsiyonel) -->
+    <span id="inv-slug" style="display: none"></span>
+
+    <script>
+      // QR otomatik (opsiyonel): INV_META.share_url varsa bas
+      (function () {
+        const link =
+          (window.INV_META &&
+            (window.INV_META.share_url || window.INV_META.public_url)) ||
+          "";
+        if (!link) return;
+        const img = document.getElementById("qr-img");
+        if (!img) return;
+        img.src =
+          "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+          encodeURIComponent(link);
+        img.style.display = "block";
+      })();
+    </script>
+  </body>
+</html>

@@ -31,6 +31,8 @@ class User(AbstractUser):
     last_login = models.DateTimeField(auto_now=True)
     active_devices = models.JSONField(default=list, blank=True)
     reminder_credits = models.IntegerField(default=3)
+    recipient_quota_limit = models.PositiveIntegerField(default=200)
+
 
     # Related models
 

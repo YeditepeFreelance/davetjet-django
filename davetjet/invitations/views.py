@@ -56,6 +56,12 @@ class CreateInvitationView(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('core:login')
     redirect_field_name = 'next'
 
+    def get(self, request, *args, **kwargs):
+        inv = Invitation.objects.filter(project__owner=request.user).first()
+        if inv:
+            return redirect('core:invitations')
+        return super().get(request, *args, **kwargs)
+
 
 class CreateInvitationAPI(APIView):
     def post(self, request):

@@ -14,7 +14,7 @@
 
   <!-- Bottom Section -->
   <div class="bottom-widgets">
-    <div class="card invite-preview">
+    <div class="card invite-preview" style="grid-column: 1 / -1">
       <h3>Hızlı İşlemler</h3>
       <div class="content">
         <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="card recipient-tracking">
+    <div class="card recipient-tracking" style="grid-column: 1 / -1">
       <h3>Davetli Takibi</h3>
       <div class="content">
         <table>
@@ -39,8 +39,8 @@
             <tr>
               <th>Ad</th>
               <th>Email</th>
+              <th>Telefon</th>
               <th>Durum</th>
-              <th>Eklenme Tarihi</th>
               <th>İşlem</th>
             </tr>
           </thead>
@@ -49,8 +49,9 @@
             <tr data-id="recipient-{{ recipient.id }}">
               <td>{{ recipient.name }}</td>
               <td>{{ recipient.email }}</td>
-              <td>{{ recipient.status }}</td>
-              <td>{{ recipient.created_at|date:"Y-m-d H:i" }}</td>
+              <td>{{ recipient.phone_number }}</td>
+              <td>{{ recipient.rsvp }}</td>
+              {% comment %} <td>{{ recipient.created_at|date:"Y-m-d H:i" }}</td> {% endcomment %}
               <td class="actions">
                 <a href="#" class="edit-recipient">Düzenle</a>
                 <a class="delete-recipient">Sil</a>
