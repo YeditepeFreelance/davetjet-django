@@ -19,8 +19,9 @@ class Project(models.Model):
   updated_at = models.DateTimeField(auto_now=True)  
 
   def save(self, *args, **kwargs):
-      self.invitation.all().first().recipients.set(self.recipients.all())
-      self.invitation.all().first().save()
+      if self.pk:
+        self.invitation.all().first().recipients.set(self.recipients.all())
+        self.invitation.all().first().save()
 
       super().save(*args, **kwargs)
 

@@ -71,6 +71,8 @@ class SendingView(LoginRequiredMixin, TemplateView):
     def get(self, request, **kwargs):
         ctx = {}
         invitation, statistics = request.user.get_statistics()
+        if not invitation:
+            return redirect('core:create-invitation')
         ctx['invitation'] = invitation
         ctx['statistics'] = statistics
         ctx['preview'] = invitation.render_preview_html()
