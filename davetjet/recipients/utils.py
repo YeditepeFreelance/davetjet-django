@@ -66,6 +66,7 @@ def get_user_recipient_limit(user):
 def get_recipient_usage(user):
     # Tüm projelerindeki toplam davetli sayısı (hesap genelinde limit)
     used = Recipient.objects.filter(project__owner=user).count()
+    print(used, file=sys.stderr)
     limit = get_user_recipient_limit(user)
     remaining = max(0, limit - used)
     return {"limit": limit, "used": used, "remaining": remaining}

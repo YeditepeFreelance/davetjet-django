@@ -2,6 +2,7 @@
 import re
 import logging
 from datetime import timedelta
+
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -18,10 +19,17 @@ log = logging.getLogger(__name__)
 scheduler = EnhancedSchedulerService(
     sms_username=settings.NETGSM_USERNAME,
     sms_password=settings.NETGSM_PASSWORD,
-    msgheader=getattr(settings, "NETGSM_APPNAME", None)
+    msgheader=getattr(settings, "NETGSM_APPNAME", None),
 )
 
 # ---------- helpers ----------
+def _respect_being_sent(instance) -> bool:
+    """Sadece being_sent=True iken sinyal akışına izin ver."""
+    ok = bool(getattr(instance, "being_sent", False))
+    if not ok:
+        log.debug("signals: skip (being_sent=False) inv_id=%s", getattr(instance, "id", None))
+    return ok
+
 def _normalize_tr_phone(msisdn: str | None) -> str | None:
     """Netgsm 'no' için 10 haneli TR GSM: 5XXXXXXXXX"""
     if not msisdn:
@@ -161,8 +169,7 @@ def _burst_lock(key: str, ttl: int = 30) -> bool:
 # ---------- REMINDERS ----------
 def _compose_reminder_email_html(inv: Invitation) -> str:
     """Hatırlatma maili: üstte kısa başlık + CTA + özet + preview."""
-    primary = "#2b8556"
-    link = (inv.secure_invite_link or "").strip()
+    # İsteğe göre özel başlık + altta zaten _compose_invitation_email_html kullanılıyor
     top = f"""
       <h2 style="margin:0 0 12px 0;color:#0f172a;font-family:Inter,Segoe UI,Arial,sans-serif;">
         Etkinlik Hatırlatması: {escape(inv.name or '')}
@@ -190,8 +197,7 @@ def _get_owner_and_quota(inv: Invitation):
 
 def _consume_quota_if_any(inv: Invitation, needed: int) -> bool:
     """
-    needed: planlanan reminder job sayısı (batch bazlı). 
-    Eğer krediyi kişi başına saymak istersen: needed *= recipient_sayisi
+    needed: planlanan reminder job sayısı (batch bazlı).
     """
     user, profile, field = _get_owner_and_quota(inv)
     if not profile or not field:
@@ -217,7 +223,7 @@ def schedule_reminders_for_invitation(inv: Invitation):
         log.debug("reminders skip: can_send=False")
         return
 
-    # Bir kez çalışsın (ör. publish anı)
+    # Bir kez çalışsın (ör. publish veya manual trigger anı)
     if not _burst_lock(f"inv:{inv.pk}:rem_sched", ttl=30):
         log.debug("reminders skip: locked")
         return
@@ -230,7 +236,7 @@ def schedule_reminders_for_invitation(inv: Invitation):
     except Exception:
         offsets = [1440, 60, 30]
 
-    # Alıcı listelerini çıkar (o anki liste)
+    # Alıcı listeleri (o anki)
     emails = [e for e in inv.recipients.values_list("email", flat=True) if e]
     phones = []
     for raw in inv.recipients.values_list("phone_number", flat=True):
@@ -238,7 +244,7 @@ def schedule_reminders_for_invitation(inv: Invitation):
         if p:
             phones.append(p)
 
-    # Kaç reminder job planlanacak? (sadece ileri tarihli olanlar)
+    # İleri tarihli olanları seç
     future_offsets = []
     for m in offsets:
         run_at = inv.invitation_date - timedelta(minutes=m)
@@ -249,8 +255,7 @@ def schedule_reminders_for_invitation(inv: Invitation):
         log.info("No future reminder offsets to schedule.")
         return
 
-    # (Opsiyonel) kredi tüket
-    # kişi başına saymak istersen: needed = len(future_offsets) * max(len(emails), len(phones))
+    # (Opsiyonel) kredi tüket — kişi başına sayacaksan çarpanı değiştir
     needed = len(future_offsets)
     if not _consume_quota_if_any(inv, needed):
         log.warning("Reminder scheduling skipped due to quota.")
@@ -263,16 +268,14 @@ def schedule_reminders_for_invitation(inv: Invitation):
 
     for m in future_offsets:
         run_at = inv.invitation_date - timedelta(minutes=m)
-        # email
         if emails:
             scheduler.schedule_email(
                 recipients=emails,
                 send_time=run_at,
                 subject=subj,
-                message="",          # istersen plain text ekle
+                message="",
                 html_message=html,
             )
-        # sms
         if phones:
             scheduler.schedule_sms(
                 recipients=phones,
@@ -280,12 +283,15 @@ def schedule_reminders_for_invitation(inv: Invitation):
                 header=header,
                 send_time=run_at,
             )
-        log.info("Reminder scheduled: inv=%s offset_min=%s run_at=%s emails=%s phones=%s",
-                 inv.pk, m, run_at, len(emails), len(phones))
+        log.info(
+            "Reminder scheduled: inv=%s offset_min=%s run_at=%s emails=%s phones=%s",
+            inv.pk, m, run_at, len(emails), len(phones)
+        )
 
 # ---------- publish transition guard ----------
 @receiver(pre_save, sender=Invitation)
 def _remember_draft_state(sender, instance: Invitation, **kwargs):
+    # eski is_draft'ı yakala (gerekirse ileride kullanırsın)
     instance._was_draft = True
     if instance.pk:
         try:
@@ -295,40 +301,55 @@ def _remember_draft_state(sender, instance: Invitation, **kwargs):
             pass
 
 @receiver(post_save, sender=Invitation)
-def invitation_published_send_all(sender, instance: Invitation, created, **kwargs):
-    # sadece "taslaktan → yayında" geçişinde toplu gönder
+def invitation_dispatch(sender, instance: Invitation, created, **kwargs):
+    """
+    GÖNDERİM TETİĞİ:
+    - SADECE being_sent=True ise çalışır.
+    - delivery_settings varsa kanalları ona göre sınırlar; yoksa email=True, sms=True varsayılır.
+    - hatırlatıcılar da burada planlanır (being_sent akışında).
+    """
     if created:
         log.debug("post_save(created=True) skip")
+        return
+    if not _respect_being_sent(instance):
         return
     if not _can_send(instance):
         log.debug("post_save skip: can_send=False")
         return
-    if not getattr(instance, "_was_draft", True):
-        log.debug("post_save skip: not a draft->published transition")
-        return
 
-    # tek seferlik dispatch (m2m ile çakışmayı azaltır)
+    # tek seferlik dispatch (tek POST'ta birden fazla save olursa çakışmayı engelle)
     if not _burst_lock(f"inv:{instance.pk}:dispatch", ttl=30):
         log.debug("post_save skip: locked")
         return
 
+    delivery = instance.delivery_settings or {}
+    email_on = delivery.get("email", True)
+    sms_on   = delivery.get("sms", True)
+
     all_recs = instance.recipients.all()
 
-    # her iki kanalı da dene (bilgisi olanlara gider)
-    emails = [e for e in all_recs.values_list("email", flat=True) if e]
-    log.debug("post_save emails=%s", emails)
-    _send_email_batch(instance, emails)
-    _send_sms_batch(instance, all_recs)
+    if email_on:
+        emails = [e for e in all_recs.values_list("email", flat=True) if e]
+        log.debug("post_save emails=%s", emails)
+        _send_email_batch(instance, emails)
 
-    # >>> HATIRLATICILARI BURADA PLANLA <<<
+    if sms_on:
+        _send_sms_batch(instance, all_recs)
+
+    # hatırlatıcıları being_sent akışında planla
     schedule_reminders_for_invitation(instance)
 
 @receiver(m2m_changed, sender=Invitation.recipients.through)
 def invitation_recipients_changed(sender, instance: Invitation, action, pk_set, **kwargs):
+    """
+    Yeni alıcı eklendiğinde being_sent=True ise anlık gönderir.
+    """
     log.debug("m2m_changed action=%s inv_id=%s pk_set=%s", action, instance.pk, pk_set)
 
     if action != "post_add":
         log.debug("m2m skip: action!=post_add")
+        return
+    if not _respect_being_sent(instance):
         return
     if not _can_send(instance):
         log.debug("m2m skip: can_send=False (is_draft or expired or no date)")
@@ -337,16 +358,22 @@ def invitation_recipients_changed(sender, instance: Invitation, action, pk_set, 
         log.debug("m2m skip: empty pk_set")
         return
 
-    # m2m için pk_set’e özel lock — publish ile çakışmayı azaltır
+    # m2m için pk_set’e özel lock — dispatch ile çakışmayı azaltır
     lock_key = f"inv:{instance.pk}:m2m:{hash(frozenset(pk_set))}"
     if not _burst_lock(lock_key, ttl=15):
         log.debug("m2m skip: locked")
         return
 
+    delivery = instance.delivery_settings or {}
+    email_on = delivery.get("email", True)
+    sms_on   = delivery.get("sms", True)
+
     added_qs = instance.recipients.filter(pk__in=pk_set)
 
-    # her iki kanal
-    emails = [e for e in added_qs.values_list("email", flat=True) if e]
-    log.debug("m2m emails=%s", emails)
-    _send_email_batch(instance, emails)
-    _send_sms_batch(instance, added_qs)
+    if email_on:
+        emails = [e for e in added_qs.values_list("email", flat=True) if e]
+        log.debug("m2m emails=%s", emails)
+        _send_email_batch(instance, emails)
+
+    if sms_on:
+        _send_sms_batch(instance, added_qs)

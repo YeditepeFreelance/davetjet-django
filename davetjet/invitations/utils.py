@@ -16,7 +16,7 @@ def generate_secure_invitation_link(invitation, base_url=None):
     }
     token = fernet.encrypt(json.dumps(payload).encode()).decode()
 
-    base = base_url or getattr(settings, "SITE_URL", "http://localhost:8000")
+    base = base_url or getattr(settings, "SITE_URL", "https://davetjet-webapp.onrender.com")
     # URL'de bozulmasın diye quote
     return f"{base}/invitations/{invitation.slug}/?access={quote(token)}"
 

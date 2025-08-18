@@ -1,5 +1,7 @@
+import os
 import uuid
 from datetime import timedelta
+from bs4 import BeautifulSoup, NavigableString
 from django.db import models
 from django.utils.text import slugify
 from django.utils.crypto import get_random_string
@@ -7,6 +9,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.db.models import JSONField
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 from communication.scheduler import SchedulerService
 from davetjet.config import channel_choices
@@ -43,7 +46,7 @@ class Invitation(models.Model):
     project = models.ForeignKey(
         'projects.Project',
         on_delete=models.CASCADE,
-        related_name='invitations',
+        related_name='invitation',
         help_text='The project associated with this invitation.'
     )
 
@@ -96,7 +99,7 @@ class Invitation(models.Model):
     # --- SECURITY ---
     is_password_protected = models.BooleanField(default=True)
     password = models.CharField(max_length=100, blank=True)
-    secure_invite_link = models.URLField(max_length=200, blank=True)
+    secure_invite_link = models.URLField(max_length=300, blank=True)
 
     # --- AUTOMATION ---
     automation = models.BooleanField(default=False, help_text="Automation enabled?")
@@ -108,7 +111,9 @@ class Invitation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     is_draft = models.BooleanField(default=True, db_index=True)
+    is_locked = models.BooleanField(default=False, db_index=True)  # <— NEW
     published_at = models.DateTimeField(null=True, blank=True)  # EK
+    being_sent = models.BooleanField(default=False, db_index=True)
 
     class Published(models.Manager):
         def get_queryset(self):
@@ -120,6 +125,30 @@ class Invitation(models.Model):
     def __str__(self):
         return self.name
 
+    @cached_property
+    def is_ready(self) -> bool:
+        """UI için: alanlar tamam mı? (gönderilmiş/kilitli olması şart değil)"""
+        required_filled = bool(self.name and self.invitation_date and self.template and self.message)
+        # istersen location/message da zorunlu kıl:
+        # required_filled = required_filled and bool(self.message) and bool(self.location)
+        return required_filled
+
+    @property
+    def status_label(self) -> str:
+        if self.is_locked:
+            return "Gönderildi"
+        if self.is_ready:
+            return "Hazır"
+        return "Taslak"
+
+    def lock_after_send(self):
+        """Gönderimden sonra çağrılır."""
+        self.is_draft = False
+        self.is_locked = True
+        if not self.published_at:
+            self.published_at = timezone.now()
+        self.save(update_fields=["is_draft","is_locked","published_at","updated_at"])
+
     @property
     def can_send(self) -> bool:
         """Gönderim/schedule yapılabilir mi?"""
@@ -129,9 +158,90 @@ class Invitation(models.Model):
     def preview_template_path(self) -> str:
         return TEMPLATE_MAP.get(self.template, "inv-temps/classic.html")
 
-    def render_preview(self, request):
-        return render_to_string(self.preview_template_path, {"invitation": self}, request=request)
+    def render_preview_html(self, *, strip_scripts: bool = False, prefer_secure_link: bool = True) -> str:
+        """
+        Statik şablonu okuyup davetiye alanlarıyla doldurur ve tek bir HTML string döndürür.
+        - strip_scripts=True -> <script> etiketlerini kaldırır (e-posta için)
+        - prefer_secure_link=True -> varsa secure_invite_link'i, yoksa /invitations/<slug>/ kullanır
+        """
+        # 1) Şablonu yükle
+        rel = self.preview_template_path  # örn: "inv-temps/classic.html"
+        template_path = os.path.join(settings.BASE_DIR, "static", rel)
+        if not os.path.exists(template_path):
+            return '<div style="padding:12px;color:#b91c1c">Şablon bulunamadı.</div>'
 
+        with open(template_path, encoding="utf-8") as f:
+            soup = BeautifulSoup(f.read(), "html.parser")
+
+        # --- küçük yardımcılar ---
+        def _set_text(el, value: str | None):
+            el.clear()
+            el.append(NavigableString("" if value is None else str(value)))
+
+        def _set_attr(el, attr, value: str | None):
+            if value is None:
+                if attr in el.attrs:
+                    del el[attr]
+            else:
+                el[attr] = str(value)
+
+        def _ensure_el(selector: str, tag_name="span"):
+            el = soup.select_one(selector)
+            if el is None:
+                parent = soup.body or soup
+                el = soup.new_tag(tag_name)
+                if selector.startswith("#"):
+                    el["id"] = selector[1:]
+                parent.append(el)
+            return el
+
+        # 2) Alanları doldur
+        dt = self.invitation_date
+        if dt:
+            dt = timezone.localtime(dt)
+            date_str = dt.strftime("%d.%m.%Y")
+            time_str = dt.strftime("%H:%M")
+        else:
+            date_str = ""
+            time_str = ""
+
+        mapping = {
+            "#event-title": self.name,
+            "#event-message": (self.message or "").strip(),
+            "#event-date": date_str,
+            "#event-time": time_str,
+            "#event-location": (getattr(self, "location", "") or "").strip(),
+        }
+        for sel, val in mapping.items():
+            el = soup.select_one(sel) or _ensure_el(sel, "span")
+            _set_text(el, val)
+
+        # Slug / link
+        link = (self.secure_invite_link or "").strip() if prefer_secure_link else ""
+        if not link:
+            # fallback: site içi görünüm
+            link = f"/invitations/{self.slug}/"
+
+        slug_el = soup.select_one("#inv-slug")
+        if slug_el:
+            _set_text(slug_el, self.slug)
+
+        rsvp_link = soup.select_one("#rsvp-link")
+        if rsvp_link:
+            _set_attr(rsvp_link, "href", link)
+
+        # 3) E-postalar için script’leri ve contenteditable’ları temizle
+        for tag in soup.find_all(attrs={"contenteditable": True}):
+            try:
+                del tag["contenteditable"]
+            except Exception:
+                pass
+
+        if strip_scripts:
+            for s in soup.find_all("script"):
+                s.decompose()
+
+        return str(soup)
     # ---- NEW: Backend validation (kredi yoksa reminders açılamaz)
     def clean(self):
         super().clean()

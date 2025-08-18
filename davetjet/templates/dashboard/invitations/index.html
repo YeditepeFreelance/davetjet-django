@@ -16,7 +16,7 @@
   <!-- Bottom Section -->
   <div class="bottom-widgets">
 {% for project in projects %}
-  {% for invitation in project.invitations.all %}
+  {% with project.invitation.all.first as invitation %}
     <div class="card invite-preview"
          data-href="{% url 'core:edit-invitation' invitation.id %}"
          role="link" tabindex="0" aria-label="{{ invitation.name }} davetiyesini düzenle">
@@ -46,12 +46,11 @@
     Düzenle
   </a>
 </div>
-
-      </div>
-    </div>
-  {% endfor %}
+</div>
+</div>
+  {% endwith %}
 {% endfor %}
-{% if not projects or projects|length < 1 or not project.invitations or project.invitations|length < 1 %}
+{% if projects|length < 1 %}
   <div class="empty-state">
     {% comment %} <p style="color: #333; font-size: 1.6re">Henüz davetiyeniz yok.</p> {% endcomment %}
     <a href="{% url 'core:create-invitation' %}" class="btn btn--primary">

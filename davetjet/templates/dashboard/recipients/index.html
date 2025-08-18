@@ -17,21 +17,22 @@
   <div class="bottom-widgets">
 {% for proj in projects %}
   <div class="card invite-preview">
-    <a class="stretched-link" href="{% url 'core:edit-recipients' proj.id %}" aria-label="{{ proj.name }}"></a>
-
-    <h3>{{ proj.name }}</h3>
+    {% with proj.invitation.all.first as invitation %}
+    <a class="stretched-link" href="{% url 'core:edit-recipients' proj.id %}" aria-label="{{ invitation.name }}"></a>
+    <h3>{{ invitation.name }}</h3>
     <div class="content">
       <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
       <div class="actions">
-        <button type="button" class="btn btn--csv btn--sm" data-export="{{ proj.id }}">
+        <button type="button" class="btn btn--csv btn--sm" data-export="{{ invitation.id }}">
           CSV Dışa Aktar
         </button>
         <a href="{% url 'core:analytics' %}">İstatistikler</a>
-        <a href="{% url 'core:edit-invitation' proj.id %}">Düzenle</a>
-        <p>Toplam: {{ proj.recipients.count }}</p>
+        <a href="{% url 'core:edit-invitation' invitation.id %}">Düzenle</a>
+        <p>Toplam: {{ invitation.recipients.count }}</p>
 
       </div>
     </div>
+    {% endwith %}
   </div>
 {% endfor %}
 

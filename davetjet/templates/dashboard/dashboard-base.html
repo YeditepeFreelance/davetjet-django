@@ -136,7 +136,15 @@
   </a>
 </li>
 {% endwith %}
-
+      {% with name=request.resolver_match.url_name %}
+<li class="{% if name == 'sending' %}active{% endif %}">
+  <a href="{% url 'core:sending' %}" class="sb-item"
+     {% if name == 'sending' %}aria-current="page"{% endif %}>
+    <i class="fa-solid fa-paper-plane"></i>
+    <span class="label">Gönderim</span>
+  </a>
+</li>
+{% endwith %}
     </ul>
   </div>
 

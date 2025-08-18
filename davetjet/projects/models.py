@@ -8,7 +8,6 @@ class Project(models.Model):
 
   owner = models.ForeignKey('users.User', related_name='projects', on_delete=models.CASCADE, blank=True, null=True)
   recipients = models.ManyToManyField(Recipient, related_name='project', blank=True)
-  invitation = models.ForeignKey(Invitation, related_name='projects', on_delete=models.CASCADE, blank=True, null=True)
 
   start_date = models.DateField(blank=True, null=True, auto_now_add=True)
   end_date = models.DateField(blank=True, null=True)
@@ -18,6 +17,12 @@ class Project(models.Model):
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)  
+
+  def save(self, *args, **kwargs):
+      self.invitation.all().first().recipients.set(self.recipients.all())
+      self.invitation.all().first().save()
+
+      super().save(*args, **kwargs)
 
   def __str__(self):
     return self.name

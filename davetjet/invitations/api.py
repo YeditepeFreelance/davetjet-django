@@ -1,6 +1,7 @@
 # invitations/api.py
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db import transaction
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -349,3 +350,66 @@ def invitation_detail(request, pk):
     inv.refresh_from_db()
 
     return Response(InvitationDetailSerializer(inv).data, status=200)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def schedule_send(request, pk):
+    """
+    /invitations/api/schedule-send/<pk>/
+    - being_sent=True -> save()  (sinyaller sadece bu durumda çalışacak)
+    - sadece seçilen kanallardan göndersin diye delivery_settings'i request'ten uygula
+    - iş biter bitmez being_sent=False yap
+    """
+    with transaction.atomic():
+        inv = get_object_or_404(
+            Invitation.objects.select_for_update().select_related("project"),
+            pk=pk,
+            project__owner=request.user,
+        )
+
+        # — Kanallar: hem "channels": {...} objesi, hem de "channel_email" checkbox şekli desteklenir —
+        data = request.data if isinstance(request.data, dict) else {}
+        ds = inv.delivery_settings or {}
+
+        if "channels" in data and isinstance(data["channels"], dict):
+            ch = data["channels"]
+            ds["email"] = bool(ch.get("email", ds.get("email", True)))
+            ds["sms"] = bool(ch.get("sms", ds.get("sms", False)))
+            ds["whatsapp"] = bool(ch.get("whatsapp", ds.get("whatsapp", False)))
+        else:
+            # checkbox isimleriyle gelmiş olabilir (true/false)
+            if "channel_email" in data:
+                ds["email"] = str(data["channel_email"]).lower() in ("1","true","on","yes")
+            if "channel_sms" in data:
+                ds["sms"] = str(data["channel_sms"]).lower() in ("1","true","on","yes")
+            if "channel_whatsapp" in data:
+                ds["whatsapp"] = str(data["channel_whatsapp"]).lower() in ("1","true","on","yes")
+
+        # — Gönderimi tetiklemek için bayrağı aç —
+        inv.being_sent = True
+        inv.delivery_settings = ds
+
+        # taslaktaysa istersen yayınla (opsiyonel)
+        if inv.is_draft:
+            inv.is_draft = False
+            if not inv.published_at:
+                inv.published_at = timezone.now()
+
+        # kritik save: sinyaller burada being_sent=True gördüğü için çalışır
+        inv.save()
+
+    # sinyaller schedule’ları kurdu; bayrağı kapat
+    # (ikinci save post_save tetikler ama being_sent=False olduğu için sinyaller hemen çıkacak)
+    inv.being_sent = False
+    inv.save(update_fields=["being_sent"])
+
+    return Response(
+        {
+            "ok": True,
+            "message": "Gönderim planlaması başlatıldı. Seçilen kanallara göre iletilecek.",
+            "invitation_id": inv.id,
+            "channels": inv.delivery_settings,
+            "is_draft": inv.is_draft,
+        },
+        status=status.HTTP_200_OK,
+    )

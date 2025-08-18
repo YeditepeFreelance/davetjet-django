@@ -1,0 +1,314 @@
+{% extends '../dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="send-page">
+  <!-- Üst özet -->
+  <header class="send-header glass">
+    <div class="send-header__title">
+      <h2>Gönderim Ayarları ({{ invitation.name }})</h2>
+      <p class="alt">Davetiyenizi kontrol edin, kanalları seçin ve gönderimi başlatın.</p>
+    </div>
+
+    <div class="send-summary">
+      <div class="chip">
+        <i class="fa-solid fa-users"></i>
+        <span>Toplam Davetli</span>
+        <strong>{{ statistics.invitee_count|default:"0" }}</strong>
+      </div>
+      <div class="chip">
+        <i class="fa-regular fa-envelope"></i>
+        <span>E-posta Ulaşılabilir</span>
+        <strong>{{ statistics.email_reachable|default:"0" }}</strong>
+      </div>
+      <div class="chip">
+        <i class="fa-solid fa-mobile-screen"></i>
+        <span>SMS Ulaşılabilir</span>
+        <strong>{{ statistics.sms_reachable|default:"0" }}</strong>
+      </div>
+    </div>
+  </header>
+
+  <div class="send-layout">
+    <!-- Sol kolon: Önizleme + Mesaj -->
+    <div class="send-col send-col--main">
+      <!-- Davetiye Önizleme -->
+     
+      
+      <!-- Mesaj Düzenleyici -->
+      <article class="card glass send-card">
+        <div class="card__head">
+          <h3>Mesaj</h3>
+          <span class="hint">Bu mesaj, seçtiğiniz kanallara gönderilir. (E-posta/SMS için özelleştirme yapabilirsiniz)</span>
+        </div>
+
+        <div class="msg-editor">
+          <label class="field">
+            <span class="field__label">Genel Mesaj</span>
+            <textarea class="field__control" rows="5" placeholder="Davet mesajınız...">{{ invitation.message }}</textarea>
+          </label>
+
+          <details class="msg-advanced">
+            <summary>Gelişmiş (kanal bazlı)</summary>
+            <div class="msg-advanced__grid">
+              <label class="field">
+                <span class="field__label">
+                  <i class="fa-regular fa-envelope"></i> E-posta Mesajı (opsiyonel)
+                </span>
+                <textarea class="field__control" rows="4" placeholder="E-posta gövdesi (boşsa genel mesaj kullanılır)">{{ draft.email_message }}</textarea>
+              </label>
+
+              <label class="field">
+                <span class="field__label">
+                  <i class="fa-solid fa-mobile-screen"></i> SMS Mesajı (opsiyonel)
+                </span>
+                <textarea class="field__control" rows="4" placeholder="SMS gövdesi (boşsa genel mesaj kullanılır)">{{ draft.sms_message }}</textarea>
+                <small class="count-hint">Türkçe karakter desteği aktiftir.</small>
+              </label>
+            </div>
+          </details>
+        </div>
+      </article>
+    </div>
+
+    <!-- Sağ kolon: Kanallar + Zamanlama + Onay -->
+    <aside class="send-col send-col--side">
+      <!-- Kanallar -->
+      <section class="card glass send-card">
+        <div class="card__head">
+          <h3>Kanallar</h3>
+          <span class="hint">Kullanmak istediğiniz kanalları seçin.</span>
+        </div>
+
+        <div class="channel-list">
+          <label class="toggle">
+            <input type="checkbox" name="channel_email" checked>
+            <span class="toggle__ui">
+              <i class="fa-regular fa-envelope"></i>
+              <span>E-posta</span>
+            </span>
+            <span class="meta">{{ statistics.email_reachable|default:"0" }} kişi</span>
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" name="channel_sms" {% if statistics.sms_reachable > 0 %}checked{% endif %}>
+            <span class="toggle__ui">
+              <i class="fa-solid fa-mobile-screen"></i>
+              <span>SMS</span>
+            </span>
+            <span class="meta">{{ statistics.sms_reachable|default:"0" }} kişi</span>
+          </label>
+
+          <label class="toggle disabled">
+            <input type="checkbox" name="channel_whatsapp" disabled>
+            <span class="toggle__ui">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>WhatsApp</span>
+            </span>
+            <span class="meta">Yakında</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Zamanlama -->
+      <section class="card glass send-card">
+        <div class="card__head">
+          <h3>Zamanlama</h3>
+        </div>
+
+        <div class="schedule">
+          <label class="radio">
+            <input type="radio" name="schedule_mode" value="now" checked>
+            <span>Hemen gönder</span>
+          </label>
+
+          <label class="radio">
+            <input type="radio" name="schedule_mode" value="later">
+            <span>Belirli tarihte gönder</span>
+          </label>
+
+          <div class="schedule__row">
+            <label class="field">
+              <span class="field__label">Tarih</span>
+              <input class="field__control" type="date" name="send_date" />
+            </label>
+            <label class="field">
+              <span class="field__label">Saat</span>
+              <input class="field__control" type="time" name="send_time" />
+            </label>
+          </div>
+
+          <small class="hint">Planlı gönderim seçerseniz davet mesajınız belirtilen tarih/saatte iletilir.</small>
+        </div>
+      </section>
+
+      <!-- Özet & Onay -->
+      <section class="card glass send-card">
+        <div class="card__head">
+          <h3>Gönderim Özeti</h3>
+        </div>
+
+        <ul class="summary-list">
+          <li><span>Toplam davetli</span><strong>{{ statistics.invitee_count|default:"0" }}</strong></li>
+          <li><span>E-posta gidecek</span><strong>{{ statistics.email_reachable|default:"0" }}</strong></li>
+          <li><span>SMS gidecek</span><strong>{{ statistics.sms_reachable|default:"0" }}</strong></li>
+        </ul>
+
+        <label class="agree">
+          <input type="checkbox" name="confirm_all" />
+          <span>Davetiye ve davetlileri onaylıyorum</span>
+        </label>
+
+        <div class="actions">
+          <a href="{% url 'invitations:invitation-drafts' %}" class="btn btn--outlined">Taslakları Gör</a>
+          <button type="button" class="btn btn--primary">Onayla ve Planla</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(function(){
+  // ---- Yardımcılar ----
+  function getCookie(name){
+    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return m ? decodeURIComponent(m.pop()) : null;
+  }
+  function flash(type, text){
+    // basit inline mesaj (success/error)
+    const host = document.querySelector('.send-header') || document.body;
+    const box = document.createElement('div');
+    box.className = 'send-flash ' + type;
+    box.textContent = text;
+    box.style.cssText = "margin-top:12px;padding:10px 12px;border-radius:10px;font-weight:600;"
+      + (type==='success'
+         ? "background:#e7f7ef;color:#1f6f46;border:1px solid #c8efd9;"
+         : "background:#fdecea;color:#8a1f17;border:1px solid #f5c6c3;");
+    host.appendChild(box);
+    setTimeout(()=> box.remove(), 5000);
+  }
+  function combineLocalToISO(dateStr, timeStr){
+    if(!dateStr || !timeStr) return null;
+    const [y,m,d] = dateStr.split('-').map(Number);
+    const [hh,mm] = timeStr.split(':').map(Number);
+    const dt = new Date(y, (m-1), d, hh, mm, 0);
+    return dt.toISOString(); // backend UTC kabul etsin (önerilir)
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const root = document.querySelector('.send-page');
+    if(!root) return;
+
+    // Invitation kimliği (JS içine güvenli gömülmüş)
+    const INV_ID = {{ invitation.id }};
+    const INV_SLUG = "{{ invitation.slug }}";
+    // API ucu: kendi URL pattern’ine göre gerekirse değiştir
+    const API_SEND_URL = `/invitations/api/schedule-send/${INV_ID}/`;
+
+    // Elemanlar
+    const btnPlan = root.querySelector('.actions .btn.btn--primary');
+    const btnDrafts = root.querySelector('.actions .btn.btn--outlined');
+    const agree = root.querySelector('input[name="confirm_all"]');
+
+    const emailToggle = root.querySelector('input[name="channel_email"]');
+    const smsToggle   = root.querySelector('input[name="channel_sms"]');
+
+    const scheduleRadios = root.querySelectorAll('input[name="schedule_mode"]');
+    const dateInput = root.querySelector('input[name="send_date"]');
+    const timeInput = root.querySelector('input[name="send_time"]');
+
+    // Mesaj textareaları (ilk: genel, diğerleri: email/sms)
+    const generalTextarea = root.querySelector('.msg-editor > label.field textarea.field__control');
+    const advancedTextareas = root.querySelectorAll('.msg-advanced__grid textarea.field__control');
+    const emailTextarea = advancedTextareas[0] || null;
+    const smsTextarea   = advancedTextareas[1] || null;
+
+    // Zamanlama alanlarını "Hemen gönder" iken kapat
+    function syncScheduleInputs(){
+      const mode = root.querySelector('input[name="schedule_mode"]:checked')?.value || 'now';
+      const disabled = (mode !== 'later') ? true : false;
+      dateInput.disabled = disabled;
+      timeInput.disabled = disabled;
+      dateInput.parentElement.style.opacity = disabled ? .6 : 1;
+      timeInput.parentElement.style.opacity = disabled ? .6 : 1;
+    }
+    scheduleRadios.forEach(r => r.addEventListener('change', syncScheduleInputs));
+    syncScheduleInputs();
+
+    async function handleSubmit(){
+      // Doğrulamalar
+      const channels = {
+        email: !!emailToggle?.checked,
+        sms:   !!smsToggle?.checked
+      };
+      if(!channels.email && !channels.sms){
+        flash('error', 'En az bir kanal seçmelisiniz (E-posta veya SMS).');
+        return;
+      }
+      if(!agree?.checked){
+        flash('error', 'Lütfen “Davetiye ve davetlileri onaylıyorum” kutusunu işaretleyin.');
+        return;
+      }
+
+      const mode = root.querySelector('input[name="schedule_mode"]:checked')?.value || 'now';
+      let scheduled_at = null;
+      if(mode === 'later'){
+        if(!dateInput.value || !timeInput.value){
+          flash('error', 'Planlı gönderim için tarih ve saat seçin.');
+          return;
+        }
+        scheduled_at = combineLocalToISO(dateInput.value, timeInput.value);
+      }
+
+      const payload = {
+        invitation_id: INV_ID,
+        slug: INV_SLUG,
+        channels,
+        message: (generalTextarea?.value || '').trim(),
+        email_message: (emailTextarea?.value || '').trim() || null,
+        sms_message: (smsTextarea?.value || '').trim() || null,
+        schedule: {
+          mode,
+          scheduled_at, // ISO (UTC) veya null
+        }
+      };
+
+      try{
+        btnPlan.disabled = true;
+        btnPlan.textContent = 'Gönderim ayarlanıyor…';
+
+        const res = await fetch(API_SEND_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken') || ''
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(()=> ({}));
+        if(res.ok){
+          flash('success', data.message || 'Gönderim planlandı!');
+          // İstersen yönlendir: window.location.href = data.redirect || "{% url 'core:dashboard' %}";
+        } else {
+          flash('error', data.error || 'Gönderim sırasında hata oluştu.');
+        }
+      } catch(err){
+        flash('error', 'Ağ hatası. Lütfen tekrar deneyin.');
+      } finally {
+        btnPlan.disabled = false;
+        btnPlan.textContent = 'Onayla ve Planla';
+      }
+    }
+
+    btnPlan?.addEventListener('click', handleSubmit);
+  });
+})();
+</script>
+
+{% endblock %}

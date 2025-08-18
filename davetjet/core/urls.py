@@ -3,7 +3,7 @@ from django.urls import path
 from users.views import CustomLoginView, CustomRegisterView, LogOutView, DashboardSettingsView, DashboardProfileView
 from recipients.views import ViewRecipientListView, EditRecipientListView
 from invitations.views import InvitationsListView, EditInvitationView, CreateInvitationView, CreateInvitationAPI
-from .views import DashboardView, SearchAPIView, InvitationEditView
+from .views import DashboardView, SearchAPIView, InvitationEditView, SendingView
 
 app_name = 'core'
 
@@ -21,6 +21,7 @@ urlpatterns = [
     path('dashboard/subscribe/', lambda request: render(request, 'dashboard/subscribe.html'), name='subscribe'),
     path('dashboard/package/', lambda request: render(request, 'dashboard/package.html'), name='package'),
     path('dashboard/analytics/', lambda request: render(request, 'dashboard/analytics/analytics.html'), name='analytics'),
+    path('dashboard/sending/', SendingView.as_view(), name='sending'),
     # path('subscribe/', lambda request: render(request, 'utils/modal-subscribe.html'), name='modal-subscribe'),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('register/', CustomRegisterView.as_view(), name='register'),

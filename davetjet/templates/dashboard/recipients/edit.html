@@ -1,8 +1,9 @@
 {% extends '../dashboard-base.html' %} {% load static %} {% block content %}
+{% with project.invitation.all.first as invitation %}
 <section class="overview scrollable">
     <div class="overview-top">
     <div>
-      <h1>Liste: {{ project.name }}</h1>
+      <h1>Liste: {{ invitation.name }}</h1>
       <p>
         Bu ekrandan davetiye listenize göz atabilir ve düzenleyebilirsiniz.
       </p>
@@ -67,6 +68,7 @@
     </div>
   </div>
 </section>
+{% endwith %}
 {% endblock %} 
  
 {% block extra_js %}

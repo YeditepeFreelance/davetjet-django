@@ -1,4 +1,5 @@
 import json
+import sys
 from django.shortcuts import render
 from django.views import View
 from django.shortcuts import redirect
@@ -14,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from invitations.models import Invitation
 from invitations.serializers import InvitationSerializer
+from projects.models import Project
 
 class DashboardView(LoginRequiredMixin, View):
   def get(self, request, *args, **kwargs):
@@ -60,6 +62,20 @@ class SearchAPIView(APIView):
         results = serialized_invitations + filtered_pages + filtered_commands
 
         return Response(results)
+
+
+class SendingView(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboard/sending/sending.html'
+    login_url = 'core:login'
+
+    def get(self, request, **kwargs):
+        ctx = {}
+        invitation, statistics = request.user.get_statistics()
+        ctx['invitation'] = invitation
+        ctx['statistics'] = statistics
+        ctx['preview'] = invitation.render_preview_html()
+        return render(request, self.template_name, ctx)
+    
 
 class InvitationEditView(TemplateView):
     template_name = "dashboard/invitations/create.html"  # mevcut wizard template'in
