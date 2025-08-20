@@ -254,65 +254,85 @@
   });
 
   // ------- EDIT (değişmedi)
-  editRecipientBtns.forEach((btn) => {
-    btn.addEventListener("click", function (event) {
-      event.preventDefault();
-      const row = this.closest("tr");
-      const recipientName = row.querySelector("td:first-child").textContent;
-      const recipientEmail = row.querySelector("td:nth-child(2)").textContent;
+editRecipientBtns.forEach((btn) => {
+  btn.addEventListener("click", function (event) {
+    event.preventDefault();
+    const row = this.closest("tr");
+    const recipientIdAttr = row.dataset.id; // "recipient-123"
+    const recipientName = row.querySelector("td:first-child").textContent;
+    const recipientEmail = row.querySelector("td:nth-child(2)").textContent;
+    const recipientPhone = row.querySelector("td:nth-child(3)").textContent;
 
-      window.AppModal.open("form", {
-        title: "Davetli Düzenle",
-        body: `
-          <form id="edit-recipient-form" data-id="${row.dataset.id}" method="POST">
-            <input type="hidden" name="csrfmiddlewaretoken" value="${getCSRF()}">
-            <label for="recipient-name">Ad:</label>
-            <input type="text" id="recipient-name" value="${recipientName}" required />
-            <label for="recipient-email">Email:</label>
-            <input type="email" id="recipient-email" value="${recipientEmail}" required />
-          </form>
-        `,
-        footer: `
-          <div class="modal__buttons">
-            <button class="btn btn--cancel modal-exit" id="modal-close" onclick="window.AppModal.close()">İptal</button>
-            <button class="btn btn--success" data-id="${row.dataset.id}" id="save-changes">Kaydet</button>
-          </div>
-        `,
-      });
+    window.AppModal.open("form", {
+      title: "Davetli Düzenle",
+      body: `
+        <form id="edit-recipient-form" data-id="${recipientIdAttr}" method="POST">
+          <input type="hidden" name="csrfmiddlewaretoken" value="${getCSRF()}">
 
-      qsa("#save-changes").forEach(button => {
-        button.addEventListener("click", function () {
-          const recipientId = this.getAttribute("data-id");
-          const formRec = qs(`form[data-id="${recipientId}"]`);
-          if (!formRec) return toast("Form bulunamadı.");
+          <label for="recipient-name">Ad:</label>
+          <input type="text" id="recipient-name" value="${recipientName}" required />
 
-          const nameInput = formRec.querySelector("#recipient-name");
-          const emailInput = formRec.querySelector("#recipient-email");
-          const csrfToken = getCSRF();
+          <label for="recipient-email">Email:</label>
+          <input type="email" id="recipient-email" value="${recipientEmail}" required />
 
-          if (!nameInput.value.trim() || !emailInput.value.trim()) return toast("Lütfen tüm alanları doldurun.");
+          <label for="recipient-phone">Telefon:</label>
+          <input type="text" id="recipient-phone" value="${recipientPhone}" required />
+        </form>
+      `,
+      footer: `
+        <div class="modal__buttons">
+          <button class="btn btn--cancel modal-exit" id="modal-close" onclick="window.AppModal.close()">İptal</button>
+          <button class="btn btn--success" data-id="${recipientIdAttr}" id="save-changes">Kaydet</button>
+        </div>
+      `,
+    });
 
-          const formData = new FormData();
-          formData.append("recipient_id", recipientId.split("-")[1]);
-          formData.append("name", nameInput.value);
-          formData.append("email", emailInput.value);
-          formData.append("csrfmiddlewaretoken", csrfToken);
+    // Kaydet
+    qsa("#save-changes").forEach(button => {
+      button.addEventListener("click", function () {
+        const recipientId = this.getAttribute("data-id"); // "recipient-123"
+        const formRec = qs(`form[data-id="${recipientId}"]`);
+        if (!formRec) return toast("Form bulunamadı.");
 
-          fetch("{% url 'recipients:edit' %}", { method: "POST", body: formData })
-          .then(response => { if (!response.ok) return response.text().then(t=>{ throw new Error(t); }); return response.text(); })
+        const nameInput  = formRec.querySelector("#recipient-name");
+        const emailInput = formRec.querySelector("#recipient-email");
+        const phoneInput = formRec.querySelector("#recipient-phone");
+        const csrfToken  = getCSRF();
+
+        if (!nameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
+          return toast("Lütfen tüm alanları doldurun.");
+        }
+
+        // (Opsiyonel) basit telefon normalize
+        const phone = phoneInput.value.replace(/\s+/g, " ").trim();
+
+        const formData = new FormData();
+        formData.append("recipient_id", recipientId.split("-")[1]);
+        formData.append("name", nameInput.value);
+        formData.append("email", emailInput.value);
+        formData.append("phone_number", phone);
+        formData.append("csrfmiddlewaretoken", csrfToken);
+
+        fetch("{% url 'recipients:edit' %}", { method: "POST", body: formData })
+          .then(response => {
+            if (!response.ok) return response.text().then(t=>{ throw new Error(t); });
+            return response.text();
+          })
           .then(() => {
-            const row = qs(`tr[data-id="${recipientId}"]`);
-            if (row) {
-              row.querySelector("td:first-child").textContent = nameInput.value;
-              row.querySelector("td:nth-child(2)").textContent = emailInput.value;
+            // Satırı anında güncelle
+            const rowEl = qs(`tr[data-id="${recipientId}"]`);
+            if (rowEl) {
+              rowEl.querySelector("td:first-child").textContent = nameInput.value;
+              rowEl.querySelector("td:nth-child(2)").textContent = emailInput.value;
+              rowEl.querySelector("td:nth-child(3)").textContent = phone;
             }
             window.AppModal?.close?.();
           })
           .catch(error => { console.log(error); toast("Güncelleme başarısız: " + error.message); });
-        });
       });
     });
   });
+});
 
   // ------- EXPORT (değişmedi)
   exportCSVBtn?.addEventListener("click", function (event) {

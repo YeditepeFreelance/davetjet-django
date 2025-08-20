@@ -19,7 +19,7 @@ class Project(models.Model):
   updated_at = models.DateTimeField(auto_now=True)  
 
   def save(self, *args, **kwargs):
-      if self.pk:
+      if (self.pk or self.id) and self.recipients.exists():
         self.invitation.all().first().recipients.set(self.recipients.all())
         self.invitation.all().first().save()
 

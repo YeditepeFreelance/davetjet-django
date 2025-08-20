@@ -2,7 +2,7 @@
 <section class="overview scrollable">
   <div class="overview-top">
     <div>
-      <h1>Davetiyeler ({{ projects|length }} adet listelendi)</h1>
+      <h1>Davetiyeler ({{ projects.0.invitation.all|length }} adet listelendi)</h1>
       <p>
         Bu ekrandan davetiyellerinize göz atabilir ve yenilerini
         oluşturabilirsiniz.
@@ -17,6 +17,7 @@
   <div class="bottom-widgets">
 {% for project in projects %}
   {% with project.invitation.all.first as invitation %}
+  {% if invitation %}
     <div class="card invite-preview"
          data-href="{% url 'core:edit-invitation' invitation.id %}"
          role="link" tabindex="0" aria-label="{{ invitation.name }} davetiyesini düzenle">
@@ -48,9 +49,10 @@
 </div>
 </div>
 </div>
+{% endif %}
   {% endwith %}
 {% endfor %}
-{% if projects|length < 1 %}
+{% if projects|length < 1 or not projects.0.invitation.all %}
   <div class="empty-state">
     {% comment %} <p style="color: #333; font-size: 1.6re">Henüz davetiyeniz yok.</p> {% endcomment %}
     <a href="{% url 'core:create-invitation' %}" class="btn btn--primary">

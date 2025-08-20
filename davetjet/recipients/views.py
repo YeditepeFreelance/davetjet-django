@@ -121,6 +121,7 @@ class EditRecipientView(LoginRequiredMixin, View):
 
         recipient.name = request.POST.get('name', recipient.name)
         recipient.email = request.POST.get('email', recipient.email)
+        recipient.phone_number = request.POST.get('phone_number', recipient.phone_number)
         recipient.save()
         return HttpResponse("Recipient updated successfully.", status=200)
 
@@ -237,7 +238,7 @@ class EditRecipientListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['project'] = Project.objects.filter(owner=self.request.user, id=self.kwargs.get('pk')).first()
+        context['project'] = Project.objects.filter(owner=self.request.user).first()
         context['recipient_quota_json'] = json.dumps(get_recipient_usage(self.request.user))
         return context
 
@@ -247,6 +248,13 @@ class ViewRecipientListView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy('core:login')
     redirect_field_name = 'next'
     template_name = 'dashboard/recipients/index.html'
+
+    def get(self, request, *args, **kwargs):
+        inv = Invitation.objects.filter(project__owner=request.user).first()
+        if not inv:
+            return redirect('core:create-invitation')
+
+        return redirect('core:edit-recipients', inv.id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

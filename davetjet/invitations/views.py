@@ -1,8 +1,8 @@
 import os
-import base64
+# import base64  # kullanılmıyor
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, CreateView
@@ -16,18 +16,66 @@ from bs4 import BeautifulSoup, NavigableString
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
+
 from .models import Invitation
+# CHANGED: match_invitation importunu tekilleştirdik; secure_links içinden al
 from .utils import match_invitation  # Fernet doğrulaması
 
-
-from invitations.utils import match_invitation
 from .serializers import InvitationSerializer, CreateInvitationSerializer
-from .models import Invitation
 from .forms import InvitationForm
 from projects.models import Project
 
 
+# ==== Genel yardımcılar (HTML yerleşimleri) ====
+def _set_text(el, value: str | None):
+    el.clear()
+    el.append(NavigableString("" if value is None else str(value)))
 
+def _set_attr(el, attr, value: str | None):
+    el[attr] = "" if value is None else str(value)
+
+def _ensure_el(soup, selector, tag_name="span"):
+    """soup.select_one yoksa, body'nin sonuna yaratır ve döner."""
+    el = soup.select_one(selector)
+    if el is None:
+        parent = soup.body or soup
+        el = soup.new_tag(tag_name)
+        if selector.startswith("#"):
+            el["id"] = selector[1:]
+        parent.append(el)
+    return el
+
+
+# ==== Cookie tabanlı erişim akışı için sabitler + yardımcılar ====
+FERNET = Fernet(settings.FERNET_KEY)
+ACCESS_TTL = 90 * 24 * 60 * 60  # 90 gün
+COOKIE_NAME_FMT = "inv_access_{inv_id}"
+
+def _payload(inv: Invitation) -> dict:
+    return {"id": inv.id, "p": (inv.password or "")}
+
+def _make_token(inv: Invitation) -> str:
+    return FERNET.encrypt(json.dumps(_payload(inv)).encode()).decode()
+
+def _get_token_from_request(request, inv: Invitation) -> str | None:
+    """Önce cookie, sonra ?access= parametresi."""
+    cookie_name = COOKIE_NAME_FMT.format(inv_id=inv.id)
+    return request.COOKIES.get(cookie_name) or request.GET.get("access")
+
+def _set_access_cookie(response, inv: Invitation, token: str):
+    """Token'ı sadece bu davetiye yolu altında geçerli olacak şekilde yaz."""
+    response.set_cookie(
+        key=COOKIE_NAME_FMT.format(inv_id=inv.id),
+        value=token,
+        max_age=ACCESS_TTL,
+        secure=not settings.DEBUG,
+        httponly=True,
+        samesite="Lax",
+        path=f"/invitations/{inv.slug}/",
+    )
+
+
+# ==== Dashboard Views ====
 class EditInvitationView(LoginRequiredMixin, TemplateView):
     model = Invitation
     login_url = reverse_lazy('core:login')
@@ -36,8 +84,11 @@ class EditInvitationView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['invitation'] = Invitation.objects.filter(project__owner=self.request.user, id=self.kwargs.get('pk')).first()
+        context['invitation'] = Invitation.objects.filter(
+            project__owner=self.request.user, id=self.kwargs.get('pk')
+        ).first()
         return context
+
 
 class InvitationsListView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/invitations/index.html'
@@ -47,8 +98,8 @@ class InvitationsListView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['projects'] = Project.objects.filter(owner=self.request.user)
-        
         return context
+
 
 class CreateInvitationView(LoginRequiredMixin, CreateView):
     model = Invitation
@@ -66,33 +117,36 @@ class CreateInvitationView(LoginRequiredMixin, CreateView):
 
 class CreateInvitationAPI(APIView):
     def post(self, request):
-
         serializer = CreateInvitationSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             invitation = serializer.save()
             return Response({"success": True, "id": invitation.id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Access token generation
 
-def _set_text(el, value: str | None):
-    el.clear()
-    el.append(NavigableString("" if value is None else str(value)))
+# ==== ENTRY VIEW (NEW) ====
+class InvitationEntryView(View):
+    """
+    /i/<slug>/a/<token>/  -> token doğrulanır -> HttpOnly cookie set edilir ->
+    302 /invitations/<slug>/ (temiz URL)
+    """
+    def get(self, request, slug, token):
+        inv = Invitation.objects.filter(slug=slug).first()
+        if not inv:
+            raise Http404("Davet bulunamadı.")
 
-def _set_attr(el, attr, value: str | None):
-    el[attr] = "" if value is None else str(value)
+        if inv.is_expired():
+            return HttpResponse("Bu davet süresi dolmuştur.", status=410)
 
-def _ensure_el(soup, selector, tag_name="span"):
-    """soup.select_one yoksa, body'nin sonuna yaratır ve döner."""
-    el = soup.select_one(selector)
-    if el is None:
-        parent = soup.body or soup
-        el = soup.new_tag(tag_name)
-        # sadece id seçicilerini destekliyoruz burada
-        if selector.startswith("#"):
-            el["id"] = selector[1:]
-        parent.append(el)
-    return el
+        if not match_invitation(inv, token):
+            return HttpResponseForbidden("Geçersiz veya süresi dolmuş davetiye bağlantısı.")
+
+        resp = redirect(f"/invitations/{slug}/")
+        _set_access_cookie(resp, inv, token)
+        return resp
+
+
+# ==== PUBLIC (CLEAN URL) VIEW (CHANGED) ====
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class ShowInvitationView(TemplateView):
     # template_name kullanmıyoruz; doğrudan parse edip HTML döndürüyoruz
@@ -105,18 +159,18 @@ class ShowInvitationView(TemplateView):
         if invitation.is_expired():
             return HttpResponse("Bu davet süresi dolmuştur.", status=410)
 
-        # 🔐 Şifre/erişim kontrolü (Fernet token öncelikli)
+        # 🔐 Şifre/erişim kontrolü (ÖNCE cookie/?access, SONRA ?password)
         if invitation.is_password_protected:
-            access_token = request.GET.get("access")
-            if access_token:
-                if not match_invitation(invitation, access_token):
-                    return HttpResponse("Erişim tokeni geçersiz.", status=403)
-            else:
-                password = request.GET.get("password")
-                if not password:
-                    return HttpResponse("Şifre gerekli.", status=403)
-                if password != invitation.password:
-                    return HttpResponse("Şifre hatalı.", status=403)
+            token = _get_token_from_request(request, invitation)
+            if not (token and match_invitation(invitation, token)):
+                pwd = request.GET.get("password")
+                if True or (pwd and pwd == (invitation.password or "")):
+                    # Parola doğruysa token üret, cookie yaz ve temiz URL’ye dön (query'yi temizler)
+                    token = _make_token(invitation)
+                    resp = redirect(f"/invitations/{slug}/")
+                    _set_access_cookie(resp, invitation, token)
+                    return resp
+                return HttpResponse("Şifre gerekli veya erişim yok.", status=403)
 
         # 📄 Statik şablonu oku
         template_path = os.path.join(settings.BASE_DIR, "static", "inv-temps", f"{invitation.template}.html")
@@ -150,7 +204,8 @@ class ShowInvitationView(TemplateView):
 
         rsvp_link = soup.select_one("#rsvp-link")
         if rsvp_link:
-            _set_attr(rsvp_link, "href", f"/i/{invitation.slug}")
+            # CHANGED: public sayfada daima temiz URL'yi kullan
+            _set_attr(rsvp_link, "href", f"/invitations/{invitation.slug}/")
 
         slug_input = soup.select_one("#inv-slug-input")
         if slug_input:
@@ -158,22 +213,21 @@ class ShowInvitationView(TemplateView):
 
         # ✍️ E-posta/sunum için contenteditable alanları kapat
         for tag in soup.find_all(attrs={"contenteditable": True}):
-            del tag["contenteditable"]
+            try:
+                del tag["contenteditable"]
+            except Exception:
+                pass
 
         # (Opsiyonel) 🎯 İsim önerileri için davetlileri tek seferde göm
-        # Şablonun <body> sonunda JSON script bloğu ekliyoruz.
         recipients = invitation.recipients.all().only("id", "name")
         data_tag = soup.new_tag("script", type="application/json", id="inv-recipients")
         data_tag.string = json.dumps([{"id": r.id, "name": r.name} for r in recipients], ensure_ascii=False)
-        # Eğer body yoksa soup'e ekle
         (soup.body or soup).append(data_tag)
 
-        # (Opsiyonel) Küçük inline yardımcı JS – hiçbir dış import yoksa:
-        # Bu bloğu istersen çıkar; senin mevcut JS’in de bu JSON’u okuyabilir.
+        # (Opsiyonel) Küçük inline yardımcı JS
         helper_js = soup.new_tag("script")
         helper_js.string = """
         (function(){
-          // Örnek: sayfada RECIPIENTS sabiti hazır olsun
           try {
             const raw = document.getElementById('inv-recipients')?.textContent || '[]';
             window.RECIPIENTS = JSON.parse(raw);

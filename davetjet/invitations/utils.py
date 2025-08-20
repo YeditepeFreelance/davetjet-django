@@ -1,41 +1,67 @@
 # invitations/utils/secure_links.py
 import json
-from urllib.parse import quote  # token'i URL'e koyarken güvenli
+from urllib.parse import quote
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 
 fernet = Fernet(settings.FERNET_KEY)
 
+def _site_base(base_url=None):
+    return base_url or getattr(settings, "SITE_URL", "https://davetjet-webapp.onrender.com")
+
+def _token_payload(invitation):
+    return {"id": invitation.id, "p": (invitation.password or "")}
+
 def generate_secure_invitation_link(invitation, base_url=None):
     """
-    Token = {"id": <int>, "p": <str or ''>}
+    Eski sürüm (query param). Dilersen kullanmaya devam edebilirsin.
     """
-    payload = {
-        "id": invitation.id,
-        "p": (invitation.password or ""),  # None -> ""
-    }
-    token = fernet.encrypt(json.dumps(payload).encode()).decode()
-
-    base = base_url or getattr(settings, "SITE_URL", "https://davetjet-webapp.onrender.com")
-    # URL'de bozulmasın diye quote
+    token = fernet.encrypt(json.dumps(_token_payload(invitation)).encode()).decode()
+    base = _site_base(base_url)
+    return f"{base}/invitations/{invitation.slug}/"
     return f"{base}/invitations/{invitation.slug}/?access={quote(token)}"
 
-def match_invitation(invitation, access_token: str) -> bool:
+def generate_entry_url(invitation, base_url=None):
+    """
+    ÖNERİLEN: Cookie ayarlayıp temiz URL’ye yönlendiren giriş linki.
+    /i/<slug>/a/<token>/ -> (cookie set) -> 302 -> /invitations/<slug>/
+    """
+    token = fernet.encrypt(json.dumps(_token_payload(invitation)).encode()).decode()
+    base = _site_base(base_url)
+    return f"{base}/i/{invitation.slug}/a/{quote(token)}/"
+
+def match_invitation(invitation, access_token: str, ttl_seconds: int | None = None) -> bool:
     try:
-        data = json.loads(fernet.decrypt(access_token.encode()).decode())
+        # ttl_seconds verirsen link/cookie süreli olur.
+        raw = fernet.decrypt(access_token.encode(), ttl=ttl_seconds) if ttl_seconds \
+              else fernet.decrypt(access_token.encode())
+        data = json.loads(raw.decode())
     except InvalidToken:
         return False
     except Exception:
         return False
-
-    # Tip güvenli kıyas
     if str(data.get("id")) != str(invitation.id):
         return False
-
     if (invitation.password or "") != (data.get("p") or ""):
         return False
-
     return True
+
+
+# invitations/utils/secure_links.py (aynı dosyada)
+def get_token_from_request(request, invitation):
+    """
+    Önce cookie, sonra query paramdan token çek.
+    """
+    cookie_name = f"inv_access_{invitation.id}"
+    token = request.COOKIES.get(cookie_name)
+    if not token:
+        token = request.GET.get("access")
+    return token
+
+def has_access(request, invitation, ttl_seconds: int | None = None) -> bool:
+    token = get_token_from_request(request, invitation)
+    return bool(token and match_invitation(invitation, token, ttl_seconds=ttl_seconds))
+
 
 import os
 from bs4 import BeautifulSoup, NavigableString

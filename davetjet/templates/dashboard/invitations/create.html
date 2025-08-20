@@ -26,18 +26,33 @@
         <div class="template-gallery">
           <label class="template-card selected" data-template="classic">
             <input type="radio" name="template" value="classic" checked>
-            <div class="thumb"><img src="{% static 'images/template1.png' %}" alt="Klasik"></div>
+            <div class="thumb"><img src="{% static 'inv-temps/classic.jpg' %}" alt="Klasik"></div>
             <div class="meta"><p>Klasik</p><span class="badge">Önerilen</span></div>
           </label>
           <label class="template-card" data-template="modern">
             <input type="radio" name="template" value="modern">
-            <div class="thumb"><img src="{% static 'images/template2.png' %}" alt="Modern"></div>
+            <div class="thumb"><img src="{% static 'inv-temps/modern.jpg' %}" alt="Modern"></div>
             <div class="meta"><p>Modern</p></div>
           </label>
           <label class="template-card" data-template="minimal">
             <input type="radio" name="template" value="minimal">
-            <div class="thumb"><img src="{% static 'images/template3.png' %}" alt="Minimal"></div>
+            <div class="thumb"><img src="{% static 'inv-temps/minimal.jpg' %}" alt="Minimal"></div>
             <div class="meta"><p>Minimal</p></div>
+          </label>
+          <label class="template-card" data-template="bauhaus-black">
+            <input type="radio" name="template" value="bauhaus-black">
+            <div class="thumb"><img src="{% static 'inv-temps/bauhaus-black.jpg' %}" alt="Bauhaus Black"></div>
+            <div class="meta"><p>Bauhaus Black</p></div>
+          </label>
+          <label class="template-card" data-template="blueprint">
+            <input type="radio" name="template" value="blueprint">
+            <div class="thumb"><img src="{% static 'inv-temps/blueprint.jpg' %}" alt="Blueprint"></div>
+            <div class="meta"><p>Blueprint</p></div>
+          </label>
+          <label class="template-card" data-template="editorial">
+            <input type="radio" name="template" value="editorial">
+            <div class="thumb"><img src="{% static 'inv-temps/editorial.jpg' %}" alt="Editorial"></div>
+            <div class="meta"><p>Editorial</p></div>
           </label>
         </div>
       </div>
@@ -89,12 +104,7 @@
             <p class="muted">Etkinlikten önce otomatik bilgilendirme gönder.</p>
           </div>
         </div>
-        <div class="head-right">
-          <label class="switch">
-            <input type="checkbox" id="remindersEnabled">
-            <span class="slider"></span>
-          </label>
-        </div>
+        
       </header>
 
       <div class="card-body" id="reminderControls">
@@ -146,7 +156,7 @@
 
 
       <!-- Step 4: Message & Multi-Channel Preview -->
-      <div class="wizard-step step-3 hidden" data-step="4">
+       <div class="wizard-step step-3 hidden" data-step="4">
         <div class="step-head">
           <h2>Mesaj & Kanal Önizlemesi</h2>
           <p class="muted">Metni düzenledikçe SMS ve e-posta kartları canlı güncellenir.</p>
@@ -190,10 +200,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> 
 
       <!-- Step 5: Share -->
-      <div class="wizard-step step-4 hidden" data-step="5">
+      <div class="wizard-step step-4 hidden" data-step="4">
         <div class="step-head">
           <h2>Paylaş & Aksiyonlar</h2>
         </div>
@@ -289,7 +299,19 @@
 
 {% block extra_js %}
 {% if inv_json %}<script>window.INV_META = {{ inv_json|safe }};</script>{% endif %}
+  <script>
+    (function () {
+      // iframe içinde mi?
+      var isFramed = false;
+      try { isFramed = (window.self !== window.top); } catch (e) { isFramed = true; }
+      // Bazı gömme yerleri ?embed=1 vb. gönderir: onu da kabul et
+      var qs = new URLSearchParams(location.search);
+      if (qs.has('embed') || qs.has('iframe') || qs.get('view') === 'embed') isFramed = true;
 
+      // CSS’in yakalayacağı sınıfı HTML köküne bas
+      document.documentElement.classList.toggle('is-framed', isFramed);
+    })();
+  </script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   // ====== Elements

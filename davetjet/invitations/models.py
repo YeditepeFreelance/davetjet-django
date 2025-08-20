@@ -26,12 +26,18 @@ TEMPLATE_CHOICES = [
     ('classic', 'Classic'),
     ('modern', 'Modern'),
     ('minimal', 'Minimal'),
+    ('editorial', 'Editorial'),
+    ('bauhaus-black', 'Bauhaus Black'),
+    ('blueprint', 'Blueprint'),
 ]
 
 TEMPLATE_MAP = {
     "classic": "inv-temps/classic.html",
     "modern":  "inv-temps/modern.html",
     "minimal": "inv-temps/minimal.html",
+    "editorial": "inv-temps/editorial.html",
+    "bauhaus-black": "inv-temps/bauhaus-black.html",
+    "blueprint": "inv-temps/blueprint.html"
 }
 
 class Invitation(models.Model):

@@ -1,12 +1,14 @@
 from django.urls import path
 
-from .views import ShowInvitationView
+from .views import ShowInvitationView, InvitationEntryView
 from . import api
 
 app_name = 'invitations'
 
 urlpatterns = [
   path('<slug:slug>/', ShowInvitationView.as_view(), name='show'),  
+      path("i/<slug:slug>/a/<str:token>/", InvitationEntryView.as_view(), name="invitation_entry"),
+
       path("api/drafts/", api.list_drafts, name="invitation-drafts"),
       path("api/schedule-send/<int:pk>/", api.schedule_send, name="invitation-schedule-send"),
     path("api/drafts/<int:pk>/promote/", api.promote_draft, name="invitation-draft-promote"),

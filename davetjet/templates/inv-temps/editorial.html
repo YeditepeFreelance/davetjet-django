@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editorial Serif Spread — Davetiye + RSVP</title>
+    <style>
+      :root {
+        /* Monokrom editorial palet */
+        --paper: #f5f1e8; /* kâğıt kremi */
+        --sheet: #fffdf8; /* sayfa rengi */
+        --ink: #1a1a1a; /* metin siyahı */
+        --rule: #cfc7b5; /* saç teli çizgi */
+        --accent: #0b6b3f; /* çok az kullanılan vurgu */
+      }
+
+      body.invitation-page {
+        margin: 0;
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+        background: var(--paper);
+        color: var(--ink);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Kâğıt dokusu */
+      .paper-grain {
+        position: fixed;
+        inset: -10% -10% -10% -10%;
+        pointer-events: none;
+        opacity: 0.05;
+        mix-blend-mode: multiply;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
+      }
+
+      /* Editoryal sayfa (gazete/dergi) */
+      .sheet {
+        position: relative;
+        width: min(960px, 92vw);
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        box-shadow: 0 18px 40px rgba(26, 26, 26, 0.08);
+        margin: 42px auto 18px;
+        padding: clamp(18px, 4.8vmin, 48px);
+      }
+
+      /* Baskı işaretleri */
+      .sheet::before,
+      .sheet::after {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border: 1px solid var(--rule);
+        opacity: 0.6;
+      }
+      .sheet::before {
+        left: -12px;
+        top: -12px;
+        border-right: none;
+        border-bottom: none;
+      }
+      .sheet::after {
+        right: -12px;
+        bottom: -12px;
+        border-left: none;
+        border-top: none;
+      }
+
+      .masthead {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: end;
+        gap: 12px;
+      }
+      .masthead .brand {
+        font-variant: small-caps;
+        letter-spacing: 0.22em;
+        font-weight: 700;
+        color: #000;
+      }
+      .masthead .issue {
+        justify-self: end;
+        font-variant: small-caps;
+        letter-spacing: 0.18em;
+      }
+
+      .headline {
+        text-align: center;
+        margin: 6px 0 2px;
+      }
+      .headline h1 {
+        margin: 0;
+        font-size: clamp(2rem, 6.2vmin, 4.4rem);
+        line-height: 1.02;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+      }
+      .subhed {
+        text-align: center;
+        margin: 6px 0 12px;
+        font-style: italic;
+        opacity: 0.9;
+      }
+
+      .hairline {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--rule),
+          transparent
+        );
+        margin: 10px 0 18px;
+      }
+
+      .cols {
+        display: grid;
+        grid-template-columns: 1.4fr 0.9fr;
+        gap: 22px;
+        align-items: start;
+      }
+
+      .intro p {
+        margin: 0 0 10px;
+        text-align: justify;
+      }
+      .intro p:first-of-type::first-letter {
+        float: left;
+        font-size: 3.8rem;
+        line-height: 0.85;
+        padding: 0.18rem 0.35rem 0.18rem 0;
+        font-weight: 900;
+      }
+
+      .vrule {
+        border-left: 1px solid var(--rule);
+        padding-left: 18px;
+      }
+
+      .fact table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.98rem;
+      }
+      .fact th {
+        text-align: left;
+        font-variant: small-caps;
+        letter-spacing: 0.14em;
+        font-size: 0.86rem;
+        color: #444;
+      }
+      .fact td {
+        padding: 6px 0;
+      }
+      .fact tr + tr td {
+        border-top: 1px dotted var(--rule);
+      }
+      .fact .label {
+        width: 36%;
+      }
+
+      .pullquote {
+        margin: 12px 0;
+        padding: 10px 14px;
+        border-left: 3px solid var(--ink);
+        font-style: italic;
+      }
+
+      .footer-note {
+        margin-top: 14px;
+        font-size: 0.95rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .footer-note .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--ink);
+        border-radius: 50%;
+      }
+
+      /* RSVP Form — editoryal form görünümü */
+      .rsvp-form {
+        width: min(960px, 92vw);
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        border-radius: 2px;
+        box-shadow: 0 12px 28px rgba(26, 26, 26, 0.06);
+        padding: clamp(16px, 3.8vmin, 26px);
+        margin-bottom: 42px;
+      }
+      .rsvp-form h2 {
+        margin: 0 0 10px;
+        text-align: center;
+        font-variant: small-caps;
+        letter-spacing: 0.18em;
+      }
+      .input-group {
+        position: relative;
+        margin-bottom: 10px;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 0.8rem 0.2rem 0.6rem;
+        border: none;
+        border-bottom: 1px solid var(--ink);
+        background: transparent;
+        font-size: 1.02rem;
+      }
+      .input-group input:focus {
+        outline: none;
+        box-shadow: 0 2px 0 0 var(--accent);
+        border-bottom-color: var(--accent);
+      }
+
+      .suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        border-top: none;
+        z-index: 100;
+        max-height: 180px;
+        overflow-y: auto;
+        display: none;
+      }
+      .suggestion-item {
+        padding: 0.6rem 0.8rem;
+        cursor: pointer;
+      }
+      .suggestion-item:hover {
+        background: #f7f3ea;
+      }
+
+      .rsvp-status {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 10px;
+        justify-content: center;
+        margin: 8px 0 10px;
+      }
+      .tick {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.5rem 0.9rem;
+        border: 1px solid var(--ink);
+        font-weight: 700;
+        cursor: pointer;
+        user-select: none;
+        background: transparent;
+      }
+      .tick .box {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--ink);
+        display: inline-block;
+      }
+      .tick.active {
+        background: #111;
+        color: #fff;
+        border-color: #111;
+      }
+      .tick.active .box {
+        border-color: #fff;
+        background: #fff;
+        box-shadow: inset 0 0 0 3px #111;
+      }
+
+      .rsvp-submit {
+        width: 100%;
+        padding: 0.95rem;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        background: #111;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      .rsvp-submit:disabled {
+        background: #999;
+        color: #eee;
+        cursor: not-allowed;
+      }
+      .rsvp-msg {
+        margin-top: 0.7rem;
+        min-height: 1.2rem;
+        text-align: center;
+        font-weight: 700;
+      }
+      .rsvp-msg.ok {
+        color: #0a7a4c;
+      }
+      .rsvp-msg.err {
+        color: #b00020;
+      }
+
+      @media (max-width: 820px) {
+        .cols {
+          grid-template-columns: 1fr;
+        }
+        .vrule {
+          border-left: none;
+          padding-left: 0;
+          border-top: 1px solid var(--rule);
+          padding-top: 14px;
+        }
+      }
+      #inv-slug {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="invitation-page">
+    <div class="paper-grain" aria-hidden="true"></div>
+
+    <div class="sheet" role="img" aria-label="Editoryal serif davetiye sayfası">
+      <div class="masthead">
+        <div class="brand">The Invitation</div>
+        <div class="dateline" id="event-date">12 Eylül 2025</div>
+        <div class="issue">Cilt XII • Sayı IX</div>
+      </div>
+
+      <div class="headline">
+        <h1 id="event-title">Elif &amp; Deniz</h1>
+      </div>
+      <div class="subhed" id="event-message">
+        Ailelerimizle birlikte, hayatlarımızı birleştirdiğimizi duyurmaktan
+        mutluluk duyarız.
+      </div>
+
+      <div class="hairline" role="separator"></div>
+
+      <div class="cols">
+        <div class="intro" contenteditable="true">
+          <p>
+            Birlikteliğimizin bu özel gününde, sevincimizi paylaşmanız bizim
+            için büyük bir onur olacak. Bu sayfada etkinlik ayrıntılarını ve
+            katılım formunu bulabilirsiniz.
+          </p>
+          <div class="pullquote">
+            “Zaman, iki kalbin aynı ritimde attığı yerde daha yavaş akar.”
+          </div>
+          <p>
+            Şehir dışından gelecek misafirlerimiz için konaklama önerileri RSVP
+            sonrasında iletilecektir.
+          </p>
+        </div>
+        <div class="vrule fact">
+          <table aria-label="Etkinlik detayları">
+            <tr>
+              <th class="label">Saat</th>
+              <td id="event-time">19:00</td>
+            </tr>
+            <tr>
+              <th class="label">Yer</th>
+              <td id="event-location">Maison Jardin, Nişantaşı</td>
+            </tr>
+            <tr>
+              <th class="label">Kıyafet</th>
+              <td contenteditable="true">Resmî • Zarif</td>
+            </tr>
+            <tr>
+              <th class="label">Not</th>
+              <td contenteditable="true">Lütfen zamanında teşrif ediniz</td>
+            </tr>
+          </table>
+          <div class="footer-note">
+            <span class="dot" aria-hidden="true" contenteditable="true"></span>
+            Davetiyeyi yanınızda getirmenize gerek yoktur.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RSVP Formu -->
+    <div class="rsvp-form" aria-labelledby="rsvp-title">
+      <h2 id="rsvp-title">Katılım Formu</h2>
+
+      <div class="input-group">
+        <input
+          type="text"
+          id="rsvp-name"
+          placeholder="Adınızı yazın"
+          autocomplete="off"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="name-suggestions"
+        />
+        <div
+          class="suggestions"
+          id="name-suggestions"
+          role="listbox"
+          aria-live="polite"
+        ></div>
+      </div>
+
+      <div class="rsvp-status" role="group" aria-label="Katılım durumu seçin">
+        <div class="tick" data-status="yes" role="button" tabindex="0">
+          <span class="box" aria-hidden="true"></span> Geleceğim
+        </div>
+        <div class="tick" data-status="maybe" role="button" tabindex="0">
+          <span class="box" aria-hidden="true"></span> Emin değilim
+        </div>
+        <div class="tick" data-status="no" role="button" tabindex="0">
+          <span class="box" aria-hidden="true"></span> Gelmeyeceğim
+        </div>
+      </div>
+
+      <button id="rsvp-submit" class="rsvp-submit" disabled>Gönder</button>
+      <div id="rsvp-msg" class="rsvp-msg" aria-live="polite"></div>
+    </div>
+
+    <span id="inv-slug"></span>
+
+    <script>
+      // --- Utilities ---
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2)
+          return decodeURIComponent(parts.pop().split(";").shift());
+      }
+      function debounce(fn, delay = 250) {
+        let t;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), delay);
+        };
+      }
+      function deriveSlugFromURL() {
+        const parts = window.location.pathname.split("/").filter(Boolean);
+        return parts.pop() || "";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const nameInput = document.getElementById("rsvp-name");
+        const suggestionsBox = document.getElementById("name-suggestions");
+        const statusTicks = document.querySelectorAll(".tick");
+        const submitBtn = document.getElementById("rsvp-submit");
+        const msg = document.getElementById("rsvp-msg");
+
+        let slug = (
+          document.getElementById("inv-slug")?.textContent || ""
+        ).trim();
+        if (!slug) slug = deriveSlugFromURL();
+
+        let selectedStatus = null;
+        let currentFetchController = null;
+
+        function updateButtonState() {
+          submitBtn.disabled = !nameInput.value.trim() || !selectedStatus;
+        }
+
+        // Durum seçimi
+        statusTicks.forEach((tick) => {
+          function activate() {
+            statusTicks.forEach((t) => t.classList.remove("active"));
+            tick.classList.add("active");
+            selectedStatus = tick.dataset.status;
+            updateButtonState();
+          }
+          tick.addEventListener("click", activate);
+          tick.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              activate();
+            }
+          });
+        });
+
+        // Dışarı tıklayınca önerileri kapat
+        document.addEventListener("click", (e) => {
+          if (!suggestionsBox.contains(e.target) && e.target !== nameInput) {
+            suggestionsBox.style.display = "none";
+            nameInput.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        // İsim önerileri (debounced)
+        const fetchSuggestions = debounce(async () => {
+          const q = nameInput.value.trim();
+          if (q.length < 1) {
+            suggestionsBox.style.display = "none";
+            nameInput.setAttribute("aria-expanded", "false");
+            return;
+          }
+          if (currentFetchController) currentFetchController.abort();
+          currentFetchController = new AbortController();
+          try {
+            const res = await fetch(
+              `/recipients/${encodeURIComponent(slug)}/?q=${encodeURIComponent(
+                q
+              )}`,
+              { signal: currentFetchController.signal }
+            );
+            if (!res.ok) throw new Error("Öneriler alınamadı");
+            const data = await res.json();
+            suggestionsBox.innerHTML = "";
+            if (Array.isArray(data) && data.length) {
+              data.forEach((item, idx) => {
+                const div = document.createElement("div");
+                div.className = "suggestion-item";
+                div.setAttribute("role", "option");
+                div.id = `suggestion-${idx}`;
+                div.textContent = item.name;
+                div.addEventListener("click", () => {
+                  nameInput.value = item.name;
+                  suggestionsBox.style.display = "none";
+                  nameInput.setAttribute("aria-expanded", "false");
+                  updateButtonState();
+                });
+                suggestionsBox.appendChild(div);
+              });
+              suggestionsBox.style.display = "block";
+              nameInput.setAttribute("aria-expanded", "true");
+            } else {
+              suggestionsBox.style.display = "none";
+              nameInput.setAttribute("aria-expanded", "false");
+            }
+          } catch (err) {
+            /* abort veya ağ hatası sessiz */
+          }
+        }, 250);
+
+        nameInput.addEventListener("input", () => {
+          updateButtonState();
+          fetchSuggestions();
+        });
+        nameInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (!submitBtn.disabled) submitBtn.click();
+          }
+        });
+
+        // Form gönderimi
+        submitBtn.addEventListener("click", async () => {
+          msg.textContent = "";
+          msg.className = "rsvp-msg";
+          submitBtn.disabled = true;
+          const csrftoken = getCookie("csrftoken");
+          try {
+            const res = await fetch(
+              `/recipients/${encodeURIComponent(slug)}/`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": csrftoken || "",
+                },
+                body: JSON.stringify({
+                  name: nameInput.value.trim(),
+                  status: selectedStatus,
+                }),
+                credentials: "same-origin",
+              }
+            );
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data && data.message) {
+              msg.textContent = data.message;
+              msg.className = "rsvp-msg ok";
+            } else {
+              msg.textContent =
+                data.error || "Bir hata oluştu. Lütfen tekrar deneyin.";
+              msg.className = "rsvp-msg err";
+            }
+          } catch (e) {
+            msg.textContent = "Ağ hatası. Lütfen tekrar deneyin.";
+            msg.className = "rsvp-msg err";
+          } finally {
+            submitBtn.disabled = false;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

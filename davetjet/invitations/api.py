@@ -350,16 +350,31 @@ def invitation_detail(request, pk):
     inv.refresh_from_db()
 
     return Response(InvitationDetailSerializer(inv).data, status=200)
+# views.py (ilgili importlar yoksa ekleyin)
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def schedule_send(request, pk):
     """
     /invitations/api/schedule-send/<pk>/
-    - being_sent=True -> save()  (sinyaller sadece bu durumda çalışacak)
-    - sadece seçilen kanallardan göndersin diye delivery_settings'i request'ten uygula
-    - iş biter bitmez being_sent=False yap
+    - being_sent=True -> save()  (sinyaller yalnızca bu flag açıkken çalışacak)
+    - seçilen kanallar ve kanal bazlı içerik (email/sms) delivery_settings'e yazılır
+    - iş biter bitmez being_sent=False yapılır
     """
+    def _truthy(v):  # checkbox/string normalize
+        return str(v).lower() in ("1", "true", "on", "yes")
+
+    def _clean(s):
+        return (s or "").strip()
+
     with transaction.atomic():
         inv = get_object_or_404(
             Invitation.objects.select_for_update().select_related("project"),
@@ -367,39 +382,65 @@ def schedule_send(request, pk):
             project__owner=request.user,
         )
 
-        # — Kanallar: hem "channels": {...} objesi, hem de "channel_email" checkbox şekli desteklenir —
         data = request.data if isinstance(request.data, dict) else {}
-        ds = inv.delivery_settings or {}
 
-        if "channels" in data and isinstance(data["channels"], dict):
-            ch = data["channels"]
-            ds["email"] = bool(ch.get("email", ds.get("email", True)))
-            ds["sms"] = bool(ch.get("sms", ds.get("sms", False)))
+        # --- Kanallar ---
+        ds = (inv.delivery_settings or {}).copy()
+        ch = data.get("channels")
+        if isinstance(ch, dict):
+            ds["email"]    = bool(ch.get("email",    ds.get("email", True)))
+            ds["sms"]      = bool(ch.get("sms",      ds.get("sms", False)))
             ds["whatsapp"] = bool(ch.get("whatsapp", ds.get("whatsapp", False)))
         else:
-            # checkbox isimleriyle gelmiş olabilir (true/false)
-            if "channel_email" in data:
-                ds["email"] = str(data["channel_email"]).lower() in ("1","true","on","yes")
-            if "channel_sms" in data:
-                ds["sms"] = str(data["channel_sms"]).lower() in ("1","true","on","yes")
-            if "channel_whatsapp" in data:
-                ds["whatsapp"] = str(data["channel_whatsapp"]).lower() in ("1","true","on","yes")
+            if "channel_email" in data:    ds["email"]    = _truthy(data.get("channel_email"))
+            if "channel_sms" in data:      ds["sms"]      = _truthy(data.get("channel_sms"))
+            if "channel_whatsapp" in data: ds["whatsapp"] = _truthy(data.get("channel_whatsapp"))
 
-        # — Gönderimi tetiklemek için bayrağı aç —
-        inv.being_sent = True
+        # --- İçerikler (frontend'den gelenleri kullan; yoksa fallback) ---
+        general_message = _clean(data.get("message") or inv.message or "")
+        email_message   = _clean(data.get("email_message") or general_message)
+        sms_message     = _clean(data.get("sms_message")   or general_message)
+        email_subject   = _clean(data.get("email_subject") or f"{inv.name} — Davetiye")
+
+        # Pretty davetiye URL'si (sinyaller için faydalı)
+
+        # Kanala göre boşalt (aktif olmayan kanala içerik taşımayalım)
+        ds["content"] = {
+            "general": general_message,
+            "email":   email_message if ds.get("email") else "",
+            "sms":     sms_message   if ds.get("sms")   else "",
+            "email_subject": email_subject,
+        }
+
+        # --- Zamanlama ---
+        schedule = data.get("schedule") or {}
+        mode = (schedule.get("mode") or "now").lower()
+        when_iso = schedule.get("scheduled_at")
+        when_dt = None
+        if when_iso:
+            when_dt = parse_datetime(when_iso)
+            if when_dt and timezone.is_naive(when_dt):
+                when_dt = timezone.make_aware(when_dt, timezone.get_current_timezone())
+
+        ds["schedule"] = {
+            "mode": mode,                              # "now" | "later"
+            "scheduled_at": when_dt.isoformat() if when_dt else None,  # ISO8601 veya None
+        }
+
+        # --- Davetiye state ---
         inv.delivery_settings = ds
+        inv.being_sent = True
 
-        # taslaktaysa istersen yayınla (opsiyonel)
+        # Taslaktaysa yayınla (opsiyonel ama genelde gerekli)
         if inv.is_draft:
             inv.is_draft = False
             if not inv.published_at:
                 inv.published_at = timezone.now()
 
-        # kritik save: sinyaller burada being_sent=True gördüğü için çalışır
+        # Kritik save: sinyaller burada tetiklenir (being_sent=True)
         inv.save()
 
-    # sinyaller schedule’ları kurdu; bayrağı kapat
-    # (ikinci save post_save tetikler ama being_sent=False olduğu için sinyaller hemen çıkacak)
+    # Sinyaller kurulumunu yaptı; flag'i kapat
     inv.being_sent = False
     inv.save(update_fields=["being_sent"])
 
@@ -408,7 +449,13 @@ def schedule_send(request, pk):
             "ok": True,
             "message": "Gönderim planlaması başlatıldı. Seçilen kanallara göre iletilecek.",
             "invitation_id": inv.id,
-            "channels": inv.delivery_settings,
+            "channels": inv.delivery_settings.get("channels") or {
+                "email": inv.delivery_settings.get("email", False),
+                "sms": inv.delivery_settings.get("sms", False),
+                "whatsapp": inv.delivery_settings.get("whatsapp", False),
+            },
+            "content": inv.delivery_settings.get("content", {}),
+            "schedule": inv.delivery_settings.get("schedule", {}),
             "is_draft": inv.is_draft,
         },
         status=status.HTTP_200_OK,

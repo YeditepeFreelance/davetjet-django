@@ -74,6 +74,7 @@ class User(AbstractUser):
                 "status_counts": {"yes": 0, "maybe": 0, "no": 0, "pending": 0},
             }
 
+        projects.first().save()
         project_ids = list(projects.values_list("id", flat=True))
         # --- Tüm davetliler (tekrarsız) ---
         recs = (
@@ -81,7 +82,6 @@ class User(AbstractUser):
             .filter(invitations__project_id__in=project_ids)  # OneToOne / FK fark etmez, Invitation üstünde project_id var
             .distinct()
         )
-        
         invitee_count = recs.count()
 
         email_reachable = recs.filter(email__isnull=False).count()

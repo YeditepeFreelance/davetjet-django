@@ -115,9 +115,9 @@
 
       {# Davetli listesi: ana/editle/upload vs. #}
       {% with name=request.resolver_match.url_name %}
-<li class="{% if name == 'recipients' or name == 'edit_recipients' or name == 'recipients_upload' or name == 'project_recipients' %}active{% endif %}">
+<li class="{% if name == 'recipients' or name == 'edit-recipients' or name == 'recipients_upload' or name == 'project_recipients' %}active{% endif %}">
   <a href="{% url 'core:recipients' %}" class="sb-item"
-     {% if name == 'recipients' or name == 'edit_recipients' or name == 'recipients_upload' or name == 'project_recipients' %}aria-current="page"{% endif %}>
+     {% if name == 'recipients' or name == 'edit-recipients' or name == 'recipients_upload' or name == 'project_recipients' %}aria-current="page"{% endif %}>
     <i class="fa-solid fa-users"></i>
     <span class="label">Davetli Listesi</span>
   </a>
@@ -125,7 +125,15 @@
 {% endwith %}
 
 
-    
+    {% with name=request.resolver_match.url_name %}
+<li class="{% if name == 'sending' %}active{% endif %}">
+  <a href="{% url 'core:sending' %}" class="sb-item"
+     {% if name == 'sending' %}aria-current="page"{% endif %}>
+    <i class="fa-solid fa-paper-plane"></i>
+    <span class="label">Gönderim</span>
+  </a>
+</li>
+{% endwith %}
 
       {% with name=request.resolver_match.url_name %}
 <li class="{% if name == 'analytics' or name == 'analytics_detail' %}active{% endif %}">
@@ -136,15 +144,7 @@
   </a>
 </li>
 {% endwith %}
-      {% with name=request.resolver_match.url_name %}
-<li class="{% if name == 'sending' %}active{% endif %}">
-  <a href="{% url 'core:sending' %}" class="sb-item"
-     {% if name == 'sending' %}aria-current="page"{% endif %}>
-    <i class="fa-solid fa-paper-plane"></i>
-    <span class="label">Gönderim</span>
-  </a>
-</li>
-{% endwith %}
+      
     </ul>
   </div>
 

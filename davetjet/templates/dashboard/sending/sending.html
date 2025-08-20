@@ -32,9 +32,7 @@
   <div class="send-layout">
     <!-- Sol kolon: Önizleme + Mesaj -->
     <div class="send-col send-col--main">
-      <!-- Davetiye Önizleme -->
-     
-      
+
       <!-- Mesaj Düzenleyici -->
       <article class="card glass send-card">
         <div class="card__head">
@@ -45,27 +43,62 @@
         <div class="msg-editor">
           <label class="field">
             <span class="field__label">Genel Mesaj</span>
-            <textarea class="field__control" rows="5" placeholder="Davet mesajınız...">{{ invitation.message }}</textarea>
+            <textarea class="field__control" id="general-message" rows="5" placeholder="Davet mesajınız...">{{ invitation.message }}</textarea>
           </label>
 
-          <details class="msg-advanced">
+          <details class="msg-advanced" open>
             <summary>Gelişmiş (kanal bazlı)</summary>
-            <div class="msg-advanced__grid">
-              <label class="field">
-                <span class="field__label">
-                  <i class="fa-regular fa-envelope"></i> E-posta Mesajı (opsiyonel)
-                </span>
-                <textarea class="field__control" rows="4" placeholder="E-posta gövdesi (boşsa genel mesaj kullanılır)">{{ draft.email_message }}</textarea>
-              </label>
 
-              <label class="field">
-                <span class="field__label">
-                  <i class="fa-solid fa-mobile-screen"></i> SMS Mesajı (opsiyonel)
-                </span>
-                <textarea class="field__control" rows="4" placeholder="SMS gövdesi (boşsa genel mesaj kullanılır)">{{ draft.sms_message }}</textarea>
-                <small class="count-hint">Türkçe karakter desteği aktiftir.</small>
-              </label>
-            </div>
+            <!-- Kanal Önizlemeleri (Kompakt & Sekmeli) -->
+            <article id="channelPreviews" class="card glass send-card channel-previews compact">
+              <div class="card__head compact-head">
+                <h3>Önizleme</h3>
+                <div class="preview-tabs" role="tablist" aria-label="Kanal Önizleme">
+                  <button type="button" class="tab active" data-tab="email" role="tab" aria-selected="true">
+                    <i class="fa-regular fa-envelope"></i> E-posta
+                  </button>
+                  <button type="button" class="tab" data-tab="sms" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-mobile-screen"></i> SMS
+                  </button>
+                </div>
+              </div>
+
+              <div class="panels">
+                <!-- E-posta paneli -->
+                <section class="preview-panel panel-email" data-panel="email" role="tabpanel">
+                  <div class="mini-head">
+                    <div class="from">
+                      <div class="avatar">DJ</div>
+                      <div class="meta">
+                        <strong>Davetiye • DavetJet</strong>
+                        <small>&lt;noreply@davetjet.com&gt;</small>
+                      </div>
+                    </div>
+                    <div class="to"><small>Kime:</small> <span class="chip">alici@example.com</span></div>
+                  </div>
+
+                  <div class="row subject">
+                    <label for="mail-subject-input">Konu</label>
+                    <input id="mail-subject-input" type="text" class="mini-input" value="Davetiyeniz">
+                  </div>
+
+                  <div id="mail-body-preview" class="ed ed-mail" contenteditable="true" spellcheck="false" dir="ltr"></div>
+
+                  <div class="row cta">
+                    <a id="mail-link-preview" class="btn btn--primary btn-mini" href="#" target="_blank" rel="noopener">Davetiye Linki</a>
+                    <small class="muted url" id="mail-link-text"></small>
+                  </div>
+                </section>
+
+                <!-- SMS paneli -->
+                <section class="preview-panel panel-sms hidden" data-panel="sms" role="tabpanel" hidden>
+                  <div class="sms-compact">
+                    <div id="sms-body-preview" class="bubble" contenteditable="true" spellcheck="false" dir="ltr"></div>
+                    <div class="sms-meta"><small id="sms-counter">0 karakter • 0/1 SMS</small></div>
+                  </div>
+                </section>
+              </div>
+            </article>
           </details>
         </div>
       </article>
@@ -171,15 +204,22 @@
 
 
 {% block extra_js %}
+<style>
+  /* Kritik minimum: sekmeler için görünürlük */
+  .preview-panel.hidden{ display:none; }
+</style>
+
 <script>
 (function(){
-  // ---- Yardımcılar ----
+  // ---------- Helpers ----------
+  const qs  = (s, r=document)=>r.querySelector(s);
+  const qsa = (s, r=document)=>Array.from(r.querySelectorAll(s));
+
   function getCookie(name){
     const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
     return m ? decodeURIComponent(m.pop()) : null;
   }
   function flash(type, text){
-    // basit inline mesaj (success/error)
     const host = document.querySelector('.send-header') || document.body;
     const box = document.createElement('div');
     box.className = 'send-flash ' + type;
@@ -188,127 +228,208 @@
       + (type==='success'
          ? "background:#e7f7ef;color:#1f6f46;border:1px solid #c8efd9;"
          : "background:#fdecea;color:#8a1f17;border:1px solid #f5c6c3;");
-    host.appendChild(box);
-    setTimeout(()=> box.remove(), 5000);
+    host.appendChild(box); setTimeout(()=> box.remove(), 5000);
   }
   function combineLocalToISO(dateStr, timeStr){
     if(!dateStr || !timeStr) return null;
     const [y,m,d] = dateStr.split('-').map(Number);
     const [hh,mm] = timeStr.split(':').map(Number);
     const dt = new Date(y, (m-1), d, hh, mm, 0);
-    return dt.toISOString(); // backend UTC kabul etsin (önerilir)
+    return dt.toISOString();
+  }
+  function escapeHTML(s){ return (s||"").replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])); }
+  function nl2br(txt){ return escapeHTML(txt).replace(/\n/g,'<br>'); }
+  function smsPartsInfo(txt){
+    const isAscii = /^[\x00-\x7F]*$/.test(txt || "");
+    const per = isAscii ? 160 : 70;
+    const concat = isAscii ? 153 : 67;
+    const len = (txt||"").length;
+    const parts = len <= per ? (len?1:0) : Math.ceil(len/concat);
+    const inPart = len <= per ? len : (len % concat || concat);
+    const limit = len <= per ? per : concat;
+    return {len, parts, inPart, limit};
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    const root = document.querySelector('.send-page');
-    if(!root) return;
+    const root = qs('.send-page'); if(!root) return;
 
-    // Invitation kimliği (JS içine güvenli gömülmüş)
-    const INV_ID = {{ invitation.id }};
+    // ---------- Context ----------
+    const INV_ID   = {{ invitation.id }};
     const INV_SLUG = "{{ invitation.slug }}";
-    // API ucu: kendi URL pattern’ine göre gerekirse değiştir
+    const INV_TITLE= "{{ invitation.name|escapejs }}";
+    const INV_DATE = "{{ invitation.invitation_date|date:'d.m.Y' }}";
+    const INV_TIME = "{{ invitation.invitation_date|time:'H:i' }}";
+    const INV_LOC  = "{{ invitation.location|default_if_none:''|escapejs }}";
+    const PRETTY_URL = `${location.origin}/invitations/${INV_SLUG}/`;
     const API_SEND_URL = `/invitations/api/schedule-send/${INV_ID}/`;
 
-    // Elemanlar
-    const btnPlan = root.querySelector('.actions .btn.btn--primary');
-    const btnDrafts = root.querySelector('.actions .btn.btn--outlined');
-    const agree = root.querySelector('input[name="confirm_all"]');
+    // ---------- Controls ----------
+    const emailTgl = qs('input[name="channel_email"]', root);
+    const smsTgl   = qs('input[name="channel_sms"]', root);
+    const agree    = qs('input[name="confirm_all"]', root);
+    const btnPlan  = qs('.actions .btn.btn--primary', root);
 
-    const emailToggle = root.querySelector('input[name="channel_email"]');
-    const smsToggle   = root.querySelector('input[name="channel_sms"]');
+    const scheduleRadios = qsa('input[name="schedule_mode"]', root);
+    const dateInput = qs('input[name="send_date"]', root);
+    const timeInput = qs('input[name="send_time"]', root);
 
-    const scheduleRadios = root.querySelectorAll('input[name="schedule_mode"]');
-    const dateInput = root.querySelector('input[name="send_date"]');
-    const timeInput = root.querySelector('input[name="send_time"]');
+    const generalTextarea = qs('#general-message', root);
 
-    // Mesaj textareaları (ilk: genel, diğerleri: email/sms)
-    const generalTextarea = root.querySelector('.msg-editor > label.field textarea.field__control');
-    const advancedTextareas = root.querySelectorAll('.msg-advanced__grid textarea.field__control');
-    const emailTextarea = advancedTextareas[0] || null;
-    const smsTextarea   = advancedTextareas[1] || null;
+    // ---------- Preview elements ----------
+    const previewRoot     = qs('#channelPreviews', root);
+    const tabButtons      = qsa('.preview-tabs .tab', previewRoot);
+    const emailPanel      = qs('.panel-email', previewRoot);
+    const smsPanel        = qs('.panel-sms', previewRoot);
 
-    // Zamanlama alanlarını "Hemen gönder" iken kapat
-    function syncScheduleInputs(){
-      const mode = root.querySelector('input[name="schedule_mode"]:checked')?.value || 'now';
-      const disabled = (mode !== 'later') ? true : false;
-      dateInput.disabled = disabled;
-      timeInput.disabled = disabled;
-      dateInput.parentElement.style.opacity = disabled ? .6 : 1;
-      timeInput.parentElement.style.opacity = disabled ? .6 : 1;
+    const mailSubjectInput= qs('#mail-subject-input', previewRoot);
+    const mailBodyEl      = qs('#mail-body-preview', previewRoot);
+    const mailLinkEl      = qs('#mail-link-preview', previewRoot);
+    const mailLinkText    = qs('#mail-link-text', previewRoot);
+
+    const smsBodyEl       = qs('#sms-body-preview', previewRoot);
+    const smsCounterEl    = qs('#sms-counter', previewRoot);
+
+    // ---------- Defaults ----------
+    function buildDefaults(){
+      const when  = [INV_DATE, INV_TIME].filter(Boolean).join(" • ");
+      const where = INV_LOC ? `, ${INV_LOC}` : "";
+      const base  = `${INV_TITLE} davetine ${when}${where} bekleriz.`;
+      const tail  = `Detaylar/Katılım: ${PRETTY_URL}`;
+      const general = `${base}\n${tail}`;
+      const emailSubject = `${INV_TITLE} — Davetiye`;
+      const email = `Merhaba,\n\n${base}\n\n${tail}\n\nSevgiler,`;
+      const sms   = `${INV_TITLE} davetine bekleriz. ${when}${where}\n${PRETTY_URL}`;
+      return { general, emailSubject, email, sms };
     }
-    scheduleRadios.forEach(r => r.addEventListener('change', syncScheduleInputs));
+    const defaults = buildDefaults();
+
+    // Genel alan boşsa doldur
+    if (generalTextarea && !generalTextarea.value.trim()) generalTextarea.value = defaults.general;
+    if (mailSubjectInput) mailSubjectInput.value = defaults.emailSubject;
+
+    // Dirty flags: kullanıcı panel içinden düzenlediyse genel mesaj değişince üzerine yazmayalım
+    let emailDirty = false;
+    let smsDirty   = false;
+
+    // ---------- Renderers ----------
+    function renderMail(){
+      const fallback = (generalTextarea?.value || defaults.email).trim();
+      const content  = emailDirty ? mailBodyEl.innerText : fallback;
+      mailBodyEl.innerHTML = nl2br(content || defaults.email);
+      mailLinkEl.href = PRETTY_URL;
+      mailLinkText.textContent = PRETTY_URL;
+    }
+    function renderSMS(){
+      const fallback = (generalTextarea?.value || defaults.sms).trim();
+      const content  = smsDirty ? smsBodyEl.innerText : fallback;
+      smsBodyEl.textContent = content || defaults.sms;
+      const meta = smsPartsInfo(smsBodyEl.textContent);
+      smsCounterEl.textContent = `${meta.len} karakter • ${meta.inPart}/${meta.parts||1} SMS`;
+    }
+
+    // İlk render
+    renderMail(); renderSMS();
+
+    // Genel mesaj değişirse, paneli dirty değilse senkronize et
+    generalTextarea?.addEventListener('input', ()=>{
+      if(!emailDirty) renderMail();
+      if(!smsDirty)   renderSMS();
+    });
+
+    // Panel içi düzenlemeler dirty yapsın
+    mailBodyEl?.addEventListener('input', ()=>{ emailDirty = true; });
+    smsBodyEl ?.addEventListener('input', ()=>{ smsDirty   = true; renderSMS(); });
+
+    // ---------- Tabs ----------
+    function showTab(tab){
+      const isEmail = (tab === 'email');
+      emailPanel.classList.toggle('hidden', !isEmail);
+      smsPanel  .classList.toggle('hidden',  isEmail);
+      emailPanel.toggleAttribute('hidden', !isEmail);
+      smsPanel  .toggleAttribute('hidden',  isEmail);
+      tabButtons.forEach(b=>{
+        const active = (b.dataset.tab === tab);
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+    tabButtons.forEach(btn=>{
+      btn.addEventListener('click', (e)=>{ e.preventDefault(); showTab(btn.dataset.tab); });
+    });
+    showTab('email');
+
+    // ---------- Kanal aç/kapa -> panel durumu ----------
+    function syncChannelPanels(){
+      const eOn = !!emailTgl?.checked;
+      const sOn = !!smsTgl?.checked;
+      emailPanel.classList.toggle('is-off', !eOn);
+      smsPanel  .classList.toggle('is-off', !sOn);
+      mailBodyEl.setAttribute('contenteditable', eOn ? 'true' : 'false');
+      smsBodyEl .setAttribute('contenteditable', sOn ? 'true' : 'false');
+    }
+    emailTgl?.addEventListener('change', syncChannelPanels);
+    smsTgl  ?.addEventListener('change',  syncChannelPanels);
+    syncChannelPanels();
+
+    // ---------- Zamanlama ----------
+    function syncScheduleInputs(){
+      const mode = qs('input[name="schedule_mode"]:checked', root)?.value || 'now';
+      const dis = (mode!=='later');
+      dateInput.disabled = dis; timeInput.disabled = dis;
+      dateInput.parentElement.style.opacity = dis ? .6 : 1;
+      timeInput.parentElement.style.opacity = dis ? .6 : 1;
+    }
+    scheduleRadios.forEach(r=>r.addEventListener('change', syncScheduleInputs));
     syncScheduleInputs();
 
+    // ---------- Gönder/Planla ----------
     async function handleSubmit(){
-      // Doğrulamalar
-      const channels = {
-        email: !!emailToggle?.checked,
-        sms:   !!smsToggle?.checked
-      };
-      if(!channels.email && !channels.sms){
-        flash('error', 'En az bir kanal seçmelisiniz (E-posta veya SMS).');
-        return;
-      }
-      if(!agree?.checked){
-        flash('error', 'Lütfen “Davetiye ve davetlileri onaylıyorum” kutusunu işaretleyin.');
-        return;
-      }
+      const channels = { email: !!emailTgl?.checked, sms: !!smsTgl?.checked };
+      if(!channels.email && !channels.sms){ return flash('error','En az bir kanal seçmelisiniz (E-posta veya SMS).'); }
+      if(!agree?.checked){ return flash('error','“Davetiye ve davetlileri onaylıyorum” kutusunu işaretleyin.'); }
 
-      const mode = root.querySelector('input[name="schedule_mode"]:checked')?.value || 'now';
+      const mode = qs('input[name="schedule_mode"]:checked', root)?.value || 'now';
       let scheduled_at = null;
-      if(mode === 'later'){
-        if(!dateInput.value || !timeInput.value){
-          flash('error', 'Planlı gönderim için tarih ve saat seçin.');
-          return;
-        }
+      if(mode==='later'){
+        if(!dateInput.value || !timeInput.value){ return flash('error','Planlı gönderim için tarih ve saat seçin.'); }
         scheduled_at = combineLocalToISO(dateInput.value, timeInput.value);
       }
 
+      // Gönderilecek metinleri **doğrudan önizleme** alanlarından oku
+      const email_message = (mailBodyEl.innerText || '').trim() || (generalTextarea?.value || '').trim() || defaults.email;
+      const sms_message   = (smsBodyEl.innerText  || '').trim() || (generalTextarea?.value || '').trim() || defaults.sms;
+
       const payload = {
-        invitation_id: INV_ID,
-        slug: INV_SLUG,
+        invitation_id: {{ invitation.id }},
+        slug: "{{ invitation.slug }}",
         channels,
         message: (generalTextarea?.value || '').trim(),
-        email_message: (emailTextarea?.value || '').trim() || null,
-        sms_message: (smsTextarea?.value || '').trim() || null,
-        schedule: {
-          mode,
-          scheduled_at, // ISO (UTC) veya null
-        }
+        email_message: channels.email ? email_message : null,
+        sms_message:   channels.sms   ? sms_message   : null,
+        // İstersen backend destekliyorsa:
+        // email_subject: (mailSubjectInput?.value || 'Davetiyeniz').trim(),
+        schedule: { mode, scheduled_at }
       };
 
       try{
-        btnPlan.disabled = true;
-        btnPlan.textContent = 'Gönderim ayarlanıyor…';
-
+        btnPlan.disabled = true; btnPlan.textContent = 'Gönderim ayarlanıyor…';
         const res = await fetch(API_SEND_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken') || ''
-          },
-          credentials: 'same-origin',
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken') || ''},
+          credentials:'same-origin',
           body: JSON.stringify(payload)
         });
-
         const data = await res.json().catch(()=> ({}));
-        if(res.ok){
-          flash('success', data.message || 'Gönderim planlandı!');
-          // İstersen yönlendir: window.location.href = data.redirect || "{% url 'core:dashboard' %}";
-        } else {
-          flash('error', data.error || 'Gönderim sırasında hata oluştu.');
-        }
-      } catch(err){
-        flash('error', 'Ağ hatası. Lütfen tekrar deneyin.');
-      } finally {
-        btnPlan.disabled = false;
-        btnPlan.textContent = 'Onayla ve Planla';
+        if(res.ok){ flash('success', data.message || 'Gönderim planlandı!'); }
+        else      { flash('error', data.error || 'Gönderim sırasında hata oluştu.'); }
+      }catch(e){
+        flash('error','Ağ hatası. Lütfen tekrar deneyin.');
+      }finally{
+        btnPlan.disabled = false; btnPlan.textContent = 'Onayla ve Planla';
       }
     }
-
     btnPlan?.addEventListener('click', handleSubmit);
   });
 })();
 </script>
-
 {% endblock %}

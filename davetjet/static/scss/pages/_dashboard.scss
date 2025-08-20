@@ -1297,3 +1297,200 @@ $accent: map-get(variables.$colors, 'success'); // yoksa 'primary'ye çekebilirs
     max-width: 100%;
   }
 }
+
+.channel-previews.compact .compact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+}
+
+.channel-previews.compact .card__head {
+  padding-bottom: 8px
+}
+
+.preview-tabs {
+  display: flex;
+  gap: 8px
+}
+
+.preview-tabs .tab {
+  padding: .35rem .6rem;
+  border: 1px solid #e4e7ec;
+  background: #fff;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .9rem;
+  color: #4b5563
+}
+
+.preview-tabs .tab.active {
+  background: #0f62fe;
+  color: #fff;
+  border-color: #0f62fe
+}
+
+.channel-previews.compact .panels {
+  margin-top: 10px
+}
+
+.preview-panel {
+  position: relative;
+  border: 1px solid #eef1f6;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px
+}
+
+.preview-panel.hidden {
+  display: none
+}
+
+.mini-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px
+}
+
+.from {
+  display: flex;
+  gap: 8px;
+  align-items: center
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: #eef2ff;
+  color: #3b5bdb;
+  font-size: .85rem
+}
+
+.chip {
+  display: inline-block;
+  padding: .15rem .45rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  font-size: .85rem
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0
+}
+
+.row.subject {
+  background: #f7f8fb;
+  border: 1px solid #eef1f6;
+  border-radius: 8px;
+  padding: 6px 8px
+}
+
+.mini-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-weight: 700
+}
+
+.ed {
+  min-height: 110px;
+  border: 1px solid #eef1f6;
+  border-radius: 8px;
+  padding: 8px;
+  line-height: 1.5
+}
+
+.btn-mini {
+  padding: .45rem .7rem;
+  border-radius: 8px
+}
+
+.muted {
+  color: #667085
+}
+
+.url {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%
+}
+
+.sms-compact .bubble {
+  min-height: 90px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px 14px 4px 14px;
+  padding: 8px 10px;
+  white-space: pre-wrap;
+  word-break: break-word
+}
+
+.sms-meta {
+  margin-top: 6px;
+  color: #667085
+}
+
+/* Kanal kapalıysa paneli gri yap */
+.preview-panel.is-off {
+  opacity: .55;
+  pointer-events: none
+}
+
+.preview-panel.hidden {
+  display: none;
+}
+
+/* Tab görsel durumu (isteğe bağlı ama faydalı) */
+.preview-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.preview-tabs .tab {
+  padding: .35rem .6rem;
+  border: 1px solid #e4e7ec;
+  background: #fff;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .9rem;
+  color: #4b5563;
+}
+
+.preview-tabs .tab.active {
+  background: #0f62fe;
+  color: #fff;
+  border-color: #0f62fe;
+}
+
+/* Kanal kapalıysa önizleme pasif */
+.preview-panel.is-off {
+  opacity: .55;
+  pointer-events: none;
+}
+
+#mail-body-preview,
+#sms-body-preview,
+#general-message,
+#mail-subject-input {
+  direction: ltr !important;
+  unicode-bidi: isolate;
+  /* bidi etkisini bu kutuda izole eder */
+  text-align: left;
+}
+
+/* İçerik satır kırılışları zaten var ama net olsun */
+#mail-body-preview,
+#sms-body-preview {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -29,3 +29,17 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* is-framed varken RSVP’yi evrensel olarak kapat */
+html.is-framed [data-rsvp],
+html.is-framed .rsvp,
+html.is-framed .rsvp-form,
+html.is-framed [class*="rsvp"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* İstersen başka öğeleri de embed görünümünde saklamak için */
+html.is-framed [data-hide-when-embed] {
+  display: none !important;
+}

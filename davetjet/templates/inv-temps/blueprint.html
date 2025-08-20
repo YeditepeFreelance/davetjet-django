@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atelier Blueprint — Davetiye + RSVP</title>
+    <style>
+      :root {
+        /* Blueprint + bakır vurgu */
+        --bp-bg: #0f1c2d; /* koyu lacivert plan */
+        --bp-grid: #1e334b; /* grid çizgisi */
+        --bp-ink: #f5faff; /* yazı (açık) */
+        --bp-sub: #c7d5ea; /* ikincil yazı */
+        --copper: #c59b63; /* bakır */
+        --paper: #f4f6f9; /* sayfa arka planı */
+        --line: #d6dde6; /* saç teli çizgi */
+      }
+
+      /* Sayfa */
+      body.invitation-page {
+        margin: 0;
+        background: var(--paper);
+        color: #111;
+        font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica,
+          Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .wrap {
+        width: min(1080px, 92vw);
+        margin: 46px auto 20px;
+      }
+
+      /* BLUEPRINT PANEL */
+      .blueprint {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #0b1626;
+        box-shadow: 0 24px 60px rgba(8, 18, 34, 0.25);
+      }
+      .blueprint::before {
+        /* grid */
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(var(--bp-bg), var(--bp-bg)),
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 23px,
+            var(--bp-grid) 24px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 23px,
+            var(--bp-grid) 24px
+          );
+        background-blend-mode: normal, normal, normal;
+      }
+
+      .bp-inner {
+        position: relative;
+        padding: clamp(18px, 5.2vmin, 56px);
+        color: var(--bp-ink);
+      }
+
+      /* Bakır milimetre cetveli */
+      .ruler {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 18px;
+        background: repeating-linear-gradient(
+          90deg,
+          var(--copper),
+          var(--copper) 6px,
+          transparent 6px,
+          transparent 12px
+        );
+        opacity: 0.35;
+      }
+      .ruler-v {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 18px;
+        background: repeating-linear-gradient(
+          180deg,
+          var(--copper),
+          var(--copper) 6px,
+          transparent 6px,
+          transparent 12px
+        );
+        opacity: 0.35;
+      }
+
+      /* Başlık blok */
+      .header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+        align-items: center;
+      }
+      .brand {
+        letter-spacing: 0.22em;
+        font-weight: 900;
+        color: var(--bp-sub);
+        text-transform: uppercase;
+      }
+      .sheetno {
+        justify-self: end;
+        color: var(--bp-sub);
+        font-variant: small-caps;
+        letter-spacing: 0.16em;
+      }
+
+      /* İsimler için ölçülendirme çizgileri */
+      .titlebox {
+        position: relative;
+        margin: 14px 0 8px;
+        padding: 18px 18px;
+        border: 1px solid var(--bp-grid);
+      }
+      .titlebox::before,
+      .titlebox::after {
+        content: "";
+        position: absolute;
+        height: 1px;
+        background: var(--bp-grid);
+        left: -28px;
+        right: -28px;
+      }
+      .titlebox::before {
+        top: 0;
+      }
+      .titlebox::after {
+        bottom: 0;
+      }
+      .titlebox h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 6.6vmin, 4.8rem);
+        letter-spacing: 0.02em;
+        font-weight: 900;
+      }
+      .subtitle {
+        margin-top: 6px;
+        color: var(--bp-sub);
+      }
+
+      /* Boyut çizgileri (dimension lines) */
+      .dim {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        color: var(--bp-sub);
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+      }
+      .dim::before,
+      .dim::after {
+        content: "";
+        position: absolute;
+        border-top: 1px solid var(--bp-grid);
+        width: 120px;
+        right: 110%;
+        top: 50%;
+      }
+      .dim::after {
+        width: 40px;
+        right: auto;
+        left: 100%;
+      }
+
+      /* Bilgi alanı */
+      .info {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin: 18px 0 10px;
+      }
+      .pill {
+        border: 1px solid var(--bp-grid);
+        color: var(--bp-ink);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 10px 14px;
+        border-radius: 999px;
+        text-align: center;
+        backdrop-filter: saturate(110%);
+      }
+      .pill strong {
+        color: var(--bp-sub);
+      }
+
+      /* Bakır not çizgisi */
+      .copper-rule {
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--copper),
+          transparent
+        );
+        opacity: 0.8;
+        margin: 14px 0 10px;
+      }
+
+      .footnote {
+        color: var(--bp-sub);
+        text-align: center;
+      }
+
+      /* Bakır mühür */
+      .seal {
+        position: absolute;
+        right: 24px;
+        bottom: 24px;
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        border: 2px solid var(--copper);
+        color: var(--copper);
+        display: grid;
+        place-items: center;
+        opacity: 0.9;
+        transform: rotate(-8deg);
+      }
+      .seal .mono {
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        font-size: 0.95rem;
+      }
+
+      /* RSVP — hafif kâğıt kutu */
+      .rsvp {
+        margin-top: 18px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: 0 14px 36px rgba(15, 28, 45, 0.12);
+        padding: clamp(16px, 3.8vmin, 26px);
+      }
+      .rsvp h2 {
+        margin: 0 0 12px;
+        text-align: center;
+        font-variant: small-caps;
+        letter-spacing: 0.18em;
+      }
+      .group {
+        position: relative;
+        margin-bottom: 12px;
+      }
+      .group input {
+        width: 100%;
+        padding: 0.9rem 0.95rem;
+        border: 1px solid #c9d3df;
+        border-radius: 10px;
+        font-size: 1rem;
+      }
+      .group input:focus {
+        outline: none;
+        border-color: #8aa6c5;
+        box-shadow: 0 0 0 4px #8aa6c533;
+      }
+      .suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: none;
+        z-index: 100;
+        max-height: 180px;
+        overflow: auto;
+        display: none;
+      }
+      .suggestion-item {
+        padding: 0.6rem 0.8rem;
+        cursor: pointer;
+      }
+      .suggestion-item:hover {
+        background: #f5f8fc;
+      }
+
+      .rsvp-status {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 8px 0 10px;
+      }
+      .chip {
+        padding: 0.6rem 1.2rem;
+        border-radius: 999px;
+        border: 1px solid #c9d3df;
+        background: #fff;
+        cursor: pointer;
+        user-select: none;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+      .chip.active[data-status="yes"] {
+        background: #0f1c2d;
+        color: #fff;
+        border-color: #0f1c2d;
+      }
+      .chip.active[data-status="maybe"] {
+        background: #c59b63;
+        color: #fff;
+        border-color: #c59b63;
+      }
+      .chip.active[data-status="no"] {
+        background: #5b6b7f;
+        color: #fff;
+        border-color: #5b6b7f;
+      }
+
+      .submit {
+        width: 100%;
+        padding: 0.95rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        background: #0f1c2d;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .submit:disabled {
+        background: #c9d3df;
+        color: #7c8ea6;
+        cursor: not-allowed;
+      }
+      .msg {
+        margin-top: 0.7rem;
+        min-height: 1.2rem;
+        text-align: center;
+        font-weight: 700;
+      }
+      .msg.ok {
+        color: #0a7a4c;
+      }
+      .msg.err {
+        color: #b00020;
+      }
+
+      @media (max-width: 760px) {
+        .info {
+          grid-template-columns: 1fr;
+        }
+      }
+      #inv-slug {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="invitation-page">
+    <div class="wrap">
+      <!-- BLUEPRINT DAVETİYE -->
+      <div
+        class="blueprint"
+        role="img"
+        aria-label="Mimari blueprint esintili davetiye"
+      >
+        <div class="ruler" aria-hidden="true"></div>
+        <div class="ruler-v" aria-hidden="true"></div>
+        <div class="bp-inner">
+          <div class="header">
+            <div class="brand">INVITATION • ATELIER</div>
+            <div class="sheetno">SHEET A‑01</div>
+          </div>
+
+          <div class="titlebox">
+            <h1 id="event-title">ELİF &amp; DENİZ</h1>
+            <div class="subtitle" id="event-message">
+              Bir mimari çizim gibi net, bir gece gibi zarif.
+            </div>
+          </div>
+          <div class="dim">SCALE 1:1</div>
+
+          <div class="info" aria-label="Etkinlik detayları">
+            <div class="pill">
+              <strong>TARİH:</strong>
+              <span id="event-date" data-id="date"></span>
+            </div>
+            <div class="pill">
+              <strong>SAAT:</strong>
+              <span id="event-time" data-id="time"></span>
+            </div>
+            <div class="pill">
+              <strong>YER:</strong>
+              <span id="event-location" data-id="location"></span>
+            </div>
+          </div>
+
+          <div class="copper-rule" role="separator"></div>
+          <p class="footnote">
+            Lütfen 18:30'da karşılama için hazır bulununuz.
+          </p>
+
+          <div class="seal" aria-hidden="true">
+            <div class="mono">E • D</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RSVP Formu -->
+      <div class="rsvp" data-rsvp aria-labelledby="rsvp-title">
+        <h2 id="rsvp-title">Katılım Formu</h2>
+        <div class="group">
+          <input
+            type="text"
+            id="rsvp-name"
+            placeholder="Adınızı yazın"
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="name-suggestions"
+          />
+          <div
+            class="suggestions"
+            id="name-suggestions"
+            role="listbox"
+            aria-live="polite"
+          ></div>
+        </div>
+        <div class="rsvp-status" role="group" aria-label="Katılım durumu seçin">
+          <div class="chip" data-status="yes" role="button" tabindex="0">
+            Geleceğim
+          </div>
+          <div class="chip" data-status="maybe" role="button" tabindex="0">
+            Emin Değilim
+          </div>
+          <div class="chip" data-status="no" role="button" tabindex="0">
+            Gelmeyeceğim
+          </div>
+        </div>
+        <button id="rsvp-submit" class="submit" disabled>Gönder</button>
+        <div id="rsvp-msg" class="msg" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Django view slug -->
+    <span id="inv-slug"></span>
+
+    <script>
+      // --- Utilities ---
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2)
+          return decodeURIComponent(parts.pop().split(";").shift());
+      }
+      function debounce(fn, delay = 250) {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), delay);
+        };
+      }
+      function deriveSlugFromURL() {
+        const parts = window.location.pathname.split("/").filter(Boolean);
+        return parts.pop() || "";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const nameInput = document.getElementById("rsvp-name");
+        const suggestionsBox = document.getElementById("name-suggestions");
+        const statusChips = document.querySelectorAll(".chip");
+        const submitBtn = document.getElementById("rsvp-submit");
+        const msg = document.getElementById("rsvp-msg");
+
+        let slug = (
+          document.getElementById("inv-slug")?.textContent || ""
+        ).trim();
+        if (!slug) slug = deriveSlugFromURL();
+
+        let selectedStatus = null;
+        let currentFetchController = null;
+        function updateBtn() {
+          submitBtn.disabled = !nameInput.value.trim() || !selectedStatus;
+        }
+
+        // Durum seçimi + klavye
+        statusChips.forEach((chip) => {
+          function activate() {
+            statusChips.forEach((c) => c.classList.remove("active"));
+            chip.classList.add("active");
+            selectedStatus = chip.dataset.status;
+            updateBtn();
+          }
+          chip.addEventListener("click", activate);
+          chip.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              activate();
+            }
+          });
+        });
+
+        // Dışarı tıklayınca önerileri kapat
+        document.addEventListener("click", (e) => {
+          if (!suggestionsBox.contains(e.target) && e.target !== nameInput) {
+            suggestionsBox.style.display = "none";
+            nameInput.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        // İsim yazıldığında öneriler (debounced)
+        const fetchSuggestions = debounce(async () => {
+          const q = nameInput.value.trim();
+          if (q.length < 1) {
+            suggestionsBox.style.display = "none";
+            nameInput.setAttribute("aria-expanded", "false");
+            return;
+          }
+          if (currentFetchController) currentFetchController.abort();
+          currentFetchController = new AbortController();
+          try {
+            const res = await fetch(
+              `/recipients/${encodeURIComponent(slug)}/?q=${encodeURIComponent(
+                q
+              )}`,
+              { signal: currentFetchController.signal }
+            );
+            if (!res.ok) throw new Error("Öneriler alınamadı");
+            const data = await res.json();
+            suggestionsBox.innerHTML = "";
+            if (Array.isArray(data) && data.length) {
+              data.forEach((item, idx) => {
+                const div = document.createElement("div");
+                div.className = "suggestion-item";
+                div.setAttribute("role", "option");
+                div.id = `suggestion-${idx}`;
+                div.textContent = item.name;
+                div.addEventListener("click", () => {
+                  nameInput.value = item.name;
+                  suggestionsBox.style.display = "none";
+                  nameInput.setAttribute("aria-expanded", "false");
+                  updateBtn();
+                });
+                suggestionsBox.appendChild(div);
+              });
+              suggestionsBox.style.display = "block";
+              nameInput.setAttribute("aria-expanded", "true");
+            } else {
+              suggestionsBox.style.display = "none";
+              nameInput.setAttribute("aria-expanded", "false");
+            }
+          } catch (err) {
+            /* abort sessiz */
+          }
+        }, 250);
+
+        nameInput.addEventListener("input", () => {
+          updateBtn();
+          fetchSuggestions();
+        });
+        nameInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (!submitBtn.disabled) submitBtn.click();
+          }
+        });
+
+        // Form gönderimi
+        submitBtn.addEventListener("click", async () => {
+          msg.textContent = "";
+          msg.className = "msg";
+          submitBtn.disabled = true;
+          const csrftoken = getCookie("csrftoken");
+          try {
+            const res = await fetch(
+              `/recipients/${encodeURIComponent(slug)}/`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": csrftoken || "",
+                },
+                body: JSON.stringify({
+                  name: nameInput.value.trim(),
+                  status: selectedStatus,
+                }),
+                credentials: "same-origin",
+              }
+            );
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data && data.message) {
+              msg.textContent = data.message;
+              msg.className = "msg ok";
+            } else {
+              msg.textContent =
+                data.error || "Bir hata oluştu. Lütfen tekrar deneyin.";
+              msg.className = "msg err";
+            }
+          } catch (e) {
+            msg.textContent = "Ağ hatası. Lütfen tekrar deneyin.";
+            msg.className = "msg err";
+          } finally {
+            submitBtn.disabled = false;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
