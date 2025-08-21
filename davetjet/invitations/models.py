@@ -29,6 +29,7 @@ TEMPLATE_CHOICES = [
     ('editorial', 'Editorial'),
     ('bauhaus-black', 'Bauhaus Black'),
     ('blueprint', 'Blueprint'),
+    ('premium', 'Premium')
 ]
 
 TEMPLATE_MAP = {
@@ -37,7 +38,8 @@ TEMPLATE_MAP = {
     "minimal": "inv-temps/minimal.html",
     "editorial": "inv-temps/editorial.html",
     "bauhaus-black": "inv-temps/bauhaus-black.html",
-    "blueprint": "inv-temps/blueprint.html"
+    "blueprint": "inv-temps/blueprint.html",
+    "premium": "inv-temps/premium.html"
 }
 
 class Invitation(models.Model):
@@ -101,6 +103,7 @@ class Invitation(models.Model):
         default='classic',
         verbose_name='Template'
     )
+    template_html = models.TextField(blank=True, help_text="HTML content of the template.")
 
     # --- SECURITY ---
     is_password_protected = models.BooleanField(default=True)

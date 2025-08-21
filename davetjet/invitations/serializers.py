@@ -1,3 +1,4 @@
+import sys
 from rest_framework import serializers
 from .models import Invitation
 from projects.models import Project
@@ -24,14 +25,14 @@ class InvitationDetailSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
-    # JSON alanları explicit tanımlayalım ki yutulmasın
-    reminder_config = serializers.ListField(
-        child=serializers.IntegerField(min_value=1),
-        required=False, allow_null=True, default=list
-    )
+    # JSON/alanlar (mevcutlar)
+    reminder_config   = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False, allow_null=True, default=list)
     delivery_settings = serializers.JSONField(required=False, default=dict)
-    reminder_message = serializers.CharField(required=False, allow_blank=True, allow_null=True, default="")
-    reminders = serializers.BooleanField(required=False, default=False)
+    reminder_message  = serializers.CharField(required=False, allow_blank=True, allow_null=True, default="")
+    reminders         = serializers.BooleanField(required=False, default=False)
+
+    # YENİ: Tam HTML
+    template_html = serializers.CharField(required=False, allow_blank=True, allow_null=True, trim_whitespace=False)
 
     class Meta:
         model = Invitation
@@ -43,7 +44,7 @@ class InvitationDetailSerializer(serializers.ModelSerializer):
             "name", "slug", "project",
             "message", "invitation_date", "location",
 
-            "template",
+            "template", "template_html",   # <- BURAYA EKLEDİK
 
             "is_password_protected", "password", "secure_invite_link",
 
@@ -60,9 +61,14 @@ class InvitationDetailSerializer(serializers.ModelSerializer):
     def get_url(self, obj):  return f"/invitations/{obj.id}/"
 
     def validate(self, attrs):
-        # Taslakta serbest; publish'te (is_draft=False) sıkı kontrol
-        is_draft = attrs.get("is_draft", getattr(self.instance, "is_draft", True))
-        reminders = attrs.get("reminders", getattr(self.instance, "reminders", False))
+        is_draft   = attrs.get("is_draft", getattr(self.instance, "is_draft", True))
+        reminders  = attrs.get("reminders", getattr(self.instance, "reminders", False))
+
+        # (Opsiyonel) template_html boyut sınırı örneği (~500 KB):
+        tpl = attrs.get("template_html", None)
+        if tpl and len(tpl.encode("utf-8")) > 500_000:
+            raise serializers.ValidationError({"template_html": "HTML içeriği çok büyük (500KB sınırı)."})
+
         if not is_draft and reminders:
             cfg = attrs.get("reminder_config", getattr(self.instance, "reminder_config", [])) or []
             ds  = attrs.get("delivery_settings", getattr(self.instance, "delivery_settings", {})) or {}
@@ -73,49 +79,55 @@ class InvitationDetailSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance, validated_data):
+        # Hatırlatıcı kapatılırsa temizlik
         if validated_data.get("reminders") is False:
             validated_data.setdefault("reminder_config", [])
             validated_data.setdefault("reminder_message", "")
-        return super().update(instance, validated_data)
 
+        # (Opsiyonel) boş stringleri None’a çevir
+        if "template_html" in validated_data and (validated_data["template_html"] or "") == "":
+            validated_data["template_html"] = None
+
+        return super().update(instance, validated_data)
 
 # — CREATE (POST; Project oluşturma mantığın korunuyor) —
 
 # invitations/serializers.py
 
 class CreateInvitationSerializer(serializers.ModelSerializer):
-    # ekstra alanlar
     is_draft = serializers.BooleanField(required=False, default=True)
 
-    reminder_config = serializers.ListField(
-        child=serializers.IntegerField(min_value=1),
-        required=False, allow_null=True, default=list
-    )
+    reminder_config   = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False, allow_null=True, default=list)
     delivery_settings = serializers.JSONField(required=False, default=dict)
-    reminder_message = serializers.CharField(required=False, allow_blank=True, allow_null=True, default="")
-    reminders = serializers.BooleanField(required=False, default=False)
+    reminder_message  = serializers.CharField(required=False, allow_blank=True, allow_null=True, default="")
+    reminders         = serializers.BooleanField(required=False, default=False)
 
     is_password_protected = serializers.BooleanField(required=False, default=False)
     password = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
+    template_html = serializers.CharField(required=False, allow_blank=True, allow_null=True, trim_whitespace=False)
+
     class Meta:
         model = Invitation
         fields = [
-            # temel
             'name', 'message', 'invitation_date', 'location', 'template',
-            # draft/publish
             'is_draft',
-            # güvenlik
             'is_password_protected', 'password',
-            # hatırlatıcılar
             'reminders', 'reminder_message', 'reminder_config',
-            # teslimat
             'channels', 'delivery_settings',
+            'template_html',
         ]
 
     def validate(self, attrs):
-        is_draft = attrs.get("is_draft", True)
+        is_draft  = attrs.get("is_draft", True)
         reminders = attrs.get("reminders", False)
+
+        # (Opsiyonel) template_html boyut sınırı:
+        tpl = attrs.get("template_html", None)
+        print(tpl, file=sys.stderr)
+        if tpl and len(tpl.encode("utf-8")) > 500_000:
+            raise serializers.ValidationError({"template_html": "HTML içeriği çok büyük (500KB sınırı)."})
+
         if not is_draft and reminders:
             cfg = attrs.get("reminder_config") or []
             ds  = attrs.get("delivery_settings") or {}
@@ -129,12 +141,17 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if not user.is_authenticated:
             raise serializers.ValidationError("User must be authenticated to create an invitation.")
+
         project = Project.objects.create(
             owner=user,
             name=f'{user.username}-{validated_data.get("name")}-{str(validated_data.get("invitation_date"))}'
         )
         validated_data['project'] = project
         validated_data.pop('user', None)
+
+        # (Opsiyonel) boş string -> None
+        if (validated_data.get("template_html") or "") == "":
+            validated_data["template_html"] = None
+
         invitation = Invitation.objects.create(**validated_data)
-        invitation.save()
         return invitation

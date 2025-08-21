@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Davetiye + RSVP</title>
+
+    <style>
+      /* ---------- Fontlar ---------- */
+      @font-face {
+        font-family: "Aniyah";
+        src: url("/static/fonts/Aniyah.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      :root {
+        --paper: #f5f2ed;
+        --ink: #3e4b3f;
+        --muted: #6b7268;
+        --accent: #cfa5a6;
+        --maxw: 820px;
+        --ratio: 2/3; /* 2:3 dikey */
+      }
+
+      /* ---------- Sayfa ---------- */
+      body {
+        margin: 0;
+        background: #f4f6f9;
+        color: #333;
+        font: 16px/1.6 "Cormorant Garamond", Georgia, serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px;
+      }
+
+      /* ---------- Davetiye Kartı ---------- */
+      .inv-shell {
+        width: min(100%, var(--maxw));
+        margin: auto;
+        position: relative;
+      }
+      .inv-card {
+        position: relative;
+        width: 100%;
+        aspect-ratio: var(--ratio); /* arka planla aynı oran */
+        background: var(--paper) url("/static/inv-temps/premium-bg.svg")
+          center/cover no-repeat;
+        border-radius: 14px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+      }
+      /* Yerleşim katmanı: yüzde ile mutlak konumlar */
+      .inv-layer {
+        inset: 0;
+        padding: 0 100px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: var(--ink);
+      }
+      .t-center {
+        text-align: center;
+      }
+      .names {
+        font-family: "Aniyah", cursive;
+        font-size: 50px;
+        text-align: center;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        width: 100%;
+        color: var(--ink);
+      }
+
+      .families {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        font-size: clamp(18px, 2.4vw, 28px);
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .message {
+        text-align: center;
+        color: var(--muted);
+        font-size: clamp(14px, 1.8vw, 20px);
+        margin-bottom: 40px;
+        margin-top: 40px;
+      }
+
+      .month {
+        text-align: center;
+        letter-spacing: 4px;
+        font-weight: 600;
+        font-size: clamp(14px, 2.1vw, 22px);
+      }
+
+      .date-strip {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: clamp(10px, 3vw, 24px);
+      }
+      .date-strip .pill {
+        text-align: center;
+        padding: 8px 0;
+        border-top: 2px solid #e9d3d3;
+        border-bottom: 2px solid #e9d3d3;
+        color: var(--ink);
+        letter-spacing: 1px;
+        font-size: 30px;
+        font-weight: 300;
+      }
+      .date-strip #event-time {
+        letter-spacing: 1px;
+        font-size: 30px;
+      }
+
+      .day-big {
+        font-family: "Cormorant Garamond", Georgia, serif;
+        font-weight: 700;
+        font-size: clamp(34px, 6.5vw, 72px);
+        padding: 2px 14px;
+        color: var(--ink);
+      }
+
+      .year {
+        text-align: center;
+        letter-spacing: 6px;
+        font-size: clamp(16px, 2.2vw, 24px);
+      }
+
+      .venue {
+        text-align: center;
+        line-height: 1.5;
+        margin-top: 40px;
+      }
+      .venue .title {
+        font-size: clamp(18px, 2.4vw, 28px);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .venue .addr {
+        font-size: clamp(14px, 1.9vw, 20px);
+        color: var(--muted);
+      }
+
+      .divider-soft {
+        height: 1px;
+        background: #eae2e2;
+        margin: 10px auto;
+        width: 70%;
+        opacity: 0.65;
+      }
+
+      /* ---------- RSVP ---------- */
+      .rsvp {
+        margin: 22px auto 10px;
+        width: min(100%, var(--maxw));
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.08);
+        padding: 18px 16px;
+      }
+      .rsvp h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        text-align: center;
+        color: #222;
+      }
+      .rsvp .row {
+        display: flex;
+        gap: 10px;
+      }
+      .rsvp .row > * {
+        flex: 1;
+      } /* contenteditable odak stili */
+      [contenteditable]:focus {
+        outline: 2px dashed var(--accent);
+        outline-offset: 2px;
+      }
+
+      .input {
+        width: 100%;
+        padding: 0.8rem 0.9rem;
+        border: 1px solid #d7d7d7;
+        border-radius: 10px;
+        font-size: 15px;
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 10px 0;
+      }
+      .chip {
+        padding: 0.55rem 1rem;
+        border: 1px solid #cfcfcf;
+        border-radius: 20px;
+        cursor: pointer;
+        user-select: none;
+        background: #fff;
+      }
+      .chip.active {
+        background: #3c8f52;
+        color: #fff;
+        border-color: #3c8f52;
+      }
+      .btn {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: none;
+        border-radius: 10px;
+        background: #3c8f52;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .btn[disabled] {
+        background: #cfcfcf;
+        cursor: not-allowed;
+      }
+      .msg {
+        text-align: center;
+        min-height: 1.2rem;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+      }
+      .ok {
+        color: #276a3a;
+      }
+      .err {
+        color: #b42318;
+      }
+
+      /* İframe’de RSVP’yi gizlemek istersen */
+      .hide-in-embed {
+        display: none !important;
+      }
+
+      /* ========== Davetiye + RSVP Responsive Eklentileri ========== */
+
+      /* 1024px ve altı: kart iç boşluklarını azalt */
+      /* === Mobilde daha küçük tipografi için ek responsive düzeltmeler === */
+      /* Safari’nin metin şişirmesini kapat (fontların beklenenden büyük görünmesini engeller) */
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      /* 768px ve altı */
+      @media (max-width: 768px) {
+        .inv-layer {
+          padding: 0 36px;
+        }
+
+        .names {
+          font-size: clamp(22px, 7vw, 34px);
+          line-height: 1.08;
+        }
+        .families {
+          font-size: clamp(13px, 2.3vw, 18px);
+          gap: 4px;
+        }
+        .message {
+          font-size: clamp(12px, 2.4vw, 16px);
+          margin: 18px 0;
+        }
+        .month {
+          font-size: clamp(12px, 2.2vw, 16px);
+          letter-spacing: 2px;
+        }
+
+        .date-strip {
+          gap: 12px;
+        }
+        .date-strip .pill {
+          font-size: clamp(14px, 3.6vw, 18px);
+          padding: 4px 0;
+          border-width: 1px;
+        }
+        .date-strip #event-time {
+          font-size: clamp(14px, 3.6vw, 18px);
+        }
+        .day-big {
+          font-size: clamp(28px, 10.5vw, 48px);
+        }
+
+        .year {
+          font-size: clamp(12px, 2.2vw, 16px);
+          letter-spacing: 3px;
+        }
+        .venue .title {
+          font-size: clamp(16px, 3.4vw, 20px);
+        }
+        .venue .addr {
+          font-size: clamp(12px, 2.6vw, 16px);
+        }
+
+        .rsvp {
+          padding: 14px 12px;
+        }
+        .input {
+          font-size: 15px;
+        }
+        .chip {
+          font-size: 0.95rem;
+          padding: 0.5rem 0.85rem;
+        }
+        .btn {
+          font-size: 0.95rem;
+          padding: 0.85rem 1rem;
+        }
+      }
+
+      /* 480px ve altı (telefon) */
+      @media (max-width: 480px) {
+        .inv-layer {
+          padding: 0 16px;
+        }
+
+        .names {
+          font-size: clamp(20px, 8vw, 28px);
+        }
+        .families {
+          font-size: clamp(12px, 3.6vw, 16px);
+          flex-direction: column;
+          align-items: center;
+        }
+        .message {
+          font-size: clamp(12px, 3.6vw, 15px);
+        }
+        .month {
+          font-size: clamp(11px, 3.6vw, 14px);
+          letter-spacing: 1.5px;
+        }
+
+        .date-strip {
+          gap: 8px;
+        }
+        .date-strip .pill {
+          font-size: clamp(12px, 4vw, 16px);
+          padding: 3px 0;
+        }
+        .date-strip #event-time {
+          font-size: clamp(12px, 4vw, 16px);
+        }
+        .day-big {
+          font-size: clamp(24px, 14vw, 40px);
+        }
+
+        .year {
+          font-size: clamp(11px, 3.6vw, 14px);
+          letter-spacing: 2px;
+        }
+
+        .venue .title {
+          font-size: clamp(14px, 4.4vw, 18px);
+        }
+        .venue .addr {
+          font-size: clamp(11px, 3.8vw, 14px);
+          line-height: 1.4;
+        }
+
+        .rsvp .row {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .input {
+          font-size: 14px;
+          padding: 0.8rem 0.9rem;
+        }
+        .chip {
+          font-size: 0.9rem;
+        }
+        .btn {
+          font-size: 0.95rem;
+          padding: 0.95rem;
+        }
+      }
+
+      /* 360px ve altı (çok dar) */
+      @media (max-width: 360px) {
+        .inv-layer {
+          padding: 0 12px;
+        }
+        .names {
+          font-size: clamp(18px, 7.5vw, 24px);
+        }
+        .day-big {
+          font-size: clamp(22px, 13vw, 36px);
+        }
+        .date-strip .pill,
+        .date-strip #event-time {
+          font-size: clamp(11px, 3.8vw, 14px);
+        }
+      }
+
+      /* Yatay küçük ekran */
+      @media (max-height: 520px) and (orientation: landscape) {
+        .inv-layer {
+          padding: 0 24px;
+        }
+        .message {
+          margin: 12px 0;
+        }
+        .venue {
+          margin-top: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== Davetiye ===== -->
+    <div class="inv-shell">
+      <div class="inv-card" aria-label="Dijital davetiye">
+        <div class="inv-layer">
+          <!-- İsimler -->
+          <!-- İsimler -->
+          <h1 class="names" id="event-title" contenteditable="true">
+            Eda &amp; Erkan
+          </h1>
+
+          <!-- Aileler -->
+          <div class="families">
+            <span id="family-left" contenteditable="true">Yiğit Ailesi</span>
+            <span id="family-right" contenteditable="true">Alagöz Ailesi</span>
+          </div>
+
+          <!-- Davet Metni -->
+          <p class="message" id="event-message" contenteditable="true">
+            Bu özel günümüzde sizleri de aramızda görmekten büyük mutluluk
+            duyarız.
+          </p>
+
+          <!-- Ay -->
+          <div class="month" id="event-month" contenteditable="true">
+            TEMMUZ
+          </div>
+
+          <!-- Gün Şeridi -->
+          <div class="date-strip">
+            <div class="pill" id="event-weekday" contenteditable="true">
+              PAZAR
+            </div>
+            <div class="day-big" id="event-day" contenteditable="true">05</div>
+            <div class="pill time" id="event-time" contenteditable="true">
+              20.00
+            </div>
+          </div>
+
+          <!-- Yıl -->
+          <div class="year" id="event-year" contenteditable="true">2025</div>
+
+          <!-- Mekân + Adres -->
+          <div class="venue">
+            <div class="title" id="event-venue" contenteditable="true">
+              Doğa Düğün Salonu
+            </div>
+            <div class="addr" id="event-location" contenteditable="true">
+              Atatürk Mah. Gazi Bulvarı No: 12<br />10100 Karesi/Balıkesir
+            </div>
+          </div>
+
+          <!-- View’in dolduracağı ham alanlar (gizli) -->
+          <span id="event-date" style="display: none">05.07.2025</span>
+          <span id="inv-slug" style="display: none"></span>
+          <a id="rsvp-link" style="display: none"></a>
+          <input id="inv-slug-input" type="hidden" />
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-soft"></div>
+
+    <!-- ===== RSVP ===== -->
+    <section class="rsvp" aria-labelledby="rsvpTitle" id="rsvpRoot">
+      <h2 id="rsvpTitle">Katılım Bildirimi</h2>
+
+      <div class="row" style="margin-bottom: 10px">
+        <input
+          id="rsvp-name"
+          class="input"
+          type="text"
+          placeholder="Adınız"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="chips" role="group" aria-label="Katılım durumu">
+        <div class="chip" data-status="yes" tabindex="0">Geleceğim</div>
+        <div class="chip" data-status="maybe" tabindex="0">Emin Değilim</div>
+        <div class="chip" data-status="no" tabindex="0">Gelmeyeceğim</div>
+      </div>
+
+      <button id="rsvp-submit" class="btn" disabled>Gönder</button>
+      <div id="rsvp-msg" class="msg"></div>
+    </section>
+
+    <script>
+      /* ----------------- Yardımcılar ----------------- */
+      function getCookie(name) {
+        const m = document.cookie.match(
+          "(^|;)\\s*" + name + "\\s*=\\s*([^;]+)"
+        );
+        return m ? decodeURIComponent(m.pop()) : null;
+      }
+      function two(n) {
+        return String(n).padStart(2, "0");
+      }
+      function parseTime(t) {
+        // "20.00" veya "20:00" -> {hh:20, mm:00}
+        const s = String(t || "").trim();
+        const m = s.match(/^(\d{1,2})[.:](\d{2})$/);
+        if (!m) return { hh: 0, mm: 0 };
+        return { hh: Math.min(+m[1], 23), mm: Math.min(+m[2], 59) };
+      }
+      function setTextIfDifferent(el, v) {
+        if (el && el.textContent !== v) el.textContent = v;
+      }
+
+      /* -------- Tarihi #event-date / #event-time'dan türet -------- */
+      function syncDateView() {
+        const rawDate = (
+          document.getElementById("event-date")?.textContent || ""
+        ).trim(); // dd.mm.yyyy
+        const timeEl = document.getElementById("event-time");
+        const rawTime = (timeEl?.textContent || "").trim();
+
+        if (!rawDate) return;
+
+        const [d, m, y] = rawDate.split(".").map(Number);
+        const { hh, mm } = parseTime(rawTime || "00:00");
+
+        // Tarih objesi (saat/dakika opsiyonel)
+        const jsDate = new Date(y, m - 1, d, hh, mm, 0);
+
+        // TR adları (UPPERCASE)
+        const MONTHS = [
+          "OCAK",
+          "ŞUBAT",
+          "MART",
+          "NİSAN",
+          "MAYIS",
+          "HAZİRAN",
+          "TEMMUZ",
+          "AĞUSTOS",
+          "EYLÜL",
+          "EKİM",
+          "KASIM",
+          "ARALIK",
+        ];
+        const WEEKDAYS = [
+          "PAZAR",
+          "PAZARTESİ",
+          "SALI",
+          "ÇARŞAMBA",
+          "PERŞEMBE",
+          "CUMA",
+          "CUMARTESİ",
+        ];
+
+        const byId = (id) => document.getElementById(id);
+
+        setTextIfDifferent(
+          byId("event-month"),
+          MONTHS[jsDate.getMonth()] || ""
+        );
+        setTextIfDifferent(
+          byId("event-weekday"),
+          WEEKDAYS[jsDate.getDay()] || ""
+        );
+        setTextIfDifferent(byId("event-day"), two(d));
+        setTextIfDifferent(byId("event-year"), String(y));
+
+        // Görsel tutarlılık için saati noktalı formatta bas (20.00)
+        if (timeEl) setTextIfDifferent(timeEl, `${two(hh)}.${two(mm)}`);
+
+        // Mekân başlığı boşsa konumu başlığa da yansıt
+        const loc = byId("event-location")?.textContent?.trim();
+        const venueEl = byId("event-venue");
+        if (venueEl && venueEl.textContent.trim() === "" && loc) {
+          setTextIfDifferent(venueEl, loc);
+        }
+      }
+
+      // Basit yardımcı: ID verilen elementin textContent değişimini dinle
+      function observeContent(id, cb) {
+        const el = document.getElementById(id);
+        if (!el || !window.MutationObserver) {
+          cb();
+          return;
+        }
+        const mo = new MutationObserver(() => cb());
+        mo.observe(el, { childList: true, characterData: true, subtree: true });
+        cb(); // ilk yüklemede de çalıştır
+      }
+
+      // Tarih/saat/konum değiştikçe otomatik türet
+      observeContent("event-date", syncDateView);
+      observeContent("event-time", syncDateView);
+      observeContent("event-location", syncDateView);
+
+      /* ----------------- RSVP ----------------- */
+      (function () {
+        const root = document.getElementById("rsvpRoot");
+        if (!root) return;
+
+        // İframe ise gizlemek istiyorsan (opsiyonel)
+        try {
+          if (window.top !== window.self) {
+            root.classList.add("hide-in-embed");
+          }
+        } catch {}
+
+        const nameInput = document.getElementById("rsvp-name");
+        const chips = Array.from(document.querySelectorAll(".chip"));
+        const submitBtn = document.getElementById("rsvp-submit");
+        const msg = document.getElementById("rsvp-msg");
+
+        let selected = null;
+        const updateBtn = () =>
+          (submitBtn.disabled = !(nameInput.value.trim() && selected));
+
+        chips.forEach((ch) => {
+          const activate = () => {
+            chips.forEach((c) => c.classList.remove("active"));
+            ch.classList.add("active");
+            selected = ch.dataset.status;
+            updateBtn();
+          };
+          ch.addEventListener("click", activate);
+          ch.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              activate();
+            }
+          });
+        });
+        nameInput.addEventListener("input", updateBtn);
+        nameInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !submitBtn.disabled) submitBtn.click();
+        });
+
+        // URL'den slug çıkar (view doldurmadıysa)
+        function deriveSlugFromURL() {
+          const parts = location.pathname.split("/").filter(Boolean);
+          return parts[parts.length - 1] || "";
+        }
+        let slug =
+          (document.getElementById("inv-slug")?.textContent || "").trim() ||
+          deriveSlugFromURL();
+
+        // NEW: #inv-slug değişirse slug'ı canlı güncelle
+        observeContent("inv-slug", () => {
+          slug =
+            (document.getElementById("inv-slug")?.textContent || "").trim() ||
+            deriveSlugFromURL();
+        });
+
+        submitBtn.addEventListener("click", async () => {
+          msg.textContent = "";
+          msg.className = "msg";
+          submitBtn.disabled = true;
+
+          // CSRF sadece varsa gönder
+          const csrf = getCookie("csrftoken");
+          const headers = { "Content-Type": "application/json" };
+          if (csrf) headers["X-CSRFToken"] = csrf;
+
+          try {
+            const res = await fetch(
+              `/recipients/${encodeURIComponent(slug)}/`,
+              {
+                method: "POST",
+                headers,
+                credentials: "same-origin",
+                body: JSON.stringify({
+                  name: nameInput.value.trim(),
+                  status: selected,
+                }),
+              }
+            );
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+              msg.textContent =
+                data.message || "Teşekkürler, yanıtınız kaydedildi.";
+              msg.classList.add("ok");
+            } else {
+              msg.textContent =
+                data.error || "Bir hata oluştu. Lütfen tekrar deneyin.";
+              msg.classList.add("err");
+            }
+          } catch (e) {
+            msg.textContent = "Ağ hatası. Lütfen tekrar deneyin.";
+            msg.classList.add("err");
+          } finally {
+            submitBtn.disabled = false;
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

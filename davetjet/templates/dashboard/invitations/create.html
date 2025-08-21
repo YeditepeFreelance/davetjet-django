@@ -24,36 +24,12 @@
           <p class="muted">Stili seçin; içerikleri sonraki adımlarda düzenleyebilirsiniz.</p>
         </div>
         <div class="template-gallery">
-          <label class="template-card selected" data-template="classic">
-            <input type="radio" name="template" value="classic" checked>
-            <div class="thumb"><img src="{% static 'inv-temps/classic.jpg' %}" alt="Klasik"></div>
-            <div class="meta"><p>Klasik</p><span class="badge">Önerilen</span></div>
+          <label class="template-card selected" data-template="premium">
+            <input type="radio" name="template" value="premium" checked>
+            <div class="thumb"><img src="{% static 'inv-temps/premium.png' %}" alt="Premium"></div>
+            <div class="meta"><p>Premium</p><span class="badge">Önerilen</span></div>
           </label>
-          <label class="template-card" data-template="modern">
-            <input type="radio" name="template" value="modern">
-            <div class="thumb"><img src="{% static 'inv-temps/modern.jpg' %}" alt="Modern"></div>
-            <div class="meta"><p>Modern</p></div>
-          </label>
-          <label class="template-card" data-template="minimal">
-            <input type="radio" name="template" value="minimal">
-            <div class="thumb"><img src="{% static 'inv-temps/minimal.jpg' %}" alt="Minimal"></div>
-            <div class="meta"><p>Minimal</p></div>
-          </label>
-          <label class="template-card" data-template="bauhaus-black">
-            <input type="radio" name="template" value="bauhaus-black">
-            <div class="thumb"><img src="{% static 'inv-temps/bauhaus-black.jpg' %}" alt="Bauhaus Black"></div>
-            <div class="meta"><p>Bauhaus Black</p></div>
-          </label>
-          <label class="template-card" data-template="blueprint">
-            <input type="radio" name="template" value="blueprint">
-            <div class="thumb"><img src="{% static 'inv-temps/blueprint.jpg' %}" alt="Blueprint"></div>
-            <div class="meta"><p>Blueprint</p></div>
-          </label>
-          <label class="template-card" data-template="editorial">
-            <input type="radio" name="template" value="editorial">
-            <div class="thumb"><img src="{% static 'inv-temps/editorial.jpg' %}" alt="Editorial"></div>
-            <div class="meta"><p>Editorial</p></div>
-          </label>
+          
         </div>
       </div>
 
@@ -250,7 +226,7 @@
     </div>
 
     <!-- RIGHT: Live Preview -->
-    <aside class="wizard-preview-area" id="previewArea" data-template="classic">
+    <aside class="wizard-preview-area" id="previewArea" data-template="premium">
       <div class="preview-header">
         <h3>Canlı Önizleme</h3>
         <button id="expandPreviewBtn" title="Tam ekran önizleme" aria-label="Tam ekran önizleme"><i class="fas fa-expand"></i></button>
@@ -299,19 +275,6 @@
 
 {% block extra_js %}
 {% if inv_json %}<script>window.INV_META = {{ inv_json|safe }};</script>{% endif %}
-  <script>
-    (function () {
-      // iframe içinde mi?
-      var isFramed = false;
-      try { isFramed = (window.self !== window.top); } catch (e) { isFramed = true; }
-      // Bazı gömme yerleri ?embed=1 vb. gönderir: onu da kabul et
-      var qs = new URLSearchParams(location.search);
-      if (qs.has('embed') || qs.has('iframe') || qs.get('view') === 'embed') isFramed = true;
-
-      // CSS’in yakalayacağı sınıfı HTML köküne bas
-      document.documentElement.classList.toggle('is-framed', isFramed);
-    })();
-  </script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   // ====== Elements
@@ -335,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventLocation = document.getElementById("eventLocation");
   const eventMessage = document.getElementById("eventMessage");
 
-  // Reminders / channels (MULTI) — quiet hours kaldırıldı
+  // Reminders / channels (MULTI)
   const remEnabledEl = document.getElementById("remindersEnabled");
   const remCtrEl     = document.getElementById("reminderControls");
   const quotaSelVal  = document.getElementById("remSelValue");
@@ -367,6 +330,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeDraftsModal = document.getElementById("closeDraftsModal");
   const draftsGrid = document.getElementById("draftsGrid");
 
+  const templatePreview = document.getElementById("livePreview");
+
   // --- EDIT ID BOOT ---
   const params   = new URLSearchParams(location.search);
   const bootMeta = window.INV_META || null;
@@ -379,7 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== Helpers
   const getCSRF = () => document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? "";
-
   function toast(msg){
     let t = document.querySelector('.mini-toast');
     if(!t){ t = document.createElement('div'); t.className = 'mini-toast'; document.body.appendChild(t); }
@@ -387,6 +351,50 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(()=>{ t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1800); });
   }
 
+  // --- NEW: tarih/slug yardımcıları
+  const toDDMMYYYY = (iso) => {
+    if(!iso) return "";
+    const [y,m,d] = iso.split("-").map(x=>parseInt(x,10));
+    if(!y || !m || !d) return "";
+    const dd = String(d).padStart(2,"0");
+    const mm = String(m).padStart(2,"0");
+    return `${dd}.${mm}.${y}`;
+  };
+  const slugify = (s) =>
+    (s || "")
+      .toString()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,"-")
+      .replace(/^-+|-+$/g,"")
+      .slice(0,80);
+
+  const deriveSlugFromLink = () => {
+    const raw = shareLink?.value || bootMeta?.share_url || bootMeta?.public_url || bootMeta?.url || "";
+    if(!raw) return "";
+    try {
+      const u = new URL(raw, location.origin);
+      const parts = u.pathname.split("/").filter(Boolean);
+      return parts.pop() || "";
+    } catch { return ""; }
+  };
+
+  const getActiveSlug = () => {
+    return bootMeta?.slug
+      || deriveSlugFromLink()
+      || (editId ? `inv-${editId}` : slugify(eventTitle?.value || "davet"));
+  };
+
+  const setIframeText = (doc, id, val) => { const el = doc.getElementById(id); if(el) el.textContent = val ?? ""; };
+  const setIframeValue = (doc, id, val) => { const el = doc.getElementById(id); if(el) el.value = val ?? ""; };
+  const setIframeHref  = (doc, id, href, text) => {
+    const el = doc.getElementById(id);
+    if(!el) return;
+    if(href) el.setAttribute("href", href);
+    if(typeof text === "string") el.textContent = text;
+  };
+
+  // === Progress bar
   const setProgress = (index) => {
     const pct = ((index) / (steps.length - 1)) * 100;
     progressBar && (progressBar.style.width = pct + "%");
@@ -397,22 +405,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // ===== Reminders STATE (çoklu seçim + kota)
+  // ===== Reminders STATE
   const rem = {
     enabled: false,
-    presetDays: new Set(),   // {1,3,7,14}
-    customDays: new Set(),   // {n}
+    presetDays: new Set(),
+    customDays: new Set(),
     channels: { email: true, sms: false },
-    quota: { max: 0, used: 0 },   // max user’dan
+    quota: { max: 0, used: 0 },
   };
 
-  // — Kota: User modelinden çek (endpoint yoksa INV_META -> fallback)
   async function fetchReminderQuota() {
-    // 1) INV_META’dan dene
     if (window.INV_META && typeof window.INV_META.max_reminders === "number") {
       rem.quota.max = window.INV_META.max_reminders;
     }
-    // 2) API dene (varsa)
     try {
       const r = await fetch("/invitations/api/reminders-quota/", { headers: {"X-Requested-With":"XMLHttpRequest"} });
       if (r.ok) {
@@ -420,38 +425,25 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof data.max === "number") rem.quota.max = data.max;
       }
     } catch(_) {}
-
-    // 3) fallback
     if (!rem.quota.max || rem.quota.max < 1) rem.quota.max = 3;
-
     if (quotaMaxVal) quotaMaxVal.textContent = String(rem.quota.max);
     updateQuotaUI();
   }
-
-  function totalSelected() {
-    return new Set([...rem.presetDays, ...rem.customDays]).size;
-  }
-  function buildReminderConfig(){
-    // seçili günleri (1..30) dakikaya çevir
+  const totalSelected = () => new Set([...rem.presetDays, ...rem.customDays]).size;
+  const buildReminderConfig = () => {
     let days = [...new Set([...rem.presetDays, ...rem.customDays])].sort((a,b)=>a-b);
-    // kota aşmamak için ilk N gün
     days = days.slice(0, Math.max(0, rem.quota.max));
     return rem.enabled ? days.map(d => d * 1440) : [];
-  }
-  function getDeliverySettings(){
-    return {
-      email: !!rem.channels.email,
-      sms: !!rem.channels.sms,
-    };
-  }
-  function applyRemindersUIEnabled(on){
+  };
+  const getDeliverySettings = () => ({ email: !!rem.channels.email, sms: !!rem.channels.sms });
+  const applyRemindersUIEnabled = (on) => {
     if (!remCtrEl) return;
     remCtrEl.classList.toggle("is-off", !on);
     remCtrEl.querySelectorAll("input,select,button").forEach(el=>{
       if (el.id === "remindersEnabled") return;
       el.disabled = !on;
     });
-  }
+  };
   function updateQuotaUI(){
     const used = totalSelected();
     rem.quota.used = used;
@@ -489,14 +481,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function hydrateRemindersFromData(meta){
     rem.enabled = !!meta?.reminders;
     if (remEnabledEl) remEnabledEl.checked = rem.enabled;
-
-    // kota
     if (typeof meta?.max_reminders === "number" && meta.max_reminders > 0) {
       rem.quota.max = meta.max_reminders;
       if (quotaMaxVal) quotaMaxVal.textContent = String(rem.quota.max);
     }
-
-    // dakika -> gün
     const cfg = Array.isArray(meta?.reminder_config) ? meta.reminder_config : [];
     const days = cfg.map(m => Math.round((m || 0) / 1440)).filter(d => d >= 1 && d <= 30);
     days.forEach(d => {
@@ -504,15 +492,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cb) { cb.checked = true; rem.presetDays.add(d); }
       else { rem.customDays.add(d); }
     });
-
-    // kanallar
     const ds = meta?.delivery_settings || {};
     rem.channels.email = ds.email !== false;
     rem.channels.sms   = !!ds.sms;
-    channelEls.forEach(cb=>{
-      if (cb.value in rem.channels) cb.checked = !!rem.channels[cb.value];
-    });
-
+    channelEls.forEach(cb=>{ if (cb.value in rem.channels) cb.checked = !!rem.channels[cb.value]; });
     applyRemindersUIEnabled(rem.enabled);
     renderSelectedDays(); updateQuotaUI();
   }
@@ -540,7 +523,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     card.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); card.click(); } });
   });
-  loadTemplate("classic");
+  // --- NEW: başlangıç premium
+  loadTemplate("premium");
 
   // ===== Progress / Nav
   document.querySelectorAll('.wizard-progress .step').forEach((btn, i) => {
@@ -586,23 +570,39 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   broadcastMessage?.addEventListener("input", () => { refreshMultiChannel(); });
 
+  // --- NEW: gizli alanları da doldurarak push
   function pushFormIntoIframe(iframe) {
-    const doc = iframe.contentDocument; if (!doc) return;
-    const map = {
-      "event-title": eventTitle?.value || "Etkinlik Başlığı",
-      "event-date": eventDate?.value || "",
-      "event-time": eventTime?.value || "",
-      "event-location": eventLocation?.value || "",
-      "event-message": eventMessage?.value || ""
-    };
-    Object.entries(map).forEach(([id, val]) => { const el = doc.getElementById(id); if (el) el.textContent = val; });
+    const doc = iframe?.contentDocument; if (!doc) return;
+
+    // Görünen alanlar
+    setIframeText(doc, "event-title",    eventTitle?.value || "Etkinlik Başlığı");
+    setIframeText(doc, "event-time",     eventTime?.value || "");
+    setIframeText(doc, "event-location", eventLocation?.value || "");
+    setIframeText(doc, "event-message",  eventMessage?.value || "");
+
+    // HIDDEN: event-date → dd.mm.yyyy
+    const ddmmyyyy = toDDMMYYYY(eventDate?.value || "");
+    setIframeText(doc, "event-date", ddmmyyyy);
+
+    // HIDDEN: slug / rsvp-link
+    const slug = getActiveSlug();
+    setIframeText(doc, "inv-slug", slug);
+    setIframeValue(doc, "inv-slug-input", slug);
+
+    // HIDDEN: rsvp-link (davetiye ya da RSVP endpoint)
+    const hrefFromShare = (() => {
+      const raw = shareLink?.value?.trim();
+      if (raw) return raw;
+      return `${location.origin}/invitations/${slug}/`;
+    })();
+    setIframeHref(doc, "rsvp-link", hrefFromShare);
   }
 
   function enableIframeSync(sourceIframe, mirrorIframe) {
     const doc = sourceIframe.contentDocument; if (!doc) return;
     const pairs = {
       "event-title": eventTitle,
-      "event-date": eventDate,
+      "event-date": eventDate,    // NOT: burada input ISO; pushFormIntoIframe dd.mm.yyyy’ye çeviriyor
       "event-time": eventTime,
       "event-location": eventLocation,
       "event-message": eventMessage
@@ -624,12 +624,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function refreshMultiChannel() {
     const title = eventTitle?.value || "Etkinlik";
-    const date = eventDate?.value || "";
+    const dateIso = eventDate?.value || "";
     const time = eventTime?.value || "";
     const loc  = eventLocation?.value || "";
     const baseMsg = eventMessage?.value || "";
     const extra = broadcastMessage?.value || "";
-    const compiled = `${title}\n${date} ${time}\n${loc}\n${extra || baseMsg}`.trim();
+    const compiled = `${title}\n${toDDMMYYYY(dateIso)} ${time}\n${loc}\n${extra || baseMsg}`.trim();
 
     const smsNode = document.getElementById("mp-sms-text");
     if (smsNode) smsNode.replaceChildren(document.createTextNode(compiled));
@@ -638,7 +638,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const subjEl = document.getElementById("mp-email-subject");
     const bodyEl = document.getElementById("mp-email-body");
     subjEl && subjEl.replaceChildren(document.createTextNode(`${title} - Davet`));
-    bodyEl && bodyEl.replaceChildren(document.createTextNode(`${extra || baseMsg}\n\nTarih: ${date} ${time}\nYer: ${loc}`));
+    bodyEl && bodyEl.replaceChildren(document.createTextNode(`${extra || baseMsg}\n\nTarih: ${toDDMMYYYY(dateIso)} ${time}\nYer: ${loc}`));
+
+    // Önizleme iframelerindeki hidden alanları da güncel tut
+    pushFormIntoIframe(previewIframe);
+    if (!document.getElementById("fullscreenPreviewModal")?.classList.contains("hidden")) {
+      pushFormIntoIframe(fullscreenIframe);
+    }
   }
 
   function updateSmsCounter(text) {
@@ -680,12 +686,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   quickSms?.addEventListener("click", async () => {
     const link = shareLink.value || "";
-    const text = `${(eventTitle?.value || "Davet")}\n${eventDate?.value || ""} ${eventTime?.value || ""}\n${eventLocation?.value || ""}\n${eventMessage?.value || ""}\n${link}`;
-    if (navigator.share) {
-      try { await navigator.share({ text }); } catch(e){}
-    } else {
-      window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
-    }
+    const text = `${(eventTitle?.value || "Davet")}\n${toDDMMYYYY(eventDate?.value || "")} ${eventTime?.value || ""}\n${eventLocation?.value || ""}\n${eventMessage?.value || ""}\n${link}`;
+    if (navigator.share) { try { await navigator.share({ text }); } catch(e){} }
+    else { window.location.href = `sms:?&body=${encodeURIComponent(text)}`; }
   });
 
   // ===== Fullscreen Preview
@@ -711,29 +714,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = evt.target.closest("#updateBtn");
     if (!btn) return;
     evt.preventDefault(); evt.stopPropagation();
-
     if (!window.editId) { toast("Kayıt yüklenmedi."); return; }
     const old = btn.textContent; btn.disabled = true; btn.textContent = "Güncelleniyor…";
     try{
       if (!validateReminders()) return;
-
       const tplSel = document.querySelector(".template-card.selected");
       const payload = {
         name: (eventTitle?.value || "").trim(),
         message: eventMessage?.value || "",
         invitation_date: (eventDate?.value && eventTime?.value) ? `${eventDate.value}T${eventTime.value}:00` : null,
         template: tplSel ? tplSel.dataset.template : undefined,
-        // Güvenlik: otomatik
         is_password_protected: true,
         password: "",
-        // reminders
         reminders: rem.enabled,
         reminder_config: buildReminderConfig(),
         reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
-        // delivery
         delivery_settings: getDeliverySettings(),
+      template_html: (templatePreview?.contentDocument?.documentElement?.outerHTML || "").trim()
       };
-
       const url = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", String(window.editId));
       const r = await fetch(url, {
         method: "PATCH",
@@ -744,6 +742,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = isNoContent ? {} : await r.json().catch(()=> ({}));
       if (!r.ok) throw new Error(data?.detail || `HTTP ${r.status}`);
       toast("Güncellendi ✅");
+      // NEW: link/slug değiştiyse önizlemeyi güncelle
+      if (data?.share_url || data?.url || data?.public_url || data?.link) {
+        shareLink.value = data.share_url || data.url || data.public_url || data.link;
+      }
+      pushFormIntoIframe(previewIframe);
+      if (!document.getElementById("fullscreenPreviewModal")?.classList.contains("hidden")) {
+        pushFormIntoIframe(fullscreenIframe);
+      }
     }catch(e){
       console.error(e); toast("Güncellenemedi");
     }finally{
@@ -751,7 +757,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== DRAFTS MODAL
+  // ===== DRAFTS MODAL (değişmedi; aşağıda sadece publish/save yerinde push ekledik)
   const openDrafts = async () => {
     document.body.classList.add("modal-open");
     draftsModal.classList.remove("hidden");
@@ -788,7 +794,7 @@ document.addEventListener("DOMContentLoaded", () => {
         el.className = "draft-card";
         const title = item.name || "Adsız Taslak";
         const date = item.invitation_date ? new Date(item.invitation_date) : null;
-        const dateStr = date ? `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : "—";
+        const dateStr = date ? `${date.toLocaleDateString()} ${date.toTimeString().slice(0,5)}` : "—";
         const avatar = (title?.trim()?.charAt(0) || "D").toUpperCase();
         el.innerHTML = `
           <div class="dc-thumb">${avatar}</div>
@@ -818,6 +824,8 @@ document.addEventListener("DOMContentLoaded", () => {
               const data = (r.status === 204) ? {} : await r.json().catch(()=> ({}));
               if (!r.ok) throw new Error(data?.detail || "Promote failed");
               if (data?.share_url && shareLink) shareLink.value = data.share_url;
+              // NEW: önizleme içindeki slug/href’i güncelle
+              pushFormIntoIframe(previewIframe);
               showStep(4); toast("Taslak yayınlandı ✅"); btn.closest(".draft-card")?.remove();
             }catch(e){ console.error(e); toast("Yayınlama başarısız."); }
             finally{ btn.disabled = false; btn.textContent = old; }
@@ -849,13 +857,13 @@ document.addEventListener("DOMContentLoaded", () => {
         invitation_date: (eventDate?.value && eventTime?.value) ? `${eventDate.value}T${eventTime.value}:00` : null,
         template: document.querySelector(".template-card.selected")?.dataset.template || "classic",
         is_draft: true,
-        // güvenlik otomatik
         is_password_protected: true,
         password: "",
         reminders: rem.enabled,
         reminder_config: buildReminderConfig(),
         reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
         delivery_settings: getDeliverySettings(),
+      template_html: (templatePreview?.contentDocument?.documentElement?.outerHTML || "").trim()
       };
 
       let r;
@@ -883,7 +891,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (data?.share_url || data?.url || data?.public_url || data?.link) {
         shareLink.value = data.share_url || data.url || data.public_url || data.link;
+        pushFormIntoIframe(previewIframe);
       }
+      // Taslağı kişiler ekranına yönlendirme (senin akışın)
       window.location.replace("{% url 'core:edit-recipients' 0 %}".replace("0", editId));
       toast(editId ? "Taslak güncellendi ✅" : "Taslak kaydedildi ✅");
     } catch (err) {
@@ -894,29 +904,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== SINGLE INVITE LIMIT (frontend guard)
+  // ===== SINGLE INVITE LIMIT
   async function canCreateAnotherInvitation(){
     try {
-      // Basit kontrol: yayınlanmış davet sayısı
       const r = await fetch("/invitations/api/invitations/?is_draft=false&limit=2", { headers:{ "X-Requested-With":"XMLHttpRequest" }});
-      if (!r.ok) return true; // sunucu kapalıysa engelleme
+      if (!r.ok) return true;
       const list = await r.json();
       const count = Array.isArray(list) ? list.length : (list?.count ?? 0);
-      return count < 1; // max 1
+      return count < 1;
     } catch { return true; }
   }
 
-  // ===== PUBLISH (Yayınla)
+  // ===== PUBLISH
   finishBtn?.addEventListener("click", async (e) => {
     e.preventDefault();
-
     if (!eventTitle.value.trim() || !eventDate.value || !eventTime.value) {
       toast("Yayınlamak için başlık, tarih ve saat gerekli."); showStep(1); return;
     }
     if (!validateReminders()) return;
 
-    // Limit: tüm planlar max 1 yayınlanmış davetiye
-    if (!(isEditing && !isEditingDraft)) { // yeni yayın veya taslağı yayınla
+    if (!(isEditing && !isEditingDraft)) {
       const ok = await canCreateAnotherInvitation();
       if (!ok) { toast("Bu planda en fazla 1 yayınlanmış davetiye oluşturabilirsiniz."); return; }
     }
@@ -926,13 +933,13 @@ document.addEventListener("DOMContentLoaded", () => {
       message: eventMessage.value || "",
       invitation_date: `${eventDate.value}T${eventTime.value}:00`,
       template: document.querySelector(".template-card.selected")?.dataset.template || "classic",
-      // Güvenlik: otomatik şifreli + secure link şifresiz giriş
       is_password_protected: true,
       password: "",
       reminders: rem.enabled,
       reminder_config: buildReminderConfig(),
       reminder_message: (broadcastMessage?.value || eventMessage?.value || "").trim(),
       delivery_settings: getDeliverySettings(),
+      template_html: (templatePreview?.contentDocument?.documentElement?.outerHTML || "").trim()
     };
 
     const old = finishBtn.textContent;
@@ -940,7 +947,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       if (isEditing && isEditingDraft && editId) {
-        // PATCH -> PROMOTE
         const patchUrl = `{% url 'invitations:invitation-detail' 0 %}`.replace("0", editId);
         const patchRes = await fetch(patchUrl, {
           method: "PATCH",
@@ -958,7 +964,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (promoteData?.share_url) shareLink.value = promoteData.share_url;
 
       } else {
-        // Yeni oluştur ve yayınla
         const createRes = await fetch("{% url 'core:create-invitation-api' %}", {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
@@ -972,7 +977,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Yayınlandı: Update butonunu göster
+      // NEW: shareLink/slug değiştiyse iframeleri güncelle
+      pushFormIntoIframe(previewIframe);
+      if (!document.getElementById("fullscreenPreviewModal")?.classList.contains("hidden")) {
+        pushFormIntoIframe(fullscreenIframe);
+      }
+
       saveDraftBtn?.classList.add("hidden");
       finishBtn?.classList.add("hidden");
       updateBtn?.classList.remove("hidden");
@@ -1003,10 +1013,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(`.template-card[data-template="${tpl}"]`)?.classList.add("selected");
     loadTemplate(tpl);
 
-    // Reminders hydrate (yeni çoklu sistem)
     hydrateRemindersFromData(data);
 
-    // UI modu
     if (data.is_draft){
       saveDraftBtn?.classList.remove("hidden");
       finishBtn?.classList.remove("hidden");
@@ -1021,7 +1029,12 @@ document.addEventListener("DOMContentLoaded", () => {
     isEditingDraft = !!data.is_draft;
     editId = String(data.id);
 
+    // Link varsa paylaş alanına yaz ve iframeleri güncelle
+    const share = data.share_url || data.url || data.public_url || data.link;
+    if (share && shareLink) shareLink.value = share;
+
     refreshMultiChannel();
+    pushFormIntoIframe(previewIframe);
   }
 
   // ===== Init
@@ -1029,7 +1042,6 @@ document.addEventListener("DOMContentLoaded", () => {
   showStep(0);
   refreshMultiChannel();
 
-  // Reminders bindings
   remEnabledEl?.addEventListener("change", (e)=>{ rem.enabled = !!e.target.checked; applyRemindersUIEnabled(rem.enabled); updateQuotaUI(); });
   presetDayEls.forEach(cb => cb.addEventListener("change", (e)=>{
     const v = parseInt(e.target.value, 10);
@@ -1054,13 +1066,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   channelEls.forEach(cb=> cb.addEventListener("change", (e)=>{ rem.channels[e.target.value] = !!e.target.checked; }));
 
-  // Kota bilgisi getir
   fetchReminderQuota();
 
-  // INV_META’dan hydrate (varsa) — fetchReminderQuota’dan bağımsız
   if (bootMeta) { hydrateFromData(bootMeta); }
   else if (editId) { loadInvitationById(editId).catch(err => { console.error(err); toast("Kayıt yüklenemedi"); }); }
 });
 </script>
-
 {% endblock %}
+

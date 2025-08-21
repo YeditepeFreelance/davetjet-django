@@ -72,7 +72,7 @@
 
   .wizard-body {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.4rem;
 
     @media (max-width: 1024px) {
@@ -278,7 +278,7 @@
 
       .preview-frame-wrapper {
         width: 100%;
-        aspect-ratio: 9/16;
+        height: 100vh;
         overflow: hidden;
         border-radius: .95rem;
         border: 1px solid rgba(0, 0, 0, .08);

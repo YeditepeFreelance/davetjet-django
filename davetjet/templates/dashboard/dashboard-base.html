@@ -104,8 +104,8 @@
 
       {# Davetiyeler: liste/oluştur/düzenle/detay/drafts #}
       {% with name=request.resolver_match.url_name %}
-        <li class="{% if name == 'invitations' or name == 'invitation_detail' or name == 'create_invitation' or name == 'edit_invitation' or name == 'invitation_drafts' %}active{% endif %}">
-          <a href="{% url 'core:invitations' %}" class="sb-item" {% if name == 'invitations' or name == 'invitation_detail' or name == 'create_invitation' or name == 'edit_invitation' or name == 'invitation_drafts' %}aria-current="page"{% endif %}>
+        <li class="{% if name == 'invitations' or name == 'edit-invitation' or name == 'create_invitation' or name == 'edit_invitation' or name == 'invitation_drafts' %}active{% endif %}">
+          <a href="{% url 'core:invitations' %}" class="sb-item" {% if name == 'invitations' or name == 'edit-invitation' or name == 'create_invitation' or name == 'edit_invitation' or name == 'invitation_drafts' %}aria-current="page"{% endif %}>
             <i class="fa-regular fa-envelope"></i>
             <span class="label">Davetiyeler</span>
           </a>

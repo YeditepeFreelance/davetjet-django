@@ -95,6 +95,12 @@ class InvitationsListView(LoginRequiredMixin, TemplateView):
     login_url = 'core:login'
     redirect_field_name = 'next'
 
+    def get(self, request, *args, **kwargs):
+        inv = Invitation.objects.filter(project__owner=request.user).first()
+        if inv:
+            return redirect('core:edit-invitation', pk=inv.id)
+        return redirect('core:create-invitation')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['projects'] = Project.objects.filter(owner=self.request.user)
@@ -147,6 +153,7 @@ class InvitationEntryView(View):
 
 
 # ==== PUBLIC (CLEAN URL) VIEW (CHANGED) ====
+
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class ShowInvitationView(TemplateView):
     # template_name kullanmıyoruz; doğrudan parse edip HTML döndürüyoruz
@@ -159,26 +166,28 @@ class ShowInvitationView(TemplateView):
         if invitation.is_expired():
             return HttpResponse("Bu davet süresi dolmuştur.", status=410)
 
-        # 🔐 Şifre/erişim kontrolü (ÖNCE cookie/?access, SONRA ?password)
+        # 🔐 Şifre/erişim kontrolü
         if invitation.is_password_protected:
             token = _get_token_from_request(request, invitation)
             if not (token and match_invitation(invitation, token)):
                 pwd = request.GET.get("password")
                 if True or (pwd and pwd == (invitation.password or "")):
-                    # Parola doğruysa token üret, cookie yaz ve temiz URL’ye dön (query'yi temizler)
                     token = _make_token(invitation)
                     resp = redirect(f"/invitations/{slug}/")
                     _set_access_cookie(resp, invitation, token)
                     return resp
                 return HttpResponse("Şifre gerekli veya erişim yok.", status=403)
 
-        # 📄 Statik şablonu oku
-        template_path = os.path.join(settings.BASE_DIR, "static", "inv-temps", f"{invitation.template}.html")
-        if not os.path.exists(template_path):
-            return HttpResponse("Şablon bulunamadı", status=404)
-
-        with open(template_path, encoding="utf-8") as f:
-            soup = BeautifulSoup(f.read(), "html.parser")
+        # 📄 ŞABLON KAYNAĞI: Önce inline HTML (template_html), yoksa statik dosya
+        markup = (invitation.template_html or "").strip()
+        if markup:
+            soup = BeautifulSoup(markup, "html.parser")
+        else:
+            template_path = os.path.join(settings.BASE_DIR, "static", "inv-temps", f"{invitation.template}.html")
+            if not os.path.exists(template_path):
+                return HttpResponse("Şablon bulunamadı", status=404)
+            with open(template_path, encoding="utf-8") as f:
+                soup = BeautifulSoup(f.read(), "html.parser")
 
         # 🧪 Tarih/saat parçaları
         dt = invitation.invitation_date
@@ -204,21 +213,20 @@ class ShowInvitationView(TemplateView):
 
         rsvp_link = soup.select_one("#rsvp-link")
         if rsvp_link:
-            # CHANGED: public sayfada daima temiz URL'yi kullan
             _set_attr(rsvp_link, "href", f"/invitations/{invitation.slug}/")
 
         slug_input = soup.select_one("#inv-slug-input")
         if slug_input:
             _set_attr(slug_input, "value", invitation.slug)
 
-        # ✍️ E-posta/sunum için contenteditable alanları kapat
+        # ✍️ Yayın sayfasında contenteditable'ları kapat (kamu görünümü)
         for tag in soup.find_all(attrs={"contenteditable": True}):
             try:
                 del tag["contenteditable"]
             except Exception:
                 pass
 
-        # (Opsiyonel) 🎯 İsim önerileri için davetlileri tek seferde göm
+        # (Opsiyonel) 🎯 İsim önerileri için davetlileri göm
         recipients = invitation.recipients.all().only("id", "name")
         data_tag = soup.new_tag("script", type="application/json", id="inv-recipients")
         data_tag.string = json.dumps([{"id": r.id, "name": r.name} for r in recipients], ensure_ascii=False)
@@ -235,5 +243,52 @@ class ShowInvitationView(TemplateView):
         })();
         """
         (soup.body or soup).append(helper_js)
+        # --- RSVP görünürlüğü: .rsvp içinden 'hide-in-embed' sınıfını kaldır
+
+        for rsvp in soup.select("section.rsvp"):
+            classes = rsvp.get("class", [])
+            if "hide-in-embed" in classes:
+                rsvp["class"] = [c for c in classes if c != "hide-in-embed"]
+
+        # --- RSVP hiç yoksa, minimal bir formu fallback olarak ekle (opsiyonel)
+        if not soup.select_one("section.rsvp"):
+            rsvp = soup.new_tag("section", **{
+                "class": "rsvp", "aria-labelledby": "rsvpTitle", "id": "rsvpRoot"
+            })
+            rsvp.inner_html = None  # sadece referans, BeautifulSoup'ta kullanılmıyor
+
+            # içerik
+            rsvp_header = soup.new_tag("h2", id="rsvpTitle")
+            rsvp_header.string = "Katılım Bildirimi"
+            rsvp.append(rsvp_header)
+
+            row = soup.new_tag("div", **{"class": "row", "style": "margin-bottom:10px"})
+            inp = soup.new_tag("input", id="rsvp-name", **{
+                "class": "input", "type": "text", "placeholder": "Adınız", "autocomplete": "off"
+            })
+            row.append(inp)
+            rsvp.append(row)
+
+            chips = soup.new_tag("div", **{"class": "chips", "role": "group", "aria-label": "Katılım durumu"})
+            for label, val in [("Geleceğim","yes"), ("Emin Değilim","maybe"), ("Gelmeyeceğim","no")]:
+                chip = soup.new_tag("div", **{"class": "chip", "tabindex":"0"})
+                chip["data-status"] = val
+                chip.string = label
+                chips.append(chip)
+            rsvp.append(chips)
+
+            btn = soup.new_tag("button", id="rsvp-submit", **{"class":"btn", "disabled": True})
+            btn.string = "Gönder"
+            rsvp.append(btn)
+
+            msg = soup.new_tag("div", id="rsvp-msg", **{"class":"msg"})
+            rsvp.append(msg)
+
+            # nereye ekleyelim? divider'ın altına, yoksa body’nin sonuna
+            anchor = soup.select_one(".divider-soft")
+            if anchor and hasattr(anchor, "insert_after"):
+                anchor.insert_after(rsvp)
+            else:
+                (soup.body or soup).append(rsvp)
 
         return HttpResponse(str(soup), content_type="text/html; charset=utf-8")

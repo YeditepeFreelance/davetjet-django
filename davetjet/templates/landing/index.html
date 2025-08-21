@@ -1,9 +1,9 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
   <head>
-    <!-- Required Meta Tags -->
+    <!-- Zorunlu Meta Etiketleri -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,7 +20,7 @@
     />
     <meta name="author" content="DavetJet" />
 
-    <!-- Open Graph (For Facebook, LinkedIn) -->
+    <!-- Open Graph (Facebook, LinkedIn) -->
     <meta property="og:type" content="website" />
     <meta
       property="og:title"
@@ -52,9 +52,9 @@
       type="image/x-icon"
     />
 
-    <!-- Theme Color for Mobile Browsers -->
+    <!-- Mobil Tarayıcı Tema Rengi -->
     <meta name="theme-color" content="#0ff" />
-    <title>DavetJet</title>
+
     <script
       src="https://kit.fontawesome.com/83fb529190.js"
       crossorigin="anonymous"
@@ -75,417 +75,310 @@
     {% include '../utils/modal-subscribe.html' %}
 
     <section class="hero-container dark">
-<nav class="navbar">
-  <div class="logo-container"><a href="#">DavetJet</a></div>
+      <nav class="navbar">
+        <div class="logo-container"><a href="#">DavetJet</a></div>
 
-  <div class="nav-center">
-    <ul class="nav-links" id="siteMenu" aria-hidden="true">
-      <button class="menu-close" aria-label="Menüyü kapat">×</button>
-      <li><a href="#" class="nav-link">About</a></li>
-      <li><a href="#" class="nav-link">Product</a></li>
-      <li><a href="#" class="nav-link">Resources</a></li>
-      <li><a href="#" class="nav-link">Support</a></li>
-    </ul>
-  </div>
+        <div class="nav-center">
+          <ul class="nav-links" id="siteMenu" aria-hidden="true">
+            <button class="menu-close" aria-label="Menüyü kapat">×</button>
+            <li><a href="#" class="nav-link">Hakkında</a></li>
+            <li><a href="#" class="nav-link">Ürün</a></li>
+            <li><a href="#" class="nav-link">Kaynaklar</a></li>
+            <li><a href="#" class="nav-link">Destek</a></li>
+          </ul>
+        </div>
 
-  <div class="auth-buttons">
-    <a href="{% url 'core:login' %}" class="signin btn">Sign In</a>
-    <a href="{% url 'core:register' %}" class="signup btn btn--secondary">Sign Up</a>
-  </div>
+        <div class="auth-buttons">
+          <a href="{% url 'core:login' %}" class="signin btn">Giriş Yap</a>
+          <a href="{% url 'core:register' %}" class="signup btn btn--secondary">Kayıt Ol</a>
+        </div>
 
-  <button class="hamburger" id="hamburger" aria-controls="siteMenu" aria-expanded="false" aria-label="Menüyü aç/kapat">
-    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-  </button>
-</nav>
+        <button
+          class="hamburger"
+          id="hamburger"
+          aria-controls="siteMenu"
+          aria-expanded="false"
+          aria-label="Menüyü aç/kapat"
+        >
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+      </nav>
 
-<!-- TAM EKRAN blur + siyah overlay -->
-<div id="navBackdrop" class="nav-backdrop" hidden></div>
-
+      <!-- TAM EKRAN blur + siyah overlay -->
+      <div id="navBackdrop" class="nav-backdrop" hidden></div>
 
       <header class="hero dark">
         <div class="hero-content">
-          <div class="badge">⭐ Beta Version v0.505b available!</div>
+          <div class="badge">⭐ Beta Sürüm v0.505b yayında!</div>
           <h1 class="heading-primary">
-            Revolutionize Your<br /><span class="highlight"
-              >Invitation Management</span
-            >
+            Davet Yönetiminizi<br /><span class="highlight">Dönüştürün</span>
           </h1>
           <p class="alt-text">
-            Unlock seamless, secure, and integrable invitation management
-            system. Create, deploy, run tests and analyze your invitations with
-            your co-workers. Try DavetJet free for 7 days!
+            Kesintisiz, güvenli ve entegre edilebilir bir davetiye yönetim sistemi.
+            Davetiyelerinizi oluşturun, dağıtın, test edin ve ekip arkadaşlarınızla analiz edin.
+            DavetJet’i 7 gün ücretsiz deneyin!
           </p>
           <div class="buttons">
-            <a class="btn btn--primary fs-trigger-btn">Start Now!</a>
-            <a href="#how-it-works" class="btn btn--light">Learn More</a>
+            <a class="btn btn--primary fs-trigger-btn">Hemen Başla!</a>
+            <a href="#how-it-works" class="btn btn--light">Daha Fazla Bilgi</a>
           </div>
         </div>
 
         <div class="hero-transition-image-container">
           <picture>
-            <!-- Mobile first -->
+            <!-- Mobile -->
             <source
               srcset="{% static 'images/iphonex.png' %}"
               type="image/png"
               media="(max-width: 480px)"
             />
-            <!-- Fallback for larger screens -->
-            <source
-              srcset="{% static 'images/laptop.svg' %}"
-            />
-            <!-- Optional fallback image if <source> is not supported -->
-            <img src="{% static 'images/laptop.png' %}" alt="Device preview" />
+            <!-- Desktop -->
+            <source srcset="{% static 'images/laptop.svg' %}" />
+            <!-- Fallback -->
+            <img src="{% static 'images/laptop.png' %}" alt="Cihaz önizleme" />
           </picture>
         </div>
       </header>
     </section>
+
     <section class="steps-section" id="how-it-works">
       <div class="container">
         <div class="steps-heading">
           <h2>
-            <span class="steps-prefix">How Our</span>
-            <span class="brand-name">DavetJet</span> Works -
-            <span class="steps-highlight">3 Simple Steps</span>
+            <span class="steps-prefix">DavetJet</span>
+            <span class="brand-name">Nasıl Çalışır</span> —
+            <span class="steps-highlight">3 Kolay Adım</span>
           </h2>
           <p class="steps-subtitle alt-text">
-            Our DavetJet invitation management system is simple, fast and
-            produces amazing results in just a few actionable steps.
+            DavetJet davetiye yönetim sistemimiz basit, hızlıdır ve sadece birkaç uygulanabilir adımda harika sonuçlar üretir.
           </p>
         </div>
 
         <div class="steps-grid">
           <div class="step-card">
-            <h3>Create an Account</h3>
+            <h3>Hesap Oluştur</h3>
             <p>
-              Create a DavetJet account by choosing desired subscription plan to
-              get started.
+              Başlamak için size uygun abonelik planını seçerek bir DavetJet hesabı oluşturun.
             </p>
             <img
               src="/static/images/step1.png"
-              alt="Create Account Screenshot"
+              alt="Hesap Oluştur ekran görüntüsü"
             />
           </div>
 
           <div class="step-card">
-            <h3>Design Your Invitation</h3>
+            <h3>Davetiyeni Tasarla</h3>
             <p>
-              Create your invitation by uploading/designing by our sketch and
-              template tools.
+              Yükleyerek veya çizim/şablon araçlarımızla davetiyeni oluştur.
             </p>
             <img
               src="/static/images/step2.png"
-              alt="Design Invitation Screenshot"
+              alt="Davetiyeyi Tasarla ekran görüntüsü"
             />
           </div>
 
           <div class="step-card">
-            <h3>Send & Analyze</h3>
+            <h3>Gönder & Analiz Et</h3>
             <p>
-              Send your invitation to your desired target list. Analyze who
-              read, RSVPd etc.
+              Davetiyeni hedef listene gönder. Kim okudu, kim RSVP yaptı anında takip et.
             </p>
-            <img src="/static/images/step3.png" alt="Analytics Screenshot" />
+            <img src="/static/images/step3.png" alt="Analitik ekran görüntüsü" />
           </div>
         </div>
       </div>
     </section>
+
     <section class="features-section">
       <div class="features-heading">
         <h2>
-          Empower your invitations:<br />
-          explore our <span class="highlight">all-in-one</span> platform
+          Davetiyelerinizi güçlendirin:<br />
+          <span class="highlight">hepsi bir arada</span> platformumuzu keşfedin
         </h2>
         <p class="features-subtitle">
-          All-in-one digital invitation management & deployment platform.<br />
-          Tailored for your individual needs.
+          Hepsi bir arada dijital davetiye yönetimi ve dağıtım platformu.<br />
+          İhtiyaçlarınıza göre şekillenir.
         </p>
         <div class="features-cta">
-          <button class="btn btn--primary">Try for free!</button>
-          <button class="btn btn--outlined">View demo</button>
+          <button class="btn btn--primary">Ücretsiz dene!</button>
+          <button class="btn btn--outlined">Demoyu gör</button>
         </div>
       </div>
 
       <div class="features-grid">
         <div class="feature-card">
           <div class="icon-wrapper">
-            <img src="{% static 'images/feature1.png' %}" alt="Manage Icon" />
+            <img src="{% static 'images/feature1.png' %}" alt="Yönet İkonu" />
           </div>
           <div class="feature-card__content">
-            <h3>Automate & Manage</h3>
+            <h3>Otomatikleştir & Yönet</h3>
             <p>
-              Automation is “the” key to success. You can automate deployment,
-              analysis, messaging.
+              Otomasyon başarı anahtarıdır. Gönderim, analiz ve mesajlaşmayı otomatikleştirin.
             </p>
           </div>
         </div>
 
         <div class="feature-card">
           <div class="icon-wrapper">
-            <img src="{% static 'images/feature1.png' %}" alt="Insights Icon" />
+            <img src="{% static 'images/feature1.png' %}" alt="İçgörü İkonu" />
           </div>
           <div class="feature-card__content">
-            <h3>Analysis & Insights</h3>
+            <h3>Analiz & İçgörüler</h3>
             <p>
-              You can view the performance of your invitation campaigns right on
-              our dashboard, along with insights.
+              Davet kampanyalarınızın performansını panomuzda anlık olarak görün, içgörüler elde edin.
             </p>
           </div>
         </div>
 
         <div class="feature-card">
           <div class="icon-wrapper">
-            <img src="{% static 'images/feature1.png' %}" alt="Template Icon" />
+            <img src="{% static 'images/feature1.png' %}" alt="Şablon İkonu" />
           </div>
           <div class="feature-card__content">
-            <h3>Template Designs</h3>
+            <h3>Şablon Tasarımları</h3>
             <p>
-              Numerous template designs crafted by designers. Fully customizable
-              and ready to go.
+              Tasarımcılar tarafından hazırlanmış çok sayıda şablon. Tamamen özelleştirilebilir ve hazır.
             </p>
           </div>
         </div>
 
         <div class="feature-card">
           <div class="icon-wrapper">
-            <img src="{% static 'images/feature1.png' %}" alt="Send Icon" />
+            <img src="{% static 'images/feature1.png' %}" alt="Gönderim İkonu" />
           </div>
           <div class="feature-card__content">
-            <h3>Deploy & Send</h3>
+            <h3>Dağıt & Gönder</h3>
             <p>
-              Deployment and sending out invitations is easy with DavetJet. We
-              handle all the struggle for you.
+              Davet göndermek DavetJet ile çok kolay. Tüm zahmeti sizin yerinize biz üstleniyoruz.
             </p>
           </div>
         </div>
       </div>
     </section>
+
     <section class="testimonials-section">
       <div class="testimonials-heading">
         <h2>
-          Don’t just take our word for it,<br />
-          take a look at what <span class="highlight">our users</span> have to
-          say.
+          Sadece bizim sözümüze bakmayın,<br />
+          <span class="highlight">kullanıcılarımız</span> ne diyor bakın.
         </h2>
         <p class="subtitle">
-          10k+ users are satisfied with what we provide for them. You can join
-          the team of DavetJet too!
+          10 binden fazla kullanıcı sağladıklarımızdan memnun. Siz de DavetJet ailesine katılın!
         </p>
       </div>
 
       <div class="testimonials-grid">
         <div class="testimonial-card">
-          <img src="{% static 'images/testimonial.png' %}" alt="User Photo" />
+          <img src="{% static 'images/testimonial.png' %}" alt="Kullanıcı Fotoğrafı" />
           <h3>Halit Hamza Şeker</h3>
           <p class="email">halithamzaseker@gmail.com</p>
           <p>
-            DavetJet is a great tool for invitation management. It has
-            automation systems, deployment mechanisms and all good.
+            DavetJet davetiye yönetimi için harika bir araç. Otomasyon, dağıtım mekanizmaları ve daha fazlası var.
           </p>
           <div class="quote-icon">
-            <!-- Lucide 'quote' icon (linear style) -->
-            <svg
-              width="50"
-              height="51"
-              viewBox="0 0 50 51"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-              <path
-                d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
+            <!-- Lucide 'quote' icon -->
+            <svg width="50" height="51" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
+              <path d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
             </svg>
           </div>
         </div>
+
+        <!-- Aynı kart yapısı tekrarlanıyor; içerikler Türkçeleştirildi -->
         <div class="testimonial-card">
-          <img src="{% static 'images/testimonial.png' %}" alt="User Photo" />
+          <img src="{% static 'images/testimonial.png' %}" alt="Kullanıcı Fotoğrafı" />
           <h3>Halit Hamza Şeker</h3>
           <p class="email">halithamzaseker@gmail.com</p>
           <p>
-            DavetJet is a great tool for invitation management. It has
-            automation systems, deployment mechanisms and all good.
+            DavetJet davetiye yönetimi için harika bir araç. Otomasyon, dağıtım mekanizmaları ve daha fazlası var.
           </p>
           <div class="quote-icon">
-            <!-- Lucide 'quote' icon (linear style) -->
-            <svg
-              width="50"
-              height="51"
-              viewBox="0 0 50 51"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-              <path
-                d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
+            <!-- Lucide 'quote' icon -->
+            <svg width="50" height="51" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
+              <path d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
             </svg>
           </div>
         </div>
+
         <div class="testimonial-card">
-          <img src="{% static 'images/testimonial.png' %}" alt="User Photo" />
+          <img src="{% static 'images/testimonial.png' %}" alt="Kullanıcı Fotoğrafı" />
           <h3>Halit Hamza Şeker</h3>
           <p class="email">halithamzaseker@gmail.com</p>
           <p>
-            DavetJet is a great tool for invitation management. It has
-            automation systems, deployment mechanisms and all good.
+            DavetJet davetiye yönetimi için harika bir araç. Otomasyon, dağıtım mekanizmaları ve daha fazlası var.
           </p>
           <div class="quote-icon">
-            <!-- Lucide 'quote' icon (linear style) -->
-            <svg
-              width="50"
-              height="51"
-              viewBox="0 0 50 51"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-              <path
-                d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
+            <svg width="50" height="51" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
+              <path d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
             </svg>
           </div>
         </div>
+
         <div class="testimonial-card">
-          <img src="{% static 'images/testimonial.png' %}" alt="User Photo" />
+          <img src="{% static 'images/testimonial.png' %}" alt="Kullanıcı Fotoğrafı" />
           <h3>Halit Hamza Şeker</h3>
           <p class="email">halithamzaseker@gmail.com</p>
           <p>
-            DavetJet is a great tool for invitation management. It has
-            automation systems, deployment mechanisms and all good.
+            DavetJet davetiye yönetimi için harika bir araç. Otomasyon, dağıtım mekanizmaları ve daha fazlası var.
           </p>
           <div class="quote-icon">
-            <!-- Lucide 'quote' icon (linear style) -->
-            <svg
-              width="50"
-              height="51"
-              viewBox="0 0 50 51"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-              <path
-                d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
+            <svg width="50" height="51" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
+              <path d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
             </svg>
           </div>
         </div>
+
         <div class="testimonial-card">
-          <img src="{% static 'images/testimonial.png' %}" alt="User Photo" />
+          <img src="{% static 'images/testimonial.png' %}" alt="Kullanıcı Fotoğrafı" />
           <h3>Halit Hamza Şeker</h3>
           <p class="email">halithamzaseker@gmail.com</p>
           <p>
-            DavetJet is a great tool for invitation management. It has
-            automation systems, deployment mechanisms and all good.
+            DavetJet davetiye yönetimi için harika bir araç. Otomasyon, dağıtım mekanizmaları ve daha fazlası var.
           </p>
           <div class="quote-icon">
-            <!-- Lucide 'quote' icon (linear style) -->
-            <svg
-              width="50"
-              height="51"
-              viewBox="0 0 50 51"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-              <path
-                d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-            </svg>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <img src="{% static 'images/testimonial.png' %}" alt="User Photo" />
-          <h3>Halit Hamza Şeker</h3>
-          <p class="email">halithamzaseker@gmail.com</p>
-          <p>
-            DavetJet is a great tool for invitation management. It has
-            automation systems, deployment mechanisms and all good.
-          </p>
-          <div class="quote-icon">
-            <!-- Lucide 'quote' icon (linear style) -->
-            <svg
-              width="50"
-              height="51"
-              viewBox="0 0 50 51"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
-              <path
-                d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z"
-                fill="#349F71"
-                fill-opacity="0.5"
-              />
+            <svg width="50" height="51" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.4722 38.3699C14.4722 38.3699 14.4705 38.3707 13.8035 36.963L14.4722 38.3699C13.9881 38.5993 13.4187 38.5655 12.966 38.2791C12.5133 37.9926 12.2389 37.4943 12.2389 36.9587V31.6312C7.6586 30.8845 4.1626 26.9097 4.1626 22.1182C4.1626 16.795 8.47806 12.4795 13.8014 12.4795C19.1248 12.4795 23.4402 16.795 23.4402 22.1182C23.4402 28.0462 21.2542 32.1101 19.0212 34.6907C17.913 35.9716 16.8025 36.8774 15.9604 37.468C15.5387 37.7637 15.1821 37.9818 14.9235 38.1295C14.7942 38.2032 14.689 38.2597 14.6123 38.2997C14.5739 38.3195 14.5425 38.3353 14.5187 38.3472L14.4888 38.3618L14.4782 38.367L14.4722 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
+              <path d="M36.8677 38.3699C36.8677 38.3699 36.8662 38.3707 36.1971 36.9587L36.8677 38.3699C36.3837 38.5993 35.8144 38.5655 35.3616 38.2791C34.9089 37.9926 34.6346 37.4943 34.6346 36.9587V31.6312C30.0541 30.8845 26.5581 26.9097 26.5581 22.1182C26.5581 16.795 30.8737 12.4795 36.1971 12.4795C41.5204 12.4795 45.8358 16.795 45.8358 22.1182C45.8358 28.0462 43.6498 32.1101 41.4169 34.6907C40.3087 35.9716 39.1981 36.8774 38.356 37.468C37.9344 37.7637 37.5777 37.9818 37.3191 38.1295C37.1898 38.2032 37.0846 38.2597 37.0079 38.2997C36.9696 38.3195 36.9381 38.3353 36.9144 38.3472L36.8844 38.3618L36.8737 38.367L36.8677 38.3699Z" fill="#349F71" fill-opacity="0.5"/>
             </svg>
           </div>
         </div>
       </div>
     </section>
+
     <section class="cta dark">
       <div class="cta__container">
-        <h2 class="cta__heading">Design, automate and deploy.</h2>
+        <h2 class="cta__heading">Tasarla, otomatikleştir ve gönder.</h2>
         <p class="cta__subheading alt-text">
-          Start your first digital invitation campaign today with DavetJet.
+          İlk dijital davetiye kampanyana bugün DavetJet ile başla.
         </p>
 
         <div class="cta__buttons">
-          <button class="btn btn--primary fs-trigger-btn">Try for free!</button>
-          <button class="btn btn--secondary">View demo</button>
+          <button class="btn btn--primary fs-trigger-btn">Ücretsiz dene!</button>
+          <button class="btn btn--secondary">Demoyu gör</button>
         </div>
 
-        <p class="cta__note">No hidden fees. No credit card required.</p>
+        <p class="cta__note">Gizli ücret yok. Kredi kartı gerekmez.</p>
       </div>
     </section>
+
     <footer class="footer">
       <div class="footer__top">
         <img
           src="/static/images/logo.webp"
-          alt="DavetJet Logo"
+          alt="DavetJet Logosu"
           class="footer__logo"
         />
       </div>
       <ul class="footer__nav">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Product</a></li>
-        <li><a href="#">Resources</a></li>
-        <li><a href="#">Support</a></li>
+        <li><a href="#">Ana Sayfa</a></li>
+        <li><a href="#">Hakkında</a></li>
+        <li><a href="#">Ürün</a></li>
+        <li><a href="#">Kaynaklar</a></li>
+        <li><a href="#">Destek</a></li>
       </ul>
-      <p class="footer__copy">© DavetJet 2025. All rights reserved.</p>
+      <p class="footer__copy">© DavetJet 2025. Tüm hakları saklıdır.</p>
     </footer>
   </body>
 </html>

@@ -9,8 +9,8 @@
       <div class="filters__group">
         <label for="invitationSelect">Davet</label>
         <select id="invitationSelect">
-          <option value="all">Tümü</option>
           <!-- Backend: dinamik doldur -->
+
           {% for inv in invitations %}
     <option value="{{ inv.pk }}">{{ inv.name }}</option>
     {# veya slug kullanacaksan: value="{{ inv.slug }}" #}
@@ -468,6 +468,7 @@ function updateKpis({ total, delivered, bounces, opened, rsvped }) {
   setText('kpiTotalInvites', total);
   setText('kpiDelivered', delivered);
   setText('kpiBounce', bounces);
+  if (!opened) opened = delivered 
   const openRate = Math.round((opened/Math.max(delivered,1))*100) + '%';
   setText('kpiOpenRate', openRate);
   const rsvpRate = Math.round((rsvped/Math.max(opened,1))*100) + '%';
@@ -533,7 +534,9 @@ function exportCSV() {
   URL.revokeObjectURL(a.href);
 }
 
-// İlk yükleme
-refresh();
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(refresh, 500);
+});
 </script>
 {% endblock %}

@@ -21,7 +21,9 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.response import Response
 
 from recipients.forms import RecipientForm
@@ -71,42 +73,46 @@ def rsvp_update(request):
 
 # ----- Davetiye bazlı autocomplete & update -----
 @api_view(['GET', 'POST'])
+@permission_classes([AllowAny])  # 🔓 Login gereksinimini kaldır
+@authentication_classes([SessionAuthentication, BasicAuthentication])  # CSRF koruması kalsın
 def recipients_handler(request, invitation_slug=None):
     """
-    GET  → /recipients/?q=...
-    POST → /recipients/ { name, status }
-    invitation_slug → davetiyeye ait kontrol
+    GET  → /recipients/<slug>/?q=...
+    POST → /recipients/<slug>/  { name, status }   (status: yes|no|maybe)
+    Not: Login gerekmez; CSRF korunur (fetchte X-CSRFToken ve credentials:'same-origin' gönderin).
     """
-    try:
-        invitation = Invitation.objects.get(slug=invitation_slug)
-    except Invitation.DoesNotExist:
-        return Response({"error": "Davet bulunamadı"}, status=status.HTTP_404_NOT_FOUND)
+    invitation = get_object_or_404(Invitation, slug=invitation_slug)
+
+    # (Opsiyonel) Şifreli davet ise token doğrula — sayfa erişiminde zaten kontrol yapıyorsan gerekmez.
+    # access_token = request.GET.get("access") or request.headers.get("X-Access-Token")
+    # if invitation.is_password_protected and access_token:
+    #     if not match_invitation(invitation, access_token):
+    #         return Response({"error": "Erişim tokeni geçersiz."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "GET":
-        # Autocomplete → sadece bu davetiyedeki kişiler
-        query = request.GET.get("q", "")
-        recipients = invitation.recipients.filter(name__icontains=query)[:5]
-        serializer = RecipientNameSerializer(recipients, many=True)
-        return Response(serializer.data)
+        q = (request.GET.get("q") or "").strip()
+        if not q:
+            return Response([], status=status.HTTP_200_OK)
+        recipients = invitation.recipients.filter(name__icontains=q).only("id", "name")[:5]
+        return Response(RecipientNameSerializer(recipients, many=True).data)
 
-    elif request.method == "POST":
-        name = request.data.get("name")
-        status_value = request.data.get("status")
+    # POST
+    name = (request.data.get("name") or "").strip()
+    status_value = (request.data.get("status") or "").strip().lower()
 
-        try:
-            recipient = invitation.recipients.get(name=name)
-        except Recipient.DoesNotExist:
-            return Response({"error": "Bu davetiyeye ait böyle bir kişi yok."}, status=status.HTTP_404_NOT_FOUND)
+    if not name:
+        return Response({"error": "İsim gerekli."}, status=status.HTTP_400_BAD_REQUEST)
+    if status_value not in {"yes", "no", "maybe"}:
+        return Response({"error": "Geçersiz katılım durumu."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if status_value not in ["yes", "no", "maybe"]:
-            return Response({"error": "Geçersiz katılım durumu"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        recipient = invitation.recipients.get(name=name)
+    except Recipient.DoesNotExist:
+        return Response({"error": "Bu davetiyeye ait böyle bir kişi yok."}, status=status.HTTP_404_NOT_FOUND)
 
-        recipient.rsvp_status = status_value
-        recipient.save(update_fields=['rsvp_status'])
-
-        return Response({"message": f"{recipient.name} için katılım durumu güncellendi"})
-
-
+    recipient.rsvp_status = status_value
+    recipient.save(update_fields=["rsvp_status"])
+    return Response({"message": f"{recipient.name} için katılım durumu güncellendi"}, status=status.HTTP_200_OK)
 # ----- Edit Recipient (tek kayıt) -----
 class EditRecipientView(LoginRequiredMixin, View):
     login_url = reverse_lazy('core:login')

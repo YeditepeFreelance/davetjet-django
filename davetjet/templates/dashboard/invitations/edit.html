@@ -20,14 +20,13 @@
         <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
         <div class="actions">
           <a
-            data-target="{% url 'recipients:export-csv' %}?invitation_id={{ invitation.id }}"
-            class="export-csv"
-            >PDF Dışa Aktar</a
+            href="{% url 'core:edit-invitation-api' pk=invitation.id %}"
+            data-target="{% url 'core:edit-invitation-api' pk=invitation.id %}"
+            >Düzenle</a
           >
-          <a data-target="{% url 'recipients:import-csv' %}" class="import-csv"
-            >İçe Aktar</a
+          <a href="{% url 'core:edit-recipients' pk=invitation.id %}" data-target="{% url 'core:edit-recipients' pk=invitation.id %}"
+            >Davetli Listesi</a
           >
-          <a>Manuel Olarak Ekle</a>
         </div>
       </div>
     </div>

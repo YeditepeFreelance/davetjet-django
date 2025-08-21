@@ -1,78 +1,74 @@
 {% load static %}
 <div id="fsSubscriptionModal" class="fs-subscription-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fsSubscriptionModalTitle" aria-describedby="fsSubscriptionModalDesc">
   <div class="fs-subscription-modal-content" role="document" tabindex="-1">
-    <button class="fs-subscription-close-btn" aria-label="Close subscription modal" onclick="toggleFsSubscriptionModal(false)">×</button>
-
+    <button class="fs-subscription-close-btn" aria-label="Abonelik penceresini kapat" onclick="toggleFsSubscriptionModal(false)">×</button>
 
     <header class="fs-subscription-modal-header">
-      <h1 id="fsSubscriptionModalTitle">Choose Your Plan & Unlock Premium Features</h1>
-      <p id="fsSubscriptionModalDesc">Flexible plans tailored for your needs. Secure payments and no hidden fees.</p>
+      <h1 id="fsSubscriptionModalTitle">Planını Seç ve Premium Özelliklerin Kilidini Aç</h1>
+      <p id="fsSubscriptionModalDesc">İhtiyaçlarına uygun esnek planlar. Güvenli ödeme, gizli ücret yok.</p>
 
-      <div class="fs-billing-toggle" role="group" aria-label="Toggle billing period">
-        <button class="fs-toggle-option active" data-plan="monthly" aria-pressed="true" type="button">One Time</button>
+      <div class="fs-billing-toggle" role="group" aria-label="Faturalandırma dönemini değiştir">
+        <button class="fs-toggle-option active" data-plan="monthly" aria-pressed="true" type="button">Tek Sefer</button>
       </div>
     </header>
 
-    <section class="fs-subscription-modal-plans" role="region" aria-label="Subscription Plans">
-      <article class="fs-plan-card current" aria-label="Starter Plan - Free">
-        <div class="fs-badge">Current Plan</div>
+    <section class="fs-subscription-modal-plans" role="region" aria-label="Abonelik Planları">
+      <article class="fs-plan-card current" aria-label="Başlangıç Planı - Ücretsiz">
+        <div class="fs-badge">Mevcut Plan</div>
         <i class="fas fa-leaf fs-icon" aria-hidden="true"></i>
-        <h3>Starter</h3>
-        <p>Perfect for trying things out</p>
-        <div class="fs-price" data-monthly="Free" data-yearly="Free">Free</div>
+        <h3>Başlangıç</h3>
+        <p>Denemek için ideal</p>
+        <div class="fs-price" data-monthly="Ücretsiz" data-yearly="Ücretsiz">Ücretsiz</div>
         <ul>
-          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> 10 Invitations</li>
-          <li><i class="fas fa-users" aria-hidden="true"></i> Max 50 Invitees</li>
-          <li><i class="fas fa-tools" aria-hidden="true"></i> Basic Features</li>
+          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> 10 Davetiye</li>
+          <li><i class="fas fa-users" aria-hidden="true"></i> Maks. 50 Davetli</li>
+          <li><i class="fas fa-tools" aria-hidden="true"></i> Temel Özellikler</li>
         </ul>
-        <button disabled class="fs-btn current-btn" aria-disabled="true">You're on this plan</button>
+        <button disabled class="fs-btn current-btn" aria-disabled="true">Bu plandasınız</button>
       </article>
 
-      <article class="fs-plan-card fs-plan-highlight" aria-label="Pro Plan - 99₺ Monthly, 999₺ Yearly">
+      <article class="fs-plan-card fs-plan-highlight" aria-label="Pro Planı - Aylık 99₺, Yıllık 999₺">
         <i class="fas fa-rocket fs-icon" aria-hidden="true"></i>
         <h3>Pro</h3>
-        <p>Ideal for growing events</p>
+        <p>Büyüyen etkinlikler için ideal</p>
         <div class="fs-price" data-monthly="99₺" data-yearly="999₺">99₺</div>
         <ul>
-          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> 100 Invitations</li>
-          <li><i class="fas fa-users" aria-hidden="true"></i> Max 500 Invitees</li>
-          <li><i class="fas fa-bolt" aria-hidden="true"></i> Premium Features</li>
+          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> 100 Davetiye</li>
+          <li><i class="fas fa-users" aria-hidden="true"></i> Maks. 500 Davetli</li>
+          <li><i class="fas fa-bolt" aria-hidden="true"></i> Premium Özellikler</li>
         </ul>
-        <button class="fs-btn fs-choose-btn" data-plan="Pro" type="button">Subscribe</button>
+        <button class="fs-btn fs-choose-btn" data-plan="Pro" type="button">Abone Ol</button>
       </article>
 
-      <article class="fs-plan-card" aria-label="Elite Plan - 199₺ Monthly, 1999₺ Yearly">
+      <article class="fs-plan-card" aria-label="Elite Planı - Aylık 199₺, Yıllık 1999₺">
         <i class="fas fa-gem fs-icon" aria-hidden="true"></i>
         <h3>Elite</h3>
-        <p>For large-scale experiences</p>
+        <p>Büyük ölçekli deneyimler için</p>
         <div class="fs-price" data-monthly="199₺" data-yearly="1999₺">199₺</div>
         <ul>
-          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Unlimited Invitations</li>
-          <li><i class="fas fa-users" aria-hidden="true"></i> Max 5000 Invitees</li>
-          <li><i class="fas fa-crown" aria-hidden="true"></i> All Features</li>
+          <li><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Sınırsız Davetiye</li>
+          <li><i class="fas fa-users" aria-hidden="true"></i> Maks. 5000 Davetli</li>
+          <li><i class="fas fa-crown" aria-hidden="true"></i> Tüm Özellikler</li>
         </ul>
-        <button class="fs-btn fs-choose-btn" data-plan="Elite" type="button">Subscribe</button>
+        <button class="fs-btn fs-choose-btn" data-plan="Elite" type="button">Abone Ol</button>
       </article>
     </section>
     
-    <!-- Payment modal inside subscription modal (initially hidden) -->
-    <!-- Inside your full-page subscription modal, after the plans container -->
-
-    <!-- Fullscreen Payment Modal inside Subscription Modal -->
+    <!-- Tam ekran ödeme modali (başlangıçta gizli) -->
     <div class="fs-payment-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fsPaymentModalTitle" aria-describedby="fsPaymentModalDesc">
       <div class="fs-payment-modal-content" role="document">
-        <h3 id="fsPaymentModalTitle" class="fs-payment-header">PayTR Payment</h3>
-        <p id="fsPaymentModalDesc" class="fs-payment-subheader">Complete your purchase securely.</p>
+        <h3 id="fsPaymentModalTitle" class="fs-payment-header">PayTR Ödeme</h3>
+        <p id="fsPaymentModalDesc" class="fs-payment-subheader">Ödemenizi güvenle tamamlayın.</p>
 
         <div class="fs-payment-modal-inner">
           <form class="fs-payment-form" novalidate>
             <div class="fs-form-group">
-              <label for="fsCardholderName" class="fs-sr-only">Cardholder Name</label>
+              <label for="fsCardholderName" class="fs-sr-only">Kart Sahibinin Adı</label>
               <input
                 type="text"
                 id="fsCardholderName"
                 name="cardholderName"
-                placeholder="Cardholder Name"
+                placeholder="Kart Sahibinin Adı"
                 autocomplete="cc-name"
                 required
                 maxlength="30"
@@ -81,12 +77,12 @@
             </div>
 
             <div class="fs-form-group">
-              <label for="fsCardNumber" class="fs-sr-only">Card Number</label>
+              <label for="fsCardNumber" class="fs-sr-only">Kart Numarası</label>
               <input
                 type="text"
                 id="fsCardNumber"
                 name="cardNumber"
-                placeholder="Card Number"
+                placeholder="Kart Numarası"
                 maxlength="19"
                 autocomplete="cc-number"
                 inputmode="numeric"
@@ -97,12 +93,12 @@
 
             <div class="fs-form-row">
               <div class="fs-form-group fs-small-group">
-                <label for="fsExpiryDate" class="fs-sr-only">Expiry Date</label>
+                <label for="fsExpiryDate" class="fs-sr-only">Son Kullanma Tarihi</label>
                 <input
                   type="text"
                   id="fsExpiryDate"
                   name="expiryDate"
-                  placeholder="MM/YY"
+                  placeholder="AA/YY"
                   maxlength="5"
                   autocomplete="cc-exp"
                   inputmode="numeric"
@@ -112,7 +108,7 @@
               </div>
 
               <div class="fs-form-group fs-small-group">
-                <label for="fsCvv" class="fs-sr-only">CVC</label>
+                <label for="fsCvv" class="fs-sr-only">Güvenlik Kodu (CVC)</label>
                 <input
                   type="password"
                   id="fsCvv"
@@ -127,17 +123,17 @@
               </div>
             </div>
 
-            <button type="submit" class="fs-btn fs-pay-btn" aria-label="Submit payment">Pay</button>
+            <button type="submit" class="fs-btn fs-pay-btn" aria-label="Ödemeyi gönder">Öde</button>
           </form>
 
-          <div class="fs-virtual-card" aria-hidden="true" aria-label="Credit Card Preview">
+          <div class="fs-virtual-card" aria-hidden="true" aria-label="Kredi Kartı Önizleme">
             <div class="fs-card-inner">
               <div class="fs-card-front">
                 <div class="fs-card-chip"></div>
                 <div class="fs-card-number" id="fsCardNumberDisplay">#### #### #### ####</div>
-                <div class="fs-card-name" id="fsCardNameDisplay">CARDHOLDER NAME</div>
-                <div class="fs-card-expiry-label">Expires</div>
-                <div class="fs-card-expiry" id="fsCardExpiryDisplay">MM/YY</div>
+                <div class="fs-card-name" id="fsCardNameDisplay">KART SAHİBİ</div>
+                <div class="fs-card-expiry-label">Son Kullanma</div>
+                <div class="fs-card-expiry" id="fsCardExpiryDisplay">AA/YY</div>
               </div>
               <div class="fs-card-back">
                 <div class="fs-card-stripe"></div>
@@ -148,10 +144,9 @@
           </div>
         </div>
 
-        <button class="fs-payment-close-btn" aria-label="Close payment modal">×</button>
+        <button class="fs-payment-close-btn" aria-label="Ödeme penceresini kapat">×</button>
       </div>
     </div>
-
 
   </div>
 </div>
