@@ -658,3 +658,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
+// PDF
+
+(async function setupPdfDownload() {
+  // CDN'den kütüphaneleri yükle
+  function load(src) {
+    return new Promise((resolve) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      document.head.appendChild(s);
+    });
+  }
+
+  if (!window.html2canvas) {
+    await load(
+      "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+    );
+  }
+  if (!window.jspdf) {
+    await load(
+      "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    );
+  }
+
+  const exportPdfs = document.querySelectorAll(".export-pdf");
+  if (!exportPdfs) return;
+
+  exportPdfs.forEach((btn) => () => {
+    btn.addEventListener("click", async () => {
+      console.log(exportPdfs);
+      try {
+        const card = document.querySelector(".inv-card");
+        if (!card) {
+          alert("Davetiye bulunamadı.");
+          return;
+        }
+
+        // Fontların yüklenmesini bekle (Aniyah dâhil)
+        if (document.fonts && document.fonts.ready) {
+          try {
+            await document.fonts.ready;
+          } catch {}
+        }
+
+        // Canvas'a yüksek çözünürlükte çiz (CORS: /static aynı origin olmalı)
+        const scale = Math.min(3, window.devicePixelRatio || 2); // 2–3 arası iyi
+        const canvas = await html2canvas(card, {
+          scale,
+          backgroundColor: "#ffffff",
+          useCORS: true, // /static aynı origin ise sorun olmaz
+        });
+
+        const img = canvas.toDataURL("image/jpeg", 0.95);
+        const pxW = canvas.width,
+          pxH = canvas.height;
+
+        // px -> pt (96dpi -> 72dpi): 1px ≈ 0.75pt
+        const ptW = pxW * 0.75,
+          ptH = pxH * 0.75;
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: ptW > ptH ? "l" : "p",
+          unit: "pt",
+          format: [ptW, ptH],
+        });
+
+        pdf.addImage(img, "JPEG", 0, 0, ptW, ptH);
+        pdf.save("davetiye.pdf");
+      } catch (e) {
+        console.error(e);
+        alert("PDF oluşturulamadı. Lütfen tekrar deneyin.");
+      }
+    });
+  });
+})();

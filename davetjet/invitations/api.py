@@ -460,3 +460,24 @@ def schedule_send(request, pk):
         },
         status=status.HTTP_200_OK,
     )
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import Invitation
+class InvitationSnapshotUpload(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        inv = get_object_or_404(
+            Invitation.objects.select_related('project'),
+            pk=pk, project__owner=request.user
+        )
+        file = request.FILES.get('file')
+        if not file:
+            return Response({"error": "file is required"}, status=400)
+        inv.snapshot_image.save(file.name, file, save=True)
+        return Response({"url": inv.snapshot_image.url}, status=200)

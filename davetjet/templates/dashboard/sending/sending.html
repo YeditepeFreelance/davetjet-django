@@ -193,8 +193,8 @@
         </label>
 
         <div class="actions">
-          <a href="{% url 'invitations:invitation-drafts' %}" class="btn btn--outlined">Taslakları Gör</a>
-          <button type="button" class="btn btn--primary">Onayla ve Planla</button>
+          <a href="{% url 'core:edit-recipients' invitation.pk %}" class="btn btn--outlined send-btn">Davetli Listesi</a>
+          <button type="button" class="btn btn--primary send-btn">Gönderime Başla</button>
         </div>
       </section>
     </aside>
@@ -385,13 +385,13 @@
     // ---------- Gönder/Planla ----------
     async function handleSubmit(){
       const channels = { email: !!emailTgl?.checked, sms: !!smsTgl?.checked };
-      if(!channels.email && !channels.sms){ return flash('error','En az bir kanal seçmelisiniz (E-posta veya SMS).'); }
-      if(!agree?.checked){ return flash('error','“Davetiye ve davetlileri onaylıyorum” kutusunu işaretleyin.'); }
+      if(!channels.email && !channels.sms){ return toast.error('En az bir kanal seçmelisiniz (E-posta veya SMS).'); }
+      if(!agree?.checked){ return toast.error('“Davetiye ve davetlileri onaylıyorum” kutusunu işaretleyin.'); }
 
       const mode = qs('input[name="schedule_mode"]:checked', root)?.value || 'now';
       let scheduled_at = null;
       if(mode==='later'){
-        if(!dateInput.value || !timeInput.value){ return flash('error','Planlı gönderim için tarih ve saat seçin.'); }
+        if(!dateInput.value || !timeInput.value){ return toast.error('Planlı gönderim için tarih ve saat seçin.'); }
         scheduled_at = combineLocalToISO(dateInput.value, timeInput.value);
       }
 
@@ -420,10 +420,10 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json().catch(()=> ({}));
-        if(res.ok){ flash('success', data.message || 'Gönderim planlandı!'); }
-        else      { flash('error', data.error || 'Gönderim sırasında hata oluştu.'); }
+        if(res.ok){ toast.success(data.message || 'Gönderim planlandı!'); }
+        else      { toast.error(data.error || 'Gönderim sırasında hata oluştu.'); }
       }catch(e){
-        flash('error','Ağ hatası. Lütfen tekrar deneyin.');
+        toast.error('Ağ hatası. Lütfen tekrar deneyin.');
       }finally{
         btnPlan.disabled = false; btnPlan.textContent = 'Onayla ve Planla';
       }

@@ -357,6 +357,36 @@
           font-size: clamp(11px, 3.6vw, 14px);
           letter-spacing: 2px;
         }
+        /* Autocomplete */
+        .input-wrap {
+          position: relative;
+          width: 100%;
+        }
+
+        .suggestions {
+          position: absolute;
+          top: calc(100% + 6px);
+          left: 0;
+          right: 0;
+          background: #fff;
+          border: 1px solid #d7d7d7;
+          border-radius: 10px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+          max-height: 200px;
+          overflow-y: auto;
+          display: none;
+          z-index: 50;
+        }
+
+        .suggestion-item {
+          padding: 0.6rem 0.8rem;
+          cursor: pointer;
+          font-size: 15px;
+        }
+
+        .suggestion-item:hover {
+          background: #f5f6f7;
+        }
 
         .venue .title {
           font-size: clamp(14px, 4.4vw, 18px);
@@ -482,13 +512,24 @@
       <h2 id="rsvpTitle">Katılım Bildirimi</h2>
 
       <div class="row" style="margin-bottom: 10px">
-        <input
-          id="rsvp-name"
-          class="input"
-          type="text"
-          placeholder="Adınız"
-          autocomplete="off"
-        />
+        <div class="input-wrap">
+          <input
+            id="rsvp-name"
+            class="input"
+            type="text"
+            placeholder="Adınız"
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="name-suggestions"
+          />
+          <div
+            class="suggestions"
+            id="name-suggestions"
+            role="listbox"
+            aria-live="polite"
+          ></div>
+        </div>
       </div>
 
       <div class="chips" role="group" aria-label="Katılım durumu">
@@ -512,6 +553,14 @@
       function two(n) {
         return String(n).padStart(2, "0");
       }
+      function debounce(fn, delay = 250) {
+        let t;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), delay);
+        };
+      }
+
       function parseTime(t) {
         // "20.00" veya "20:00" -> {hh:20, mm:00}
         const s = String(t || "").trim();
@@ -621,6 +670,20 @@
         const chips = Array.from(document.querySelectorAll(".chip"));
         const submitBtn = document.getElementById("rsvp-submit");
         const msg = document.getElementById("rsvp-msg");
+        const suggestionsBox = document.getElementById("name-suggestions");
+        let currentFetchController = null;
+
+        function hideSuggestions() {
+          suggestionsBox.style.display = "none";
+          nameInput.setAttribute("aria-expanded", "false");
+        }
+
+        // Dışarı tıklanınca kapat
+        document.addEventListener("click", (e) => {
+          if (!suggestionsBox.contains(e.target) && e.target !== nameInput) {
+            hideSuggestions();
+          }
+        });
 
         let selected = null;
         const updateBtn = () =>
@@ -644,6 +707,58 @@
         nameInput.addEventListener("input", updateBtn);
         nameInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter" && !submitBtn.disabled) submitBtn.click();
+        });
+        const fetchSuggestions = debounce(async () => {
+          const q = nameInput.value.trim();
+          if (q.length < 1) {
+            hideSuggestions();
+            return;
+          }
+
+          if (currentFetchController) currentFetchController.abort();
+          currentFetchController = new AbortController();
+
+          try {
+            const res = await fetch(
+              `/recipients/${encodeURIComponent(slug)}/?q=${encodeURIComponent(
+                q
+              )}`,
+              {
+                signal: currentFetchController.signal,
+              }
+            );
+            if (!res.ok) throw new Error("Öneriler alınamadı");
+            const data = await res.json();
+
+            suggestionsBox.innerHTML = "";
+            if (Array.isArray(data) && data.length) {
+              data.forEach((item, idx) => {
+                const div = document.createElement("div");
+                div.className = "suggestion-item";
+                div.setAttribute("role", "option");
+                div.id = `suggestion-${idx}`;
+                div.textContent = item.name || String(item);
+                div.addEventListener("click", () => {
+                  nameInput.value = item.name || String(item);
+                  hideSuggestions();
+                  updateBtn();
+                });
+                suggestionsBox.appendChild(div);
+              });
+              suggestionsBox.style.display = "block";
+              nameInput.setAttribute("aria-expanded", "true");
+            } else {
+              hideSuggestions();
+            }
+          } catch (err) {
+            // abort edilmiş olabilir, sessiz geç
+          }
+        }, 250);
+
+        // Input değişince hem buton durumunu hem önerileri güncelle
+        nameInput.addEventListener("input", () => {
+          updateBtn();
+          fetchSuggestions();
         });
 
         // URL'den slug çıkar (view doldurmadıysa)

@@ -81,7 +81,26 @@
     {% include '../utils/notifications-window.html' %}
     <audio id="notificationSound" src="{% static 'sounds/notification-sound.mp3' %}" preload="auto"></audio>
 
+    {% if messages %}
+    <div id="msgbar" class="msgbar" aria-live="polite" aria-atomic="true">
+      {% for message in messages %}
+      <div
+        class="dj-msg {{ message.tags|default:'info' }}"
+        role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}"
+        data-timeout="{% if 'persistent' in message.tags %}0{% else %}5000{% endif %}"
+      >
+        <span class="icon" aria-hidden="true"></span>
+        <div class="text">{{ message }}</div>
+        <button class="close" aria-label="Kapat">&times;</button>
+        <div class="progress"></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+
     {% block top_content %} {% endblock %}
+
 
     <div class="dashboard">
 
@@ -238,6 +257,7 @@
     <script src="{% static 'scripts/modal.js' %}" defer></script>
     <script src="{% static 'scripts/notifications.js' %}" defer></script>
     <script src="{% static 'scripts/sidebar.js' %}" defer></script>
+    <script src="{% static 'scripts/messages.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

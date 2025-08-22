@@ -1494,3 +1494,31 @@ $accent: map-get(variables.$colors, 'success'); // yoksa 'primary'ye çekebilirs
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.actions.horizontal {
+  display: flex;
+  flex-direction: row !important;
+  gap: 3.6rem !important;
+  margin-top: 2.4rem;
+  align-items: center;
+}
+
+/* Merkezden 16:9 crop, minimum yer kaplasın */
+.image-preview-ind {
+  /* Kutuyu 16:9 yap → img içeriği bu kutuyu "cover" ederek taşarsa kırpılır */
+  aspect-ratio: 16 / 9;
+  width: clamp(220px, 40vw, 520px);
+  /* sayfadaki boşluğa göre ayarla */
+  display: block;
+
+  /* Asıl kırpma sihri */
+  object-fit: cover;
+  /* kutuyu tamamen doldur, taşanı kes */
+  object-position: 50% 50%;
+  /* tam ortadan kırp */
+
+  /* İsteğe bağlı kozmetik */
+  border-radius: 12px;
+  overflow: hidden;
+  /* bazı tarayıcılarda radius+crop için faydalı */
+}

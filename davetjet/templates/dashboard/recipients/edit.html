@@ -18,8 +18,8 @@
     <div class="card invite-preview" style="grid-column: 1 / -1">
       <h3>Hızlı İşlemler</h3>
       <div class="content">
-        <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
-        <div class="actions">
+
+        <div class="actions horizontal">
           <a
             data-target="{% url 'recipients:export-csv' %}?project_id={{ project.id }}"
             class="export-csv"
@@ -28,7 +28,7 @@
           <a data-target="{% url 'recipients:import-csv' %}" class="import-csv"
             >İçe Aktar</a
           >
-          <a data-target="{% url 'recipients:add_new' %}" class="add-manually">Manuel Olarak Ekle</a>
+          <a data-target="{% url 'recipients:add_new' %}" class="add-manually btn btn--primary">Manuel Olarak Ekle</a>
         </div>
       </div>
     </div>
@@ -66,6 +66,9 @@
         </table>
       </div>
     </div>
+    <div class="card image-preview" style="grid-column: 1 / -1">
+      <img src="{{ invitation.preview_png_path }}" alt="">
+    </div>
   </div>
 </section>
 {% endwith %}
@@ -82,7 +85,6 @@
   const getCSRF = () => (document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? "");
   const qs = (sel, root=document) => root.querySelector(sel);
   const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const toast = (msg) => { try{ window.AppModal?.open?.("alert",{title:"Bilgi",body:`<p>${msg}</p>`}); }catch{ alert(msg); } };
 
   // ------- ELEMENTS
   const backToListsBtn = qs("#back-to-lists");
@@ -155,12 +157,12 @@
   }
 
   // ------- NAV
-  backToListsBtn?.addEventListener("click", (e)=>{ e.preventDefault(); window.location.href = "{% url 'core:recipients' %}"; });
+  backToListsBtn?.addEventListener("click", (e)=>{ e.preventDefault(); window.location.href = "{% url 'core:invitations' %}"; });
 
   // ------- ADD (manuel) — kota kontrol
   addManuallyBtn?.addEventListener("click", function (event) {
     event.preventDefault();
-    if(quota.loaded && quota.remaining <= 0){ toast("Davetli hakkınız kalmadı."); return; }
+    if(quota.loaded && quota.remaining <= 0){ toast.error("Davetli hakkınız kalmadı."); return; }
 
     window.AppModal.open("form", {
       title: "Davetli Ekle",
@@ -202,9 +204,9 @@
         quota.used += 1; quota.remaining = Math.max(0, quota.limit - quota.used);
         renderQuota();
         window.AppModal.close();
-        location.reload();
+        toast.success("Davetli başarıyla eklendi.");
       })
-      .catch((error) => { toast("Davetli ekleme başarısız: " + error.message); });
+      .catch((error) => { toast.error("Davetli ekleme başarısız: " + error.message); });
     });
   });
 
@@ -246,8 +248,9 @@
             quota.remaining = Math.max(0, quota.limit - quota.used);
             renderQuota();
             window.AppModal.close();
+            toast.success("Davetli başarıyla silindi.");
           })
-          .catch((error) => { toast("Silme işlemi başarısız: " + error.message); });
+          .catch((error) => { toast.error("Silme işlemi başarısız: " + error.message); });
         });
       }, 10);
     });
@@ -292,7 +295,7 @@ editRecipientBtns.forEach((btn) => {
       button.addEventListener("click", function () {
         const recipientId = this.getAttribute("data-id"); // "recipient-123"
         const formRec = qs(`form[data-id="${recipientId}"]`);
-        if (!formRec) return toast("Form bulunamadı.");
+        if (!formRec) return toast.error("Form bulunamadı.");
 
         const nameInput  = formRec.querySelector("#recipient-name");
         const emailInput = formRec.querySelector("#recipient-email");
@@ -300,7 +303,7 @@ editRecipientBtns.forEach((btn) => {
         const csrfToken  = getCSRF();
 
         if (!nameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
-          return toast("Lütfen tüm alanları doldurun.");
+          return toast.error("Lütfen tüm alanları doldurun.");
         }
 
         // (Opsiyonel) basit telefon normalize
@@ -327,8 +330,9 @@ editRecipientBtns.forEach((btn) => {
               rowEl.querySelector("td:nth-child(3)").textContent = phone;
             }
             window.AppModal?.close?.();
+            toast.success("Davetli başarıyla güncellendi.");
           })
-          .catch(error => { console.log(error); toast("Güncelleme başarısız: " + error.message); });
+          .catch(error => { console.log(error); toast.error("Güncelleme başarısız: " + error.message); });
       });
     });
   });
@@ -353,7 +357,7 @@ editRecipientBtns.forEach((btn) => {
   // ------- IMPORT — kota kontrol
   importCSVBtn?.addEventListener("click", function (event) {
     event.preventDefault();
-    if(quota.loaded && quota.remaining <= 0){ toast("Davetli hakkınız kalmadı."); return; }
+    if(quota.loaded && quota.remaining <= 0){ toast.error("Davetli hakkınız kalmadı."); return; }
 
     const url = importCSVBtn.getAttribute("data-target");
     const fileInput = document.createElement("input");
@@ -362,7 +366,7 @@ editRecipientBtns.forEach((btn) => {
       const file = fileInput.files[0];
       if (file) {
         // Bilgilendir: kalan hak kadar kişi işlenir (sunucu tarafında da doğrulayın)
-        toast(`Yükleme başlıyor. Kalan hakkınız: ${quota.remaining}. Fazlası işlenmeyecektir.`);
+        toast.info(`Yükleme başlıyor. Kalan hakkınız: ${quota.remaining}. Fazlası işlenmeyecektir.`);
         const formData = new FormData();
         formData.append("file", file);
         formData.append("project_id", "{{ project.id }}");
@@ -377,10 +381,9 @@ editRecipientBtns.forEach((btn) => {
                 quota.remaining = Math.max(0, quota.limit - quota.used);
                 renderQuota();
               }
-              alert("CSV dosyası başarıyla yüklendi.");
-              location.reload();
+              toast.success("CSV dosyası başarıyla yüklendi.");
             } else {
-              alert("Hata: " + (data.error || "Bilinmeyen hata"));
+              toast.error("Hata: " + (data.error || "Bilinmeyen hata"));
             }
           })
           .catch((error) => console.error("CSV import failed:", error));

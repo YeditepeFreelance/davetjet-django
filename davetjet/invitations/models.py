@@ -15,7 +15,7 @@ from communication.scheduler import SchedulerService
 from davetjet.config import channel_choices
 from .utils import generate_secure_invitation_link
 from django.template.loader import render_to_string
-
+from django.templatetags.static import static
 # KREDİ yardımcıları
 from users.credits import get_reminder_credits, consume_reminder_credits
 
@@ -40,6 +40,16 @@ TEMPLATE_MAP = {
     "bauhaus-black": "inv-temps/bauhaus-black.html",
     "blueprint": "inv-temps/blueprint.html",
     "premium": "inv-temps/premium.html"
+}
+
+PNG_TEMPLATE_MAP = {
+    "classic": "inv-temps/classic.png",
+    "modern":  "inv-temps/modern.png",
+    "minimal": "inv-temps/minimal.png",
+    "editorial": "inv-temps/editorial.png",
+    "bauhaus-black": "inv-temps/bauhaus-black.png",
+    "blueprint": "inv-temps/blueprint.png",
+    "premium": "inv-temps/premium.png"
 }
 
 class Invitation(models.Model):
@@ -124,6 +134,10 @@ class Invitation(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)  # EK
     being_sent = models.BooleanField(default=False, db_index=True)
 
+    snapshot_image = models.ImageField(
+        upload_to="snaps/%Y/%m/",
+        null=True, blank=True
+    )
     class Published(models.Manager):
         def get_queryset(self):
             return super().get_queryset().filter(is_draft=False)
@@ -167,6 +181,17 @@ class Invitation(models.Model):
     def preview_template_path(self) -> str:
         return TEMPLATE_MAP.get(self.template, "inv-temps/classic.html")
 
+    def preview_png_url(self) -> str:
+        if self.snapshot_image:
+            try:
+                return self.snapshot_image.url  # /invites/snaps/...
+            except Exception:
+                pass
+        return static(PNG_TEMPLATE_MAP.get(self.template, "inv-temps/preview.png"))
+
+    @cached_property
+    def preview_png_path(self) -> str:
+        return self.preview_png_url()
     def render_preview_html(self, *, strip_scripts: bool = False, prefer_secure_link: bool = True) -> str:
         """
         Statik şablonu okuyup davetiye alanlarıyla doldurur ve tek bir HTML string döndürür.

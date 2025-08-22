@@ -82,6 +82,9 @@ def recipients_handler(request, invitation_slug=None):
     Not: Login gerekmez; CSRF korunur (fetchte X-CSRFToken ve credentials:'same-origin' gönderin).
     """
     invitation = get_object_or_404(Invitation, slug=invitation_slug)
+    if invitation.project.recipients.count() > invitation.recipients.count():
+        invitation.recipients.set(invitation.project.recipients.all())
+        invitation.save()
 
     # (Opsiyonel) Şifreli davet ise token doğrula — sayfa erişiminde zaten kontrol yapıyorsan gerekmez.
     # access_token = request.GET.get("access") or request.headers.get("X-Access-Token")

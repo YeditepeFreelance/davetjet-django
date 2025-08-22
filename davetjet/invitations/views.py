@@ -4,6 +4,7 @@ from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
+from django.utils.text import slugify
 from django.views import View
 from django.views.generic import TemplateView, CreateView
 from django.urls import reverse_lazy
@@ -19,7 +20,7 @@ import json
 
 from .models import Invitation
 # CHANGED: match_invitation importunu tekilleştirdik; secure_links içinden al
-from .utils import match_invitation  # Fernet doğrulaması
+from .utils import match_invitation,build_invitation_html # Fernet doğrulaması
 
 from .serializers import InvitationSerializer, CreateInvitationSerializer
 from .forms import InvitationForm
@@ -154,19 +155,23 @@ class InvitationEntryView(View):
 
 # ==== PUBLIC (CLEAN URL) VIEW (CHANGED) ====
 
+
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class ShowInvitationView(TemplateView):
-    # template_name kullanmıyoruz; doğrudan parse edip HTML döndürüyoruz
     def get(self, request, slug):
+        # 1) Davet
         try:
-            invitation = Invitation.objects.select_related("project").prefetch_related("recipients").get(slug=slug)
+            invitation = (Invitation.objects
+                          .select_related("project")
+                          .prefetch_related("recipients")
+                          .get(slug=slug))
         except Invitation.DoesNotExist:
             raise Http404("Davet bulunamadı.")
 
         if invitation.is_expired():
             return HttpResponse("Bu davet süresi dolmuştur.", status=410)
 
-        # 🔐 Şifre/erişim kontrolü
+        # 2) Erişim kontrolü (şifre/token)
         if invitation.is_password_protected:
             token = _get_token_from_request(request, invitation)
             if not (token and match_invitation(invitation, token)):
@@ -178,117 +183,17 @@ class ShowInvitationView(TemplateView):
                     return resp
                 return HttpResponse("Şifre gerekli veya erişim yok.", status=403)
 
-        # 📄 ŞABLON KAYNAĞI: Önce inline HTML (template_html), yoksa statik dosya
-        markup = (invitation.template_html or "").strip()
-        if markup:
-            soup = BeautifulSoup(markup, "html.parser")
-        else:
-            template_path = os.path.join(settings.BASE_DIR, "static", "inv-temps", f"{invitation.template}.html")
-            if not os.path.exists(template_path):
-                return HttpResponse("Şablon bulunamadı", status=404)
-            with open(template_path, encoding="utf-8") as f:
-                soup = BeautifulSoup(f.read(), "html.parser")
+        # 3) HTML’i utils’ten üret
+        # show_rsvp=True -> 'hide-in-embed' kalksın, form görünsün
+        html = build_invitation_html(
+            invitation,
+            request=request,
+            show_rsvp=True,
+            embed_recipients=True,
+            keep_contenteditable=False,
+        )
 
-        # 🧪 Tarih/saat parçaları
-        dt = invitation.invitation_date
-        date_str = dt.strftime("%d.%m.%Y") if dt else ""
-        time_str = dt.strftime("%H:%M") if dt else ""
+        return HttpResponse(html, content_type="text/html; charset=utf-8")
 
-        # 📝 Metin yerleştirmeleri – element yoksa oluştur
-        mapping = {
-            "#event-title": invitation.name,
-            "#event-date": date_str,
-            "#event-time": time_str,
-            "#event-message": invitation.message or "",
-            "#event-location": getattr(invitation, "location", "") or "",
-        }
-        for css_sel, val in mapping.items():
-            el = soup.select_one(css_sel) or _ensure_el(soup, css_sel, "span")
-            _set_text(el, val)
 
-        # 🔗 Slug / link / gizli input gibi yardımcı hedefler
-        slug_el = soup.select_one("#inv-slug")
-        if slug_el:
-            _set_text(slug_el, invitation.slug)
-
-        rsvp_link = soup.select_one("#rsvp-link")
-        if rsvp_link:
-            _set_attr(rsvp_link, "href", f"/invitations/{invitation.slug}/")
-
-        slug_input = soup.select_one("#inv-slug-input")
-        if slug_input:
-            _set_attr(slug_input, "value", invitation.slug)
-
-        # ✍️ Yayın sayfasında contenteditable'ları kapat (kamu görünümü)
-        for tag in soup.find_all(attrs={"contenteditable": True}):
-            try:
-                del tag["contenteditable"]
-            except Exception:
-                pass
-
-        # (Opsiyonel) 🎯 İsim önerileri için davetlileri göm
-        recipients = invitation.recipients.all().only("id", "name")
-        data_tag = soup.new_tag("script", type="application/json", id="inv-recipients")
-        data_tag.string = json.dumps([{"id": r.id, "name": r.name} for r in recipients], ensure_ascii=False)
-        (soup.body or soup).append(data_tag)
-
-        # (Opsiyonel) Küçük inline yardımcı JS
-        helper_js = soup.new_tag("script")
-        helper_js.string = """
-        (function(){
-          try {
-            const raw = document.getElementById('inv-recipients')?.textContent || '[]';
-            window.RECIPIENTS = JSON.parse(raw);
-          } catch(e){ window.RECIPIENTS = []; }
-        })();
-        """
-        (soup.body or soup).append(helper_js)
-        # --- RSVP görünürlüğü: .rsvp içinden 'hide-in-embed' sınıfını kaldır
-
-        for rsvp in soup.select("section.rsvp"):
-            classes = rsvp.get("class", [])
-            if "hide-in-embed" in classes:
-                rsvp["class"] = [c for c in classes if c != "hide-in-embed"]
-
-        # --- RSVP hiç yoksa, minimal bir formu fallback olarak ekle (opsiyonel)
-        if not soup.select_one("section.rsvp"):
-            rsvp = soup.new_tag("section", **{
-                "class": "rsvp", "aria-labelledby": "rsvpTitle", "id": "rsvpRoot"
-            })
-            rsvp.inner_html = None  # sadece referans, BeautifulSoup'ta kullanılmıyor
-
-            # içerik
-            rsvp_header = soup.new_tag("h2", id="rsvpTitle")
-            rsvp_header.string = "Katılım Bildirimi"
-            rsvp.append(rsvp_header)
-
-            row = soup.new_tag("div", **{"class": "row", "style": "margin-bottom:10px"})
-            inp = soup.new_tag("input", id="rsvp-name", **{
-                "class": "input", "type": "text", "placeholder": "Adınız", "autocomplete": "off"
-            })
-            row.append(inp)
-            rsvp.append(row)
-
-            chips = soup.new_tag("div", **{"class": "chips", "role": "group", "aria-label": "Katılım durumu"})
-            for label, val in [("Geleceğim","yes"), ("Emin Değilim","maybe"), ("Gelmeyeceğim","no")]:
-                chip = soup.new_tag("div", **{"class": "chip", "tabindex":"0"})
-                chip["data-status"] = val
-                chip.string = label
-                chips.append(chip)
-            rsvp.append(chips)
-
-            btn = soup.new_tag("button", id="rsvp-submit", **{"class":"btn", "disabled": True})
-            btn.string = "Gönder"
-            rsvp.append(btn)
-
-            msg = soup.new_tag("div", id="rsvp-msg", **{"class":"msg"})
-            rsvp.append(msg)
-
-            # nereye ekleyelim? divider'ın altına, yoksa body’nin sonuna
-            anchor = soup.select_one(".divider-soft")
-            if anchor and hasattr(anchor, "insert_after"):
-                anchor.insert_after(rsvp)
-            else:
-                (soup.body or soup).append(rsvp)
-
-        return HttpResponse(str(soup), content_type="text/html; charset=utf-8")
+# PDF

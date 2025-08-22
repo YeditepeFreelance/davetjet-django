@@ -38,56 +38,51 @@
       <!-- Bottom Section -->
       {% if invitation %}
       <div class="bottom-widgets">
-        <div class="card invite-preview">
-          <h3>{{ invitation.name }}</h3>
-          <div class="content">
-            <div class="inv-preview-frame" data-base-w="390" data-max-h="140">
-            <div class="inv-preview-canvas">
-              {% include invitation.preview_template_path with invitation=invitation only %}
-            </div>
-          </div>
-            <div class="actions">
-              <a>PDF İndir</a>
-              <a href="{% url 'core:analytics' %}">İstatistikler</a>
-              <a href="{% url 'core:edit-invitation-api' invitation.id %}">Düzenle</a>
-              <p>Link: Kopyala</a></p>
-            </div>
-          </div>
-          <i class="fa-solid fa-circle-chevron-up"></i>
+  <div class="card invite-preview">
+    <h3>{{ invitation.name }}</h3>
+    <div class="content">
+      <img src="{{ invitation.preview_png_path }}" alt="Davetiyenin Önizlemesi" class="image-preview-ind">
+    <div class="actions">
+      <a  href="{% url 'core:edit-recipients' invitation.pk %}" data-slug="{{ invitation.slug }}">Davetli Listesi</a>
+      <a  href="{% url 'core:analytics' %}">İstatistikler</a>
+      <a  href="{% url 'core:edit-invitation-api' invitation.id %}">Düzenle</a>
+      <a  href="#">Link: Kopyala</a>
+    </div>
+    </div>
+    
+  </div>
 
-        </div>
+  <div class="card mini-analysis" id="miniAnalysis">
+    <div class="ma-header">
+      <h3>Mini Analiz</h3>
+      <span class="ma-badge up" id="maTrend">+0%</span>
+    </div>
 
-        <div class="card mini-analysis" id="miniAnalysis">
-          <div class="ma-header">
-            <h3>Mini Analiz</h3>
-            <span class="ma-badge up" id="maTrend">+0%</span>
-          </div>
+    <ul class="ma-list">
+      <li class="ma-row">
+        <span class="ma-label">Katılım</span>
+        <div class="ma-bar"><span class="ma-fill is-yes" id="maYesBar" style="width:0%"></span></div>
+        <strong class="ma-val" id="maYesVal">–</strong>
+      </li>
+      <li class="ma-row">
+        <span class="ma-label">Red</span>
+        <div class="ma-bar"><span class="ma-fill is-no" id="maNoBar" style="width:0%"></span></div>
+        <strong class="ma-val" id="maNoVal">–</strong>
+      </li>
+      <li class="ma-row">
+        <span class="ma-label">Cevapsız</span>
+        <div class="ma-bar"><span class="ma-fill is-pending" id="maPendingBar" style="width:0%"></span></div>
+        <strong class="ma-val" id="maPendingVal">–</strong>
+      </li>
+    </ul>
 
-          <ul class="ma-list">
-            <li class="ma-row">
-              <span class="ma-label">Katılım</span>
-              <div class="ma-bar"><span class="ma-fill is-yes" id="maYesBar" style="width:0%"></span></div>
-              <strong class="ma-val" id="maYesVal">–</strong>
-            </li>
-            <li class="ma-row">
-              <span class="ma-label">Red</span>
-              <div class="ma-bar"><span class="ma-fill is-no" id="maNoBar" style="width:0%"></span></div>
-              <strong class="ma-val" id="maNoVal">–</strong>
-            </li>
-            <li class="ma-row">
-              <span class="ma-label">Cevapsız</span>
-              <div class="ma-bar"><span class="ma-fill is-pending" id="maPendingBar" style="width:0%"></span></div>
-              <strong class="ma-val" id="maPendingVal">–</strong>
-            </li>
-          </ul>
+    <div class="ma-footer">
+      <small id="maForecast">Öngörü: —</small>
+      <a href="{% url 'core:analytics' %}" class="btn btn--outline btn--sm" id="maDetailsBtn" type="button">Detay</a>
+    </div>
+  </div>
+</div>
 
-          <div class="ma-footer">
-            <small id="maForecast">Öngörü: —</small>
-            <a href="{% url 'core:analytics' %}" class="btn btn--outline btn--sm" id="maDetailsBtn" type="button">Detay</a>
-          </div>
-        </div>
-
-      </div>
       {% endif %}
     </section>
 {% endblock %}

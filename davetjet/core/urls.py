@@ -30,3 +30,4 @@ urlpatterns = [
     path('api/search/', SearchAPIView.as_view(), name='search-api'),
     path('api/invitations/create/', CreateInvitationAPI.as_view(), name='create-invitation-api'),
 ]
+

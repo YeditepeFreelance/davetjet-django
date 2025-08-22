@@ -217,3 +217,10 @@ EMAIL_PORT = 587  # Common port for TLS
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'syntramedia@gmail.com'  # Replace with your email address
 EMAIL_HOST_PASSWORD = 'xmzlgemnfjgwupuv'  # Replace with your email password
+
+
+# MEDIA
+
+
+MEDIA_ROOT = BASE_DIR / "invites"     # proje kökünde /invites
+MEDIA_URL  = "/invites/"              # public URL kökü

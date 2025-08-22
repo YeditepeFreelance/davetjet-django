@@ -21,5 +21,8 @@ urlpatterns = [
         "api/analytics/invitations/<slug:key>/recipients/",
         api.analytics_invitation_recipients,
         name="analytics-inv-recipients",
+        
     ),
+    path('api/invitations/<int:pk>/snapshot/', api.InvitationSnapshotUpload.as_view(),
+         name='invitation-snapshot-upload'),
 ]

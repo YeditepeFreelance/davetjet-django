@@ -17,9 +17,9 @@
     <div class="card invite-preview" style="grid-column: 1 / -1">
       <h3>Hızlı İşlemler</h3>
       <div class="content">
-        <img src="{% static 'images/invitation-sample.png' %}" alt="Davetiye" />
-        <div class="actions">
+        <div class="actions horizontal">
           <a
+            class="btn btn--primary"
             href="{% url 'core:edit-invitation-api' pk=invitation.id %}"
             data-target="{% url 'core:edit-invitation-api' pk=invitation.id %}"
             >Düzenle</a
@@ -27,6 +27,8 @@
           <a href="{% url 'core:edit-recipients' pk=invitation.id %}" data-target="{% url 'core:edit-recipients' pk=invitation.id %}"
             >Davetli Listesi</a
           >
+          <a href="{% url 'core:analytics' %}" data-target="{% url 'core:analytics' %}">İstatistikler</a>
+          <a href="{% url 'core:sending' %}" data-target="{% url 'core:sending' %}">Gönderim</a>
         </div>
       </div>
     </div>
@@ -64,6 +66,9 @@
           </tbody>
         </table>
       </div>
+    </div>
+    <div class="card image-preview" style="grid-column: 1 / -1">
+      <img src="{{ invitation.preview_png_path }}" alt="">
     </div>
   </div>
 </section>
