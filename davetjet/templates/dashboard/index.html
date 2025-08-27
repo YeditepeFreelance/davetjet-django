@@ -1,91 +1,125 @@
-{% extends "./dashboard-base.html" %} {% load static %} {% block content %}
+{% extends "./dashboard-base.html" %}
+{% load static %}
+
+{% block content %}
 <section class="overview scrollable">
-  
-    <div class="overview-top">
-      <div>
-        <h1>Hoş geldin, {{ request.user.username }}</h1>
-        <p>
-          Bu ekrandan davetiyelerinize ve daha fazlasına göz atabilirsiniz
-        </p>
-      </div>
-      
-    </div>
-      <!-- Cards -->
-      <div class="cards">
-        <div class="card green">
-          <h2>Davetli Sayısı</h2>
-          <span class="value">{{ statistics.invitee_count }}</span>
-          <p>Son 24 saatte {{ statistics.recipient_count_change_pct }} artış!</p>
-
-        </div>
-        <div class="card">
-          <h2>RSVP Durumu</h2>
-          <span class="value">%{{ statistics.rsvp_ratio }}</span>
-          <p>Son 24 saatte %{{ statistics.rsvp_ratio_change }} artış!</p>
-        </div>
-        <div class="card">
-          <h2>Son Hatırlatma</h2>
-          <span class="value">{{ statistics.last_reminder_sent }}</span>
-          <p>Şimdi hatırlatma gönder!</p>
-        </div>
-        <div class="card">
-          <h2>Düğün Tarihi</h2>
-          <span class="value">{{ statistics.time_left }}</span>
-          <p>{{ statistics.event_date }}</p>
-        </div>
-      </div>
-
-      <!-- Bottom Section -->
-      {% if invitation %}
-      <div class="bottom-widgets">
-  <div class="card invite-preview">
-    <h3>{{ invitation.name }}</h3>
-    <div class="content">
-      <img src="{{ invitation.preview_png_path }}" alt="Davetiyenin Önizlemesi" class="image-preview-ind">
-    <div class="actions">
-      <a  href="{% url 'core:edit-recipients' invitation.pk %}" data-slug="{{ invitation.slug }}">Davetli Listesi</a>
-      <a  href="{% url 'core:analytics' %}">İstatistikler</a>
-      <a  href="{% url 'core:edit-invitation-api' invitation.id %}">Düzenle</a>
-      <a  href="#">Link: Kopyala</a>
-    </div>
-    </div>
-    
-  </div>
-
-  <div class="card mini-analysis" id="miniAnalysis">
-    <div class="ma-header">
-      <h3>Mini Analiz</h3>
-      <span class="ma-badge up" id="maTrend">+0%</span>
-    </div>
-
-    <ul class="ma-list">
-      <li class="ma-row">
-        <span class="ma-label">Katılım</span>
-        <div class="ma-bar"><span class="ma-fill is-yes" id="maYesBar" style="width:0%"></span></div>
-        <strong class="ma-val" id="maYesVal">–</strong>
-      </li>
-      <li class="ma-row">
-        <span class="ma-label">Red</span>
-        <div class="ma-bar"><span class="ma-fill is-no" id="maNoBar" style="width:0%"></span></div>
-        <strong class="ma-val" id="maNoVal">–</strong>
-      </li>
-      <li class="ma-row">
-        <span class="ma-label">Cevapsız</span>
-        <div class="ma-bar"><span class="ma-fill is-pending" id="maPendingBar" style="width:0%"></span></div>
-        <strong class="ma-val" id="maPendingVal">–</strong>
-      </li>
-    </ul>
-
-    <div class="ma-footer">
-      <small id="maForecast">Öngörü: —</small>
-      <a href="{% url 'core:analytics' %}" class="btn btn--outline btn--sm" id="maDetailsBtn" type="button">Detay</a>
+  <div class="overview-top">
+    <div>
+      <h1>Hoş geldin, {{ request.user.username }}</h1>
+      <p>Bu ekrandan davetiyelerinize ve daha fazlasına göz atabilirsiniz</p>
     </div>
   </div>
-</div>
 
-      {% endif %}
-    </section>
+  <!-- Cards -->
+  <div class="cards">
+    <div class="card green"
+         data-onb="card-invitee"
+         data-onb-title="Davetli Sayısı"
+         data-onb-desc="Toplam davetli sayınız."
+         data-onb-scope="{{ name|default:'dashboard' }}">
+      <h2>Davetli Sayısı</h2>
+      <span class="value">{{ statistics.invitee_count }}</span>
+      <p>Son 24 saatte {{ statistics.recipient_count_change_pct }} artış!</p>
+    </div>
+
+    <div class="card"
+         data-onb="card-rsvp"
+         data-onb-title="RSVP Durumu"
+         data-onb-desc="Toplam RSVP yüzdesi."
+         data-onb-scope="{{ name|default:'dashboard' }}">
+      <h2>RSVP Durumu</h2>
+      <span class="value">%{{ statistics.rsvp_ratio }}</span>
+      <p>Son 24 saatte %{{ statistics.rsvp_ratio_change }} artış!</p>
+    </div>
+
+    <div class="card">
+      <h2>Son Hatırlatma</h2>
+      <span class="value">{{ statistics.last_reminder_sent }}</span>
+      <p>Şimdi hatırlatma gönder!</p>
+    </div>
+
+    <div class="card">
+      <h2>Düğün Tarihi</h2>
+      <span class="value">{{ statistics.time_left }}</span>
+      <p>{{ statistics.event_date }}</p>
+    </div>
+  </div>
+
+  <!-- Bottom Section -->
+  {% if invitation %}
+  <div class="bottom-widgets">
+
+    <div class="card invite-preview"
+         data-onb="preview"
+         data-onb-title="Davet Önizleme"
+         data-onb-desc="Ortadan kırpılmış 16:9 önizleme."
+         data-onb-scope="{{ name|default:'dashboard' }}">
+      <h3>{{ invitation.name }}</h3>
+      <div class="content">
+        <img src="{{ invitation.preview_png_path }}" alt="Davetiyenin Önizlemesi" class="image-preview-ind">
+        <div class="actions"
+             data-onb="actions"
+             data-onb-title="Hızlı İşlemler"
+             data-onb-desc="Davetli listesi, istatistikler ve düzenleme."
+             data-onb-scope="{{ name|default:'dashboard' }}">
+          <a href="{% url 'core:edit-recipients' invitation.pk %}" data-slug="{{ invitation.slug }}">Davetli Listesi</a>
+          <a href="{% url 'core:analytics' %}">İstatistikler</a>
+          <a href="{% url 'core:edit-invitation-api' invitation.id %}">Düzenle</a>
+          <a href="#">Link: Kopyala</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini Analysis — sadece data-* ile besliyoruz -->
+    <div class="card mini-analysis" id="miniAnalysis"
+         data-total="{{ statistics.invitee_count|default:0 }}"
+         data-yes="{{ statistics.status_counts.yes|default:0 }}"
+         data-no="{{ statistics.status_counts.no|default:0 }}"
+         data-pending="{{ statistics.status_counts.pending|default:0 }}"
+         data-rsvp-ratio="{{ statistics.rsvp_ratio|default_if_none:0 }}"
+         data-rsvp-ratio-change="{{ statistics.rsvp_ratio_change|default_if_none:0 }}"
+         data-mobile-share="{{ statistics.device_mobile_share|default_if_none:'' }}"
+         data-onb="mini"
+         data-onb-title="Mini Analiz"
+         data-onb-desc="Katılım/Red/Cevapsız oranları ve kısa öngörü."
+         data-onb-scope="{{ name|default:'dashboard' }}">
+      <div class="ma-header">
+        <h3>Mini Analiz</h3>
+        <span class="ma-badge up" id="maTrend">+0%</span>
+      </div>
+
+      <ul class="ma-list">
+        <li class="ma-row">
+          <span class="ma-label">Katılım</span>
+          <div class="ma-bar"><span class="ma-fill is-yes" id="maYesBar" style="width:0%"></span></div>
+          <strong class="ma-val" id="maYesVal">–</strong>
+        </li>
+        <li class="ma-row">
+          <span class="ma-label">Red</span>
+          <div class="ma-bar"><span class="ma-fill is-no" id="maNoBar" style="width:0%"></span></div>
+          <strong class="ma-val" id="maNoVal">–</strong>
+        </li>
+        <li class="ma-row">
+          <span class="ma-label">Cevapsız</span>
+          <div class="ma-bar"><span class="ma-fill is-pending" id="maPendingBar" style="width:0%"></span></div>
+          <strong class="ma-val" id="maPendingVal">–</strong>
+        </li>
+      </ul>
+
+      <div class="ma-footer">
+        <small id="maForecast">Öngörü: —</small>
+        <a href="{% url 'core:analytics' %}" class="btn btn--outline btn--sm" id="maDetailsBtn" type="button">Detay</a>
+      </div>
+    </div>
+
+  </div>
+  {% endif %}
+
+</section>
 {% endblock %}
+
+{# Bu sayfada extra_js BLOĞU AYNEN KALIYOR. #}
+
 {% block extra_js %}
 {{ statistics|json_script:"stats-json" }}
 <script>
@@ -158,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 // Auto-init from a <script type="application/json" id="stats-json 
-
 </script>
-
 {% endblock %}
+
+{% block body-page %}dashboard{% endblock %}

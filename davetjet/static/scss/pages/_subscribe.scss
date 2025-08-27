@@ -898,3 +898,951 @@ $c: variables.$colors;
     height: 180px;
   }
 }
+
+/* =========================
+   RESPONSIVE / FULLSCREEN OVERRIDES
+   (mevcut SCSS'in EN SONUNA ekle)
+   ========================= */
+
+/* Genel: mobil/tablet akışını rahatlat */
+html,
+body {
+  height: 100%;
+}
+
+.subscription-container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
+  /* Tablet */
+  @media (max-width: 992px) {
+    padding: 2rem;
+  }
+
+  /* Mobil */
+  @media (max-width: 640px) {
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  }
+
+  .subscription-header {
+    h1 {
+      font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+    }
+
+    p {
+      font-size: clamp(1.05rem, 3.2vw, 1.25rem);
+    }
+  }
+
+  .plans {
+
+    /* Tablet’te 2 sütun, mobilde 1 sütun */
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1.6rem;
+    }
+
+    .plan-card {
+      padding: clamp(1.2rem, 2.8vw, 1.8rem);
+
+      .icon {
+        font-size: clamp(1.6rem, 4.2vw, 2rem);
+      }
+
+      h2 {
+        font-size: clamp(1.2rem, 3.8vw, 1.5rem);
+      }
+
+      p,
+      ul li {
+        font-size: clamp(0.95rem, 3.2vw, 1.05rem);
+      }
+
+      .price {
+        font-size: clamp(1.6rem, 5vw, 2rem);
+      }
+
+      .btn {
+        font-size: clamp(0.95rem, 3.6vw, 1.05rem);
+        padding: .8rem 1.2rem;
+      }
+    }
+  }
+}
+
+/* ======= FULLSCREEN SUBSCRIPTION MODAL (küçük ekranlarda tam ekran) ======= */
+.fs-subscription-modal {
+  overscroll-behavior: contain;
+
+  @media (max-width: 860px) {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+}
+
+.fs-subscription-modal-content {
+  display: block;
+  /* içeriği doğal akışta bırak, tümünü kaydır */
+  max-height: 92vh;
+
+  @media (max-width: 860px) {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    padding:
+      max(16px, calc(env(safe-area-inset-top))) max(16px, calc(env(safe-area-inset-right))) max(16px, calc(env(safe-area-inset-bottom))) max(16px, calc(env(safe-area-inset-left)));
+    box-shadow: none;
+    overflow: auto;
+  }
+}
+
+/* Header’ı mobilde yapışkan yap: aksiyonlar her zaman erişilebilir */
+.fs-subscription-modal-header {
+  @media (max-width: 860px) {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, .96), rgba(255, 255, 255, .86));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+  }
+}
+
+/* Planlar mobilde tek kolon + yatay kaydırma opsiyonu korunur */
+.fs-subscription-modal-plans {
+  @media (max-width: 860px) {
+    gap: 16px;
+    padding: 4px 4px 12px;
+    scroll-padding: 12px;
+  }
+}
+
+.fs-plan-card {
+  @media (max-width: 860px) {
+    width: min(560px, 92vw);
+  }
+
+  @media (max-width: 640px) {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .fs-icon {
+    font-size: clamp(1.6rem, 5vw, 2rem);
+  }
+
+  h3 {
+    font-size: clamp(1.15rem, 4.4vw, 1.4rem);
+  }
+
+  p {
+    font-size: clamp(0.9rem, 3.6vw, 1rem);
+  }
+
+  .fs-price {
+    font-size: clamp(1.5rem, 6vw, 1.9rem);
+  }
+
+  ul li {
+    font-size: clamp(.92rem, 3.6vw, 1rem);
+  }
+
+  .fs-btn {
+    font-size: clamp(.95rem, 3.6vw, 1.05rem);
+    padding: .85rem 1.2rem;
+  }
+}
+
+/* Kapat (X) butonu telefonlarda daha erişilebilir */
+.fs-subscription-close-btn {
+  @media (max-width: 860px) {
+    top: 8px;
+    right: 8px;
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    border-radius: 14px;
+  }
+}
+
+/* ======= PAYMENT MODAL: küçük ekranlarda tam ekran ======= */
+.fs-payment-modal {
+  overscroll-behavior: contain;
+
+  @media (max-width: 720px) {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+}
+
+.fs-payment-modal-content {
+  @media (max-width: 720px) {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+    padding:
+      max(16px, calc(env(safe-area-inset-top))) max(16px, calc(env(safe-area-inset-right))) max(16px, calc(env(safe-area-inset-bottom))) max(16px, calc(env(safe-area-inset-left)));
+    box-shadow: none;
+  }
+
+  .fs-payment-modal-inner {
+    @media (max-width: 720px) {
+      gap: 16px;
+    }
+  }
+
+  .fs-payment-form input {
+    @media (max-width: 720px) {
+      font-size: 16px;
+      /* iOS zoom’u engelle */
+      padding: 12px 14px;
+    }
+  }
+
+  .fs-virtual-card .fs-card-inner {
+    @media (max-width: 720px) {
+      max-width: 100%;
+      height: 176px;
+    }
+  }
+
+  .fs-payment-close-btn {
+    @media (max-width: 720px) {
+      top: 8px;
+      right: 8px;
+      width: 46px;
+      height: 46px;
+      font-size: 26px;
+      border-radius: 12px;
+    }
+  }
+}
+
+/* ======= Küçük tipografi & touch alanları rafine ======= */
+.fs-billing-toggle .fs-toggle-option {
+  @media (max-width: 860px) {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+.billing-toggle {
+  @media (max-width: 640px) {
+    gap: .6rem;
+
+    .label {
+      font-size: 1.1rem;
+    }
+
+    .toggle-box .toggle-option {
+      padding: .5rem 1rem;
+      font-size: 1.05rem;
+    }
+  }
+}
+
+/* Scroll inertial & iOS safe-area güvenliği */
+.fs-subscription-modal-content,
+.fs-payment-modal-content {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ekstra küçük cihazlar (<=360px) için sıkıştırmalar */
+@media (max-width: 360px) {
+  .fs-plan-card {
+    padding: 16px;
+
+    .fs-price {
+      font-size: 1.4rem;
+    }
+  }
+
+  .subscription-container .plans .plan-card {
+    padding: 1rem;
+  }
+}
+
+/* =========================
+   MOBILE/TABLET FIX PACK
+   (append at the VERY END)
+   ========================= */
+
+/* ——— Fullscreen modal shells ——— */
+.fs-subscription-modal,
+.fs-payment-modal {
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* ——— Content: real fullscreen on small screens ——— */
+@media (max-width: 860px) {
+  .fs-subscription-modal-content {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: auto;
+    /* okunurluk */
+    font-size: 16px;
+    line-height: 1.4;
+    /* safe-area */
+    padding:
+      max(16px, calc(env(safe-area-inset-top))) max(16px, calc(env(safe-area-inset-right))) max(16px, calc(env(safe-area-inset-bottom))) max(16px, calc(env(safe-area-inset-left)));
+  }
+
+  .fs-payment-modal-content {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: auto;
+    font-size: 16px;
+    line-height: 1.4;
+    padding:
+      max(16px, calc(env(safe-area-inset-top))) max(16px, calc(env(safe-area-inset-right))) max(16px, calc(env(safe-area-inset-bottom))) max(16px, calc(env(safe-area-inset-left)));
+  }
+}
+
+/* ——— Sticky header (subscription) ——— */
+@media (max-width: 860px) {
+  .fs-subscription-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin: 0 0 12px;
+    padding: 8px 0 10px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, .96), rgba(255, 255, 255, .86));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+
+    h1 {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    .fs-billing-toggle .fs-toggle-option {
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+  }
+}
+
+/* ——— Close buttons: FIXED + BIG + ALWAYS VISIBLE ——— */
+@media (max-width: 860px) {
+  .fs-subscription-close-btn {
+    position: fixed;
+    /* was absolute; fixed solves scroll/overlap */
+    top: calc(8px + env(safe-area-inset-top));
+    right: calc(8px + env(safe-area-inset-right));
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+    border-radius: 14px;
+    z-index: 9999;
+    background: rgba(0, 0, 0, .06);
+    color: #1f2937;
+    display: grid;
+    place-items: center;
+
+    &:hover {
+      background: rgba(0, 0, 0, .1);
+      color: #0f172a;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .fs-payment-close-btn {
+    position: fixed;
+    top: calc(8px + env(safe-area-inset-top));
+    right: calc(8px + env(safe-area-inset-right));
+    width: 54px;
+    height: 54px;
+    font-size: 26px;
+    border-radius: 12px;
+    z-index: 9999;
+    background: rgba(0, 0, 0, .06);
+    color: #1f2937;
+    display: grid;
+    place-items: center;
+
+    &:hover {
+      background: rgba(0, 0, 0, .1);
+      color: #0f172a;
+    }
+  }
+}
+
+/* ——— Plan cards: readable on mobile ——— */
+@media (max-width: 860px) {
+  .fs-plan-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    border-radius: 16px;
+
+    .fs-icon {
+      font-size: 22px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    .fs-price {
+      font-size: 22px;
+    }
+
+    ul li {
+      font-size: 14px;
+    }
+
+    .fs-btn {
+      min-height: 44px;
+      font-size: 15px;
+      padding: 12px 16px;
+    }
+  }
+}
+
+/* ——— Grid to stack on phones ——— */
+@media (max-width: 992px) {
+  .fs-subscription-modal-plans {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .subscription-container .plans {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.2rem;
+  }
+
+  .subscription-container .plans .plan-card {
+    padding: 1.2rem;
+
+    .price {
+      font-size: 1.6rem;
+    }
+
+    .btn {
+      min-height: 44px;
+      font-size: 1rem;
+    }
+  }
+}
+
+/* ——— Payment form: legible inputs + buttons ——— */
+@media (max-width: 720px) {
+  .fs-payment-modal-content .fs-payment-form input {
+    font-size: 16px;
+    /* prevent iOS zoom */
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+
+  .fs-payment-modal-content .fs-payment-form .fs-pay-btn {
+    min-height: 46px;
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  .fs-virtual-card .fs-card-inner {
+    max-width: 100%;
+    height: 180px;
+  }
+}
+
+/* ——— Touch improvements ——— */
+@media (max-width: 860px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ——— Emergency tiny devices ——— */
+@media (max-width: 360px) {
+  .fs-plan-card .fs-price {
+    font-size: 20px;
+  }
+
+  .fs-plan-card h3 {
+    font-size: 16px;
+  }
+}
+
+/* =========================
+   MOBILE REDESIGN (≤ 720px)
+   Alt sayfadan kayan bottom-sheet + kart karuseli
+   ========================= */
+@media (max-width: 720px) {
+
+  /* Arkayı hafif karart, sheet aşağıdan gelsin */
+  .fs-subscription-modal {
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(0, 0, 0, .45);
+  }
+
+  /* Bottom-sheet gövde */
+  .fs-subscription-modal-content {
+    width: 100vw;
+    height: min(92dvh, 720px);
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+    border: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: 0 -12px 36px rgba(0, 0, 0, .25);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(255, 255, 255, .95), rgba(255, 255, 255, .88)),
+      rgba(255, 255, 255, .92);
+    padding: 18px 16px 22px;
+    overflow: auto;
+    position: relative;
+
+    /* Kapama sabit ve erişilebilir */
+    .fs-subscription-close-btn {
+      position: fixed;
+      top: calc(10px + env(safe-area-inset-top));
+      right: calc(10px + env(safe-area-inset-right));
+      z-index: 9999;
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      font-size: 28px;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, .06);
+      color: #1f2937;
+      border: 1px solid rgba(0, 0, 0, .06);
+
+      &:hover {
+        background: rgba(0, 0, 0, .1);
+      }
+    }
+
+    /* Sheet tutamağı */
+    &::before {
+      content: "";
+      position: sticky;
+      top: 0;
+      display: block;
+      margin: -10px auto 10px;
+      width: 48px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .12);
+    }
+  }
+
+  /* Başlık kompakt */
+  .fs-subscription-modal-header {
+    text-align: left;
+    margin: 4px 0 10px;
+
+    h1 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 4px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #555;
+      margin: 0 0 10px;
+    }
+
+    .fs-billing-toggle {
+      display: flex;
+      gap: 8px;
+
+      .fs-toggle-option {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  /* Kart karuseli (yatay kaydırma, snap) */
+  .fs-subscription-modal-plans {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 2px 2px 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(to right, transparent 0, black 28px, black calc(100% - 28px), transparent 100%);
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, .15);
+      border-radius: 8px;
+    }
+  }
+
+  /* Plan kartı — cepte okunur */
+  .fs-plan-card {
+    scroll-snap-align: center;
+    width: calc(86vw - 24px);
+    max-width: 420px;
+    min-width: 280px;
+    border-radius: 16px;
+    padding: 18px 16px;
+    background: rgba(255, 255, 255, .85);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+
+    .fs-icon {
+      font-size: 22px;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin: 4px 0 2px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    .fs-price {
+      font-size: 22px;
+      margin: 6px 0 12px;
+    }
+
+    ul {
+      max-height: 140px;
+      /* liste çok uzarsa taşırma */
+      overflow: auto;
+      padding-right: 6px;
+
+      li {
+        font-size: 14px;
+        gap: .5rem;
+      }
+    }
+
+    .fs-btn {
+      width: 100%;
+      min-height: 46px;
+      font-size: 15px;
+      padding: 12px 14px;
+      border-radius: 12px;
+    }
+  }
+
+  /* Ödeme modalı da bottom-sheet */
+  .fs-payment-modal {
+    align-items: flex-end;
+    background: rgba(0, 0, 0, .5);
+  }
+
+  .fs-payment-modal-content {
+    width: 100vw;
+    height: min(92dvh, 720px);
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 36px rgba(0, 0, 0, .25);
+    padding: 16px;
+    overflow: auto;
+
+    .fs-payment-header {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .fs-payment-subheader {
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .fs-payment-form input {
+      font-size: 16px;
+      /* iOS zoom fix */
+      min-height: 44px;
+    }
+
+    .fs-payment-form .fs-pay-btn {
+      min-height: 46px;
+      font-size: 16px;
+    }
+
+    /* X butonu */
+    .fs-payment-close-btn {
+      position: fixed;
+      top: calc(10px + env(safe-area-inset-top));
+      right: calc(10px + env(safe-area-inset-right));
+      z-index: 9999;
+      width: 54px;
+      height: 54px;
+      font-size: 26px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, .06);
+      border: 1px solid rgba(0, 0, 0, .06);
+    }
+  }
+
+  /* Sanal kart daha kompakt */
+  .fs-virtual-card .fs-card-inner {
+    max-width: 100%;
+    height: 180px;
+  }
+}
+
+/* ——— Tablet iyileştirme (720–1024px): daha geniş sheet ——— */
+@media (min-width: 721px) and (max-width: 1024px) {
+  .fs-subscription-modal {
+    align-items: flex-end;
+  }
+
+  .fs-subscription-modal-content {
+    width: min(900px, 96vw);
+    height: min(88dvh, 760px);
+    border-radius: 22px 22px 0 0;
+  }
+
+  .fs-subscription-close-btn {
+    top: calc(12px + env(safe-area-inset-top));
+    right: calc(12px + env(safe-area-inset-right));
+  }
+}
+
+/* === MOBILE CLOSE HOTFIX (ekle: dosyanın sonuna) === */
+@media (max-width: 768px) {
+
+  /* Butonların her koşulda görünür ve tıklanabilir olması için */
+  .fs-subscription-close-btn,
+  .fs-payment-close-btn {
+    position: fixed !important;
+    /* içerik overflow’undan etkilenmesin */
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
+    width: 44px;
+    height: 44px;
+    display: grid !important;
+    /* olası display:none override’larını kır */
+    place-items: center;
+    font-size: 28px;
+    line-height: 1;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    background: rgba(255, 255, 255, .96);
+    color: #222;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+    z-index: 1301;
+    /* modal(1200-1300)’ın üstünde */
+    pointer-events: auto;
+  }
+
+  /* iOS çentik (safe-area) güvenliği */
+  @supports (padding: max(0px)) {
+
+    .fs-subscription-close-btn,
+    .fs-payment-close-btn {
+      top: max(10px, env(safe-area-inset-top));
+      right: max(10px, env(safe-area-inset-right));
+    }
+  }
+
+  /* Buton üstünde içerik kaymasın diye az bir üst boşluk bırak */
+  .fs-subscription-modal-content,
+  .fs-payment-modal-content {
+    padding-top: 16px;
+  }
+}
+
+/* Her boyutta üstte tutmak için ek garanti */
+.fs-subscription-close-btn,
+.fs-payment-close-btn {
+  z-index: 9999;
+}
+
+/* ===== CLOSE BUTTON VISIBILITY PATCH ===== */
+
+/* Modal katmanlarını net sıralayalım */
+.fs-subscription-modal,
+.fs-payment-modal {
+  position: fixed;
+  /* zaten fixed’ti ama garanti */
+  inset: 0;
+  z-index: 1200;
+  /* sayfa üstünde */
+}
+
+.fs-subscription-modal-content,
+.fs-payment-modal-content {
+  position: relative;
+  z-index: 1;
+  /* içerik katmanı */
+}
+
+/* Kapatma butonu: her zaman en üste, yüksek kontrast ve gölge */
+.fs-subscription-close-btn,
+.fs-payment-close-btn {
+  position: fixed !important;
+  /* viewport’a sabitle */
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 12px);
+  width: 46px;
+  height: 46px;
+  display: grid !important;
+  place-items: center;
+  border-radius: 12px;
+  background: #fff !important;
+  /* kontrastlı arka plan */
+  color: #111 !important;
+  border: 1px solid rgba(0, 0, 0, .08);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, .25),
+    0 0 0 2px rgba(255, 255, 255, .75);
+  /* beyaz halo */
+  z-index: 2000 !important;
+  /* içerik/overlay’in üstünde */
+  opacity: 1 !important;
+  visibility: visible !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  /* kendi üstünde blur istemiyoruz */
+  pointer-events: auto;
+  transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.fs-subscription-close-btn:hover,
+.fs-payment-close-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, .3),
+    0 0 0 2px rgba(255, 255, 255, .9);
+}
+
+/* iOS çentik güvenliği */
+@supports (padding: max(0px)) {
+
+  .fs-subscription-close-btn,
+  .fs-payment-close-btn {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+  }
+}
+
+/* Mobilde görünürlük + erişilebilirlik garantisi */
+@media (max-width: 768px) {
+
+  .fs-subscription-close-btn,
+  .fs-payment-close-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    /* modal içerik üst boşluğu: butonla çakışmasın */
+  }
+
+  .fs-subscription-modal-content,
+  .fs-payment-modal-content {
+    padding-top: 20px;
+    /* buton altında nefes */
+  }
+}
+
+/* Modal gösterimde opaklık mutlaka 1 olsun (üstten farklı bir class override ediyorsa kırar) */
+.fs-subscription-modal:not(.hidden),
+.fs-payment-modal:not(.hidden) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* (Opsiyonel) Karanlık arka planlarda da görünür olsun diye outline */
+.fs-subscription-close-btn:focus-visible,
+.fs-payment-close-btn:focus-visible {
+  outline: 2px solid #3a8f5a;
+  /* markanın accent’i */
+  outline-offset: 2px;
+}
+
+/* ===== CLOSE BUTTON COLOR OVERRIDES ===== */
+$c: variables.$colors;
+$brand: map-get($c, 'primary');
+$brand-dark: map-get($c, 'primary-dark');
+
+.fs-subscription-close-btn,
+.fs-payment-close-btn {
+  background: $brand !important;
+  /* buton zemini (marka rengi) */
+  color: #fff !important;
+  /* ikon/metin rengi */
+  border-color: rgba(0, 0, 0, .08) !important;
+  box-shadow:
+    0 10px 26px rgba($brand, .45),
+    0 0 0 2px rgba(255, 255, 255, .25);
+
+  /* halo */
+  /* hover/active */
+  &:hover {
+    background: $brand-dark !important;
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow:
+      0 8px 18px rgba($brand-dark, .40),
+      0 0 0 2px rgba(255, 255, 255, .25);
+  }
+
+  /* odak görünürlüğü */
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow:
+      0 10px 26px rgba($brand, .45),
+      0 0 0 2px rgba(255, 255, 255, .9);
+  }
+}
+
+/* (İsteğe bağlı) Çok açık temalarda daha yüksek kontrast istersen: */
+.theme-light .fs-subscription-close-btn,
+.theme-light .fs-payment-close-btn {
+  background: #111 !important;
+  color: #fff !important;
+}
+
+/* Mobilde biraz daha büyük ve dokunması kolay olsun */
+@media (max-width: 768px) {
+
+  .fs-subscription-close-btn,
+  .fs-payment-close-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 30px;
+  }
+}

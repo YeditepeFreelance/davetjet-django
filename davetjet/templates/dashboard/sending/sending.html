@@ -4,7 +4,13 @@
 {% block content %}
 <section class="send-page">
   <!-- Üst özet -->
-  <header class="send-header glass">
+  <header class="send-header glass"
+          data-onb="summary"
+          data-onb-scope="send"
+          data-onb-title="Gönderim Özeti"
+          data-onb-desc="Toplam davetli ve kanallara ulaşılabilir kişi sayısını burada görürsünüz."
+          data-onb-order="1"
+          data-onb-place="bottom">
     <div class="send-header__title">
       <h2>Gönderim Ayarları ({{ invitation.name }})</h2>
       <p class="alt">Davetiyenizi kontrol edin, kanalları seçin ve gönderimi başlatın.</p>
@@ -34,7 +40,13 @@
     <div class="send-col send-col--main">
 
       <!-- Mesaj Düzenleyici -->
-      <article class="card glass send-card">
+      <article class="card glass send-card"
+               data-onb="message"
+               data-onb-scope="send"
+               data-onb-title="Mesaj"
+               data-onb-desc="Genel mesajınızı yazın. Aşağıda kanal bazlı önizlemelere yansır."
+               data-onb-order="2"
+               data-onb-place="right">
         <div class="card__head">
           <h3>Mesaj</h3>
           <span class="hint">Bu mesaj, seçtiğiniz kanallara gönderilir. (E-posta/SMS için özelleştirme yapabilirsiniz)</span>
@@ -49,8 +61,14 @@
           <details class="msg-advanced" open>
             <summary>Gelişmiş (kanal bazlı)</summary>
 
-            <!-- Kanal Önizlemeleri (Kompakt & Sekmeli) -->
-            <article id="channelPreviews" class="card glass send-card channel-previews compact">
+            <!-- Kanal Önizlemeleri -->
+            <article id="channelPreviews" class="card glass send-card channel-previews compact"
+                     data-onb="previews"
+                     data-onb-scope="send"
+                     data-onb-title="Kanal Önizleme"
+                     data-onb-desc="E-posta ve SMS içeriklerini burada inceleyin/düzenleyin."
+                     data-onb-order="3"
+                     data-onb-place="bottom">
               <div class="card__head compact-head">
                 <h3>Önizleme</h3>
                 <div class="preview-tabs" role="tablist" aria-label="Kanal Önizleme">
@@ -90,7 +108,7 @@
                   </div>
                 </section>
 
-                <!-- SMS paneli -->
+                <!-- SMS paneli (varsayılan gizli; turu bu panele bağlamadık) -->
                 <section class="preview-panel panel-sms hidden" data-panel="sms" role="tabpanel" hidden>
                   <div class="sms-compact">
                     <div id="sms-body-preview" class="bubble" contenteditable="true" spellcheck="false" dir="ltr"></div>
@@ -107,7 +125,13 @@
     <!-- Sağ kolon: Kanallar + Zamanlama + Onay -->
     <aside class="send-col send-col--side">
       <!-- Kanallar -->
-      <section class="card glass send-card">
+      <section class="card glass send-card"
+               data-onb="channels"
+               data-onb-scope="send"
+               data-onb-title="Kanallar"
+               data-onb-desc="Göndermek istediğiniz kanalları açın/kapatın."
+               data-onb-order="4"
+               data-onb-place="left">
         <div class="card__head">
           <h3>Kanallar</h3>
           <span class="hint">Kullanmak istediğiniz kanalları seçin.</span>
@@ -144,7 +168,13 @@
       </section>
 
       <!-- Zamanlama -->
-      <section class="card glass send-card">
+      <section class="card glass send-card"
+               data-onb="schedule"
+               data-onb-scope="send"
+               data-onb-title="Zamanlama"
+               data-onb-desc="Hemen gönderin ya da belirli tarih/saat için planlayın."
+               data-onb-order="5"
+               data-onb-place="left">
         <div class="card__head">
           <h3>Zamanlama</h3>
         </div>
@@ -176,7 +206,13 @@
       </section>
 
       <!-- Özet & Onay -->
-      <section class="card glass send-card">
+      <section class="card glass send-card"
+               data-onb="review"
+               data-onb-scope="send"
+               data-onb-title="Gönderim Özeti"
+               data-onb-desc="Seçili kanallar ve alıcı sayılarını kontrol edin."
+               data-onb-order="6"
+               data-onb-place="left">
         <div class="card__head">
           <h3>Gönderim Özeti</h3>
         </div>
@@ -187,12 +223,24 @@
           <li><span>SMS gidecek</span><strong>{{ statistics.sms_reachable|default:"0" }}</strong></li>
         </ul>
 
-        <label class="agree">
+        <label class="agree"
+               data-onb="confirm"
+               data-onb-scope="send"
+               data-onb-title="Onay"
+               data-onb-desc="Gönderimi başlatmadan önce bu onayı işaretleyin."
+               data-onb-order="7"
+               data-onb-place="top">
           <input type="checkbox" name="confirm_all" />
           <span>Davetiye ve davetlileri onaylıyorum</span>
         </label>
 
-        <div class="actions">
+        <div class="actions"
+             data-onb="send-start"
+             data-onb-scope="send"
+             data-onb-title="Gönderimi Başlat"
+             data-onb-desc="Onayladıktan sonra gönderimi başlatabilirsiniz."
+             data-onb-order="8"
+             data-onb-place="top">
           <a href="{% url 'core:edit-recipients' invitation.pk %}" class="btn btn--outlined send-btn">Davetli Listesi</a>
           <button type="button" class="btn btn--primary send-btn">Gönderime Başla</button>
         </div>
@@ -202,6 +250,7 @@
 </section>
 {% endblock %}
 
+{% block body-page %}sending{% endblock %}
 
 {% block extra_js %}
 <style>

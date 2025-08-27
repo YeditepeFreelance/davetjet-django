@@ -73,7 +73,7 @@
     {% block head_scripts %}{% endblock %}
   </head>
 
-  <body>
+  <body data-page="{% block body-page %}{% endblock %}"> 
     <div class="custom-cursor"></div>
     <div class="blur-circle top-left"></div>
     <div class="blur-circle bottom-right"></div>
@@ -177,10 +177,10 @@
         </a>
       </li>
 
-      <li class="{% if name == 'settings' %}active{% endif %}">
-        <a href="{% url 'core:settings' %}" class="sb-item" {% if name == 'settings' %}aria-current="page"{% endif %}>
-          <i class="fa-solid fa-gear"></i>
-          <span class="label">Ayarlar</span>
+      <li>
+        <a id="navHelpTour" class="sb-item" aria-label="Yardım / Hızlı Tur">
+          <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+          <span class="label">Yardım</span>
         </a>
       </li>
 
@@ -233,7 +233,10 @@
 
 
           <div class="top-actions">
-            <i class="fa-regular fa-envelope"></i>
+              <button id="taskTrigger" class="task-trigger" aria-haspopup="dialog" aria-controls="taskDrawer" aria-expanded="false" title="Görevler">
+              <i class="fa-solid fa-list-check"></i>
+              <span class="badge-pulse hidden" id="notificationBadge" aria-label="Bekleyen görev sayısı"></span>
+            </button>
             <button class="notification-trigger">
               <i class="fa-regular fa-bell"></i>
               <span class="badge-pulse hidden" id="notificationBadge"></span>
@@ -252,12 +255,37 @@
       </main>
     </div>
 
+    <!-- TASK DRAWER -->
+    <aside id="taskDrawer" class="task-drawer" aria-hidden="true" aria-label="Görevler">
+      <header class="td-head">
+        <div class="td-title">
+          <i class="fa-solid fa-bullseye"></i>
+          <strong>Görevler</strong>
+        </div>
+        <button id="taskDrawerClose" class="td-close" aria-label="Kapat">×</button>
+      </header>
+
+      <div class="td-progress">
+        <div class="td-progress__bar"><span id="tdProgressFill" style="width:0%"></span></div>
+        <small id="tdProgressText">0 / 0 tamamlandı</small>
+      </div>
+
+      <ul id="taskList" class="td-list"></ul>
+
+      <footer class="td-foot">
+        <button id="tdStartPageTour" class="btn btn--success" type="button">
+          <i class="fa-regular fa-circle-question"></i> Bu sayfanın turunu başlat
+        </button>
+      </footer>
+    </aside>
+
     <!-- Global Scripts -->
     <script src="{% static 'scripts/searchBar.js' %}" defer></script>
     <script src="{% static 'scripts/modal.js' %}" defer></script>
     <script src="{% static 'scripts/notifications.js' %}" defer></script>
     <script src="{% static 'scripts/sidebar.js' %}" defer></script>
     <script src="{% static 'scripts/messages.js' %}" defer></script>
+    <script src="{% static 'scripts/onboard.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

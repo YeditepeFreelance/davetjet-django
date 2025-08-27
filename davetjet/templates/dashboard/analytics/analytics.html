@@ -3,18 +3,22 @@
 
 {% block content %}
 <div class="analytics">
+
   <!-- Filters -->
-  <section class="analytics__filters glass-card">
+  <section class="analytics__filters glass-card"
+           data-onb="filters"
+           data-onb-scope="analytics"
+           data-onb-title="Filtreler"
+           data-onb-desc="Davet, kanal ve tarih aralığını seçip verileri daraltın."
+           data-onb-order="1"
+           data-onb-place="bottom">
     <div class="filters__row">
       <div class="filters__group">
         <label for="invitationSelect">Davet</label>
         <select id="invitationSelect">
-          <!-- Backend: dinamik doldur -->
-
           {% for inv in invitations %}
-    <option value="{{ inv.pk }}">{{ inv.name }}</option>
-    {# veya slug kullanacaksan: value="{{ inv.slug }}" #}
-  {% endfor %}
+            <option value="{{ inv.pk }}">{{ inv.name }}</option>
+          {% endfor %}
         </select>
       </div>
 
@@ -48,22 +52,49 @@
 
   <!-- KPIs -->
   <section class="analytics__kpis">
-    <div class="kpi glass-card">
+    <div class="kpi glass-card"
+         data-onb="kpi-total"
+         data-onb-scope="analytics"
+         data-onb-title="Toplam Davet"
+         data-onb-desc="Seçilen aralıkta gönderilen davet toplamı."
+         data-onb-order="2"
+         data-onb-place="bottom">
       <div class="kpi__label">Toplam Davet</div>
       <div class="kpi__value" id="kpiTotalInvites">–</div>
       <div class="kpi__delta up" id="kpiInvitesDelta">+0%</div>
     </div>
-    <div class="kpi glass-card">
+
+    <div class="kpi glass-card"
+         data-onb="kpi-delivered"
+         data-onb-scope="analytics"
+         data-onb-title="Teslim & Bounce"
+         data-onb-desc="Teslim edilen davet sayısı ve başarısız (bounce) oranı."
+         data-onb-order="3"
+         data-onb-place="bottom">
       <div class="kpi__label">Teslim</div>
       <div class="kpi__value" id="kpiDelivered">–</div>
       <div class="kpi__sub">Bounce: <span id="kpiBounce">–</span></div>
     </div>
-    <div class="kpi glass-card">
+
+    <div class="kpi glass-card"
+         data-onb="kpi-open"
+         data-onb-scope="analytics"
+         data-onb-title="Açılma Oranı"
+         data-onb-desc="Teslim edilenlerin yüzde kaçı açıldı?"
+         data-onb-order="4"
+         data-onb-place="bottom">
       <div class="kpi__label">Açılma Oranı</div>
       <div class="kpi__value" id="kpiOpenRate">–</div>
       <div class="kpi__spark" id="sparklineOpens"></div>
     </div>
-    <div class="kpi glass-card">
+
+    <div class="kpi glass-card"
+         data-onb="kpi-rsvp"
+         data-onb-scope="analytics"
+         data-onb-title="Yanıt Oranı"
+         data-onb-desc="Açılanların yüzde kaçı RSVP verdi?"
+         data-onb-order="5"
+         data-onb-place="bottom">
       <div class="kpi__label">Yanıt Oranı</div>
       <div class="kpi__value" id="kpiRsvpRate">–</div>
       <div class="kpi__sub">Evet: <span id="kpiYesPct">–</span></div>
@@ -73,7 +104,13 @@
   <!-- Charts Row -->
   <section class="analytics__row">
     <!-- RSVP Donut -->
-    <div class="panel glass-card">
+    <div class="panel glass-card"
+         data-onb="donut"
+         data-onb-scope="analytics"
+         data-onb-title="RSVP Dağılımı"
+         data-onb-desc="Evet / Emin değil / Hayır dağılımı (seçili davet için)."
+         data-onb-order="6"
+         data-onb-place="right">
       <div class="panel__header">
         <h3>RSVP Dağılımı</h3>
         <div class="panel__legend">
@@ -84,7 +121,6 @@
       </div>
       <div class="panel__body donut">
         <div class="donut__ring" id="donutRings">
-          <!-- CSS conic-gradient ile boyanıyor -->
           <div class="donut__label"><span id="donutCenter">0%</span><small>Yanıt</small></div>
         </div>
         <ul class="donut__list">
@@ -96,7 +132,13 @@
     </div>
 
     <!-- Kanal Bazlı Gönderim -->
-    <div class="panel glass-card">
+    <div class="panel glass-card"
+         data-onb="channels"
+         data-onb-scope="analytics"
+         data-onb-title="Kanala Göre Gönderimler"
+         data-onb-desc="E-posta / SMS / WhatsApp dağılımını görün."
+         data-onb-order="7"
+         data-onb-place="left">
       <div class="panel__header">
         <h3>Kanala Göre Gönderimler</h3>
         <div class="panel__legend">
@@ -128,7 +170,13 @@
   <!-- Funnel + Timeline -->
   <section class="analytics__row">
     <!-- Funnel -->
-    <div class="panel glass-card">
+    <div class="panel glass-card"
+         data-onb="funnel"
+         data-onb-scope="analytics"
+         data-onb-title="Davranış Hunisi"
+         data-onb-desc="Gönderildi → Açıldı → Tıklandı → Yanıtlandı akışı."
+         data-onb-order="8"
+         data-onb-place="bottom">
       <div class="panel__header">
         <h3>Davranış Hunisi</h3>
       </div>
@@ -140,8 +188,14 @@
       </div>
     </div>
 
-    <!-- Zaman Serisi (SVG mini chart) -->
-    <div class="panel glass-card">
+    <!-- Zaman Serisi -->
+    <div class="panel glass-card"
+         data-onb="timeline"
+         data-onb-scope="analytics"
+         data-onb-title="Günlük Aktiviteler"
+         data-onb-desc="Gönderim, açılma ve RSVP trendini inceleyin."
+         data-onb-order="9"
+         data-onb-place="bottom">
       <div class="panel__header">
         <h3>Günlük Aktiviteler</h3>
       </div>
@@ -156,8 +210,14 @@
     </div>
   </section>
 
-  <!-- Top Invitations Table -->
-  <section class="analytics__table glass-card">
+  <!-- Table -->
+  <section class="analytics__table glass-card"
+           data-onb="table"
+           data-onb-scope="analytics"
+           data-onb-title="Davetiye Özeti"
+           data-onb-desc="En çok etkileşim alan davetleri sırala ve detaylarına git."
+           data-onb-order="10"
+           data-onb-place="top">
     <div class="panel__header">
       <h3>Davetiye Özeti</h3>
       <div class="panel__legend small">En çok etkileşim alan 10 davetiye</div>
@@ -174,49 +234,55 @@
             <th>Detay</th>
           </tr>
         </thead>
-        <tbody id="topInvitesBody">
-          <!-- JS dolduracak -->
-        </tbody>
+        <tbody id="topInvitesBody"></tbody>
       </table>
     </div>
   </section>
 
-  <section class="analytics__table glass-card" id="recipientsPanel" style="display:none">
-  <div class="panel__header">
-    <h3>Katılımcı Yanıtları</h3>
-    <div class="panel__legend small" style="display:flex; gap:.5rem; align-items:center;">
-      <label class="muted">Durum</label>
-      <select id="rsvpFilter">
-        <option value="all">Tümü</option>
-        <option value="yes">Evet</option>
-        <option value="maybe">Emin Değil</option>
-        <option value="no">Hayır</option>
-        <option value="pending">Beklemede</option>
-      </select>
-      <input id="rsvpSearch" type="search" placeholder="İsim, e-posta, telefon" style="min-width:220px;">
-      <button id="rsvpExport" class="btn">CSV</button>
+  <!-- Recipients (yalnızca tek davet seçilince görünür) -->
+  <section class="analytics__table glass-card" id="recipientsPanel" style="display:none"
+           data-onb="recipients"
+           data-onb-scope="analytics"
+           data-onb-title="Katılımcı Yanıtları"
+           data-onb-desc="Seçili davetin kişi yanıtlarını filtreleyin ve dışa aktarın."
+           data-onb-order="11"
+           data-onb-place="top">
+    <div class="panel__header">
+      <h3>Katılımcı Yanıtları</h3>
+      <div class="panel__legend small" style="display:flex; gap:.5rem; align-items:center;">
+        <label class="muted">Durum</label>
+        <select id="rsvpFilter">
+          <option value="all">Tümü</option>
+          <option value="yes">Evet</option>
+          <option value="maybe">Emin Değil</option>
+          <option value="no">Hayır</option>
+          <option value="pending">Beklemede</option>
+        </select>
+        <input id="rsvpSearch" type="search" placeholder="İsim, e-posta, telefon" style="min-width:220px;">
+        <button id="rsvpExport" class="btn">CSV</button>
+      </div>
     </div>
-  </div>
-  <div class="table__wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>İsim</th>
-          <th>E-posta</th>
-          <th>Telefon</th>
-          <th>RSVP</th>
-          <th>Son Güncelleme</th>
-        </tr>
-      </thead>
-      <tbody id="recipientsBody">
-        <!-- JS dolduracak -->
-      </tbody>
-    </table>
-  </div>
-</section>
+    <div class="table__wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>İsim</th>
+            <th>E-posta</th>
+            <th>Telefon</th>
+            <th>RSVP</th>
+            <th>Son Güncelleme</th>
+          </tr>
+        </thead>
+        <tbody id="recipientsBody"></tbody>
+      </table>
+    </div>
+  </section>
 
 </div>
 {% endblock %}
+
+{% block body-page %}analytics{% endblock %}
+
 
 {% block extra_js %}
 <script>

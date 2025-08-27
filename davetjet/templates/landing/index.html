@@ -380,5 +380,73 @@
       </ul>
       <p class="footer__copy">© DavetJet 2025. Tüm hakları saklıdır.</p>
     </footer>
+    <script>
+(function () {
+  'use strict';
+  function q(sel, root){ return (root||document).querySelector(sel); }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var navbar  = q('.navbar') || document;
+    var burger  = q('.hamburger', navbar) || q('.hamburger');
+    var links   = q('.nav-links', navbar) || q('.nav-links');
+    if(!burger || !links) return;
+
+    var backdrop = q('#navBackdrop') || q('.nav-backdrop');
+    if(!backdrop){
+      backdrop = document.createElement('div');
+      backdrop.className = 'nav-backdrop';
+      document.body.appendChild(backdrop);
+    }
+
+    var auth = q('.auth-buttons', navbar) || q('.auth-buttons');
+    var authSentinel = null;
+    function moveAuth(){
+      if(!auth || links.contains(auth)) return;
+      authSentinel = document.createElement('i'); authSentinel.style.display='none';
+      if(auth.parentNode) auth.parentNode.insertBefore(authSentinel, auth);
+      links.appendChild(auth);
+    }
+    function restoreAuth(){
+      if(!auth || !authSentinel || !authSentinel.parentNode) return;
+      authSentinel.parentNode.insertBefore(auth, authSentinel);
+      authSentinel.parentNode.removeChild(authSentinel);
+      authSentinel = null;
+    }
+
+    function openMenu(){
+      document.body.classList.add('menu-open');
+      burger.classList.add('is-open');
+      if(backdrop) backdrop.removeAttribute('hidden');
+      moveAuth();
+      burger.setAttribute('aria-expanded','true');
+      links.setAttribute('aria-hidden','false');
+    }
+    function closeMenu(){
+      document.body.classList.remove('menu-open');
+      burger.classList.remove('is-open');
+      if(backdrop) backdrop.setAttribute('hidden','');
+      restoreAuth();
+      burger.setAttribute('aria-expanded','false');
+      links.setAttribute('aria-hidden','true');
+    }
+    function toggleMenu(){ document.body.classList.contains('menu-open') ? closeMenu() : openMenu(); }
+
+    burger.addEventListener('click', function(e){ e.preventDefault(); toggleMenu(); });
+    if(backdrop) backdrop.addEventListener('click', closeMenu);
+
+    /* varsa içteki kapama tuşu da kapatsın (gizli olsa bile sorun değil) */
+    var innerClose = q('.nav-links .menu-close', navbar) || q('.nav-links .menu-close');
+    if(innerClose) innerClose.addEventListener('click', function(e){ e.preventDefault(); closeMenu(); });
+
+    document.addEventListener('keydown', function(e){
+      var key = e.key || e.keyCode;
+      if(key === 'Escape' || key === 27) closeMenu();
+    });
+    window.addEventListener('resize', function(){ if(window.innerWidth > 992) closeMenu(); });
+  });
+})();
+</script>
+
+
   </body>
 </html>

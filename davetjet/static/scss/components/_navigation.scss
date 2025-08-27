@@ -847,6 +847,1572 @@
     background: #fff;
   }
 
+
+}
+
+/* ===== MOBILE FULLSCREEN NAV — centered, big links, visible auth CTAs ===== */
+@media (max-width: 992px) {
+  .landing {
+    .nav-links {
+      /* safe areas + biraz padding */
+      padding: calc(env(safe-area-inset-top, 16px) + 32px) 24px calc(env(safe-area-inset-bottom, 16px) + 28px);
+      gap: 18px;
+      text-align: center;
+    }
+
+    .nav-links.is-open {
+      /* açılınca daha yumuşak giriş */
+      transition: transform .28s ease, opacity .22s ease;
+    }
+
+    /* menü linkleri: iri, kolay tıklanır */
+    .nav-links .nav-link {
+      font-size: clamp(1.25rem, 5.4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: .02em;
+      line-height: 1.35;
+      padding: .7rem 1.1rem;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: background .2s ease, transform .06s ease;
+    }
+
+    .nav-links .nav-link:active {
+      transform: translateY(1px);
+    }
+
+    .nav-links .nav-link:hover {
+      background: rgba(255, 255, 255, .12);
+    }
+
+    /* auth buttons menünün içine taşındığında “CTA stack” gibi gözüksün */
+    .nav-links .auth-buttons {
+      display: flex !important;
+      flex-direction: column;
+      gap: 10px;
+      width: min(420px, 86vw);
+      margin: 10px auto 0;
+      align-items: stretch;
+      /* full-width CTAs */
+    }
+
+    .nav-links .auth-buttons .btn {
+      padding: 14px 18px;
+      font-size: 1.06rem;
+      font-weight: 800;
+      border-radius: 12px;
+      line-height: 1;
+    }
+
+    .nav-links .auth-buttons .signin {
+      /* beyaz */
+      background: #fff;
+      color: #111;
+      border: 1px solid rgba(0, 0, 0, .08);
+    }
+
+    .nav-links .auth-buttons .signup {
+      /* primary */
+      background: var(--brand);
+      color: #fff;
+      border: 1px solid transparent;
+    }
+
+    /* hamburger ve kapama butonu: görünür & rahat tıklanır */
+    .hamburger {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, .18);
+      backdrop-filter: blur(6px);
+    }
+
+    .hamburger .bar {
+      background: #fff;
+    }
+
+    .nav-links .menu-close {
+      top: 18px;
+      right: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, .28);
+      border: 1px solid rgba(255, 255, 255, .16);
+      color: #fff;
+      font-size: 28px;
+      display: grid;
+      place-items: center;
+    }
+
+    /* overlay daha koyu/blur (linkler şık görünsün) */
+    .nav-backdrop {
+      background: rgba(0, 0, 0, .58);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* navbar’daki .auth-buttons normalde gizleniyordu; overlay açıkken göstereceğiz (JS ile taşınıyor) */
+    .navbar .auth-buttons {
+      display: none;
+    }
+  }
+}
+
+/* ===== MOBILE FULLSCREEN NAV — center + big + visible CTAs ===== */
+@media (max-width: 992px) {
+  .landing {
+
+    /* Overlay katmanı (arka) */
+    .nav-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1000 !important;
+      background: rgba(0, 0, 0, .58) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s ease, visibility 0s linear .2s;
+    }
+
+    .nav-backdrop.is-show {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .2s ease;
+    }
+
+    /* Tam ekran menü (üst) */
+    .nav-links {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1001 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      min-height: 100dvh !important;
+      padding: calc(env(safe-area-inset-top, 16px) + 28px) 24px calc(env(safe-area-inset-bottom, 16px) + 28px) !important;
+      gap: clamp(12px, 3vh, 18px) !important;
+      text-align: center !important;
+      background: transparent !important;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6%);
+      pointer-events: none;
+      transition: transform .28s ease, opacity .22s ease, visibility 0s linear .28s;
+    }
+
+    .nav-links.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Linkler: iri ve kontrastlı */
+    .nav-links .nav-link {
+      color: #fff !important;
+      font-size: clamp(1.25rem, 5.5vw, 2rem) !important;
+      font-weight: 700 !important;
+      letter-spacing: .02em !important;
+      line-height: 1.35 !important;
+      padding: .7rem 1.1rem !important;
+      border-radius: 12px !important;
+      transition: background .2s ease, transform .06s ease !important;
+    }
+
+    .nav-links .nav-link:hover {
+      background: rgba(255, 255, 255, .12) !important;
+    }
+
+    .nav-links .nav-link:active {
+      transform: translateY(1px) !important;
+    }
+
+    /* Auth butonlarını overlay içinde “full-width CTA” gibi göster */
+    .nav-links .auth-buttons {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+      width: min(420px, 86vw) !important;
+      margin-top: 8px !important;
+    }
+
+    .nav-links .auth-buttons a,
+    .nav-links .auth-buttons .btn {
+      display: inline-flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 14px 18px !important;
+      font-size: 1.06rem !important;
+      font-weight: 800 !important;
+      border-radius: 12px !important;
+      line-height: 1 !important;
+      text-decoration: none !important;
+    }
+
+    .nav-links .auth-buttons .signin {
+      background: #fff !important;
+      color: #111 !important;
+      border: 1px solid rgba(0, 0, 0, .08) !important;
+    }
+
+    .nav-links .auth-buttons .signup {
+      background: var(--brand) !important;
+      color: #fff !important;
+      border: 1px solid transparent !important;
+    }
+
+    /* Hamburger + kapama butonu görünür kıl */
+    .hamburger {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, .18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .hamburger .bar {
+      background: #fff;
+    }
+
+    .nav-links .menu-close {
+      position: absolute !important;
+      top: 18px !important;
+      right: 16px !important;
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 12px !important;
+      background: rgba(0, 0, 0, .28) !important;
+      border: 1px solid rgba(255, 255, 255, .16) !important;
+      color: #fff !important;
+      font-size: 28px !important;
+      display: grid !important;
+      place-items: center !important;
+      z-index: 1002 !important;
+      /* overlay’in üstünde */
+    }
+
+    /* Navbar’daki auth-buttons mobilde gizli kalsın (overlay’e taşınıyor) */
+    .navbar .auth-buttons {
+      display: none !important;
+    }
+
+    /* Scroll kilidi */
+    body.no-scroll {
+      height: 100vh;
+      overflow: hidden;
+    }
+  }
+}
+
+/* ===== MOBILE FULLSCREEN NAV — center + big + visible CTAs ===== */
+@media (max-width: 992px) {
+  .landing {
+
+    /* Overlay katmanı (arka) */
+    .nav-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1000 !important;
+      background: rgba(0, 0, 0, .58) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s ease, visibility 0s linear .2s;
+    }
+
+    .nav-backdrop.is-show {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .2s ease;
+    }
+
+    /* Tam ekran menü (üst) */
+    .nav-links {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1001 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      min-height: 100dvh !important;
+      padding: calc(env(safe-area-inset-top, 16px) + 28px) 24px calc(env(safe-area-inset-bottom, 16px) + 28px) !important;
+      gap: clamp(12px, 3vh, 18px) !important;
+      text-align: center !important;
+      background: transparent !important;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6%);
+      pointer-events: none;
+      transition: transform .28s ease, opacity .22s ease, visibility 0s linear .28s;
+    }
+
+    .nav-links.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Linkler: iri ve kontrastlı */
+    .nav-links .nav-link {
+      color: #fff !important;
+      font-size: clamp(1.25rem, 5.5vw, 2rem) !important;
+      font-weight: 700 !important;
+      letter-spacing: .02em !important;
+      line-height: 1.35 !important;
+      padding: .7rem 1.1rem !important;
+      border-radius: 12px !important;
+      transition: background .2s ease, transform .06s ease !important;
+    }
+
+    .nav-links .nav-link:hover {
+      background: rgba(255, 255, 255, .12) !important;
+    }
+
+    .nav-links .nav-link:active {
+      transform: translateY(1px) !important;
+    }
+
+    /* Auth butonlarını overlay içinde “full-width CTA” gibi göster */
+    .nav-links .auth-buttons {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+      width: min(420px, 86vw) !important;
+      margin-top: 8px !important;
+    }
+
+    .nav-links .auth-buttons a,
+    .nav-links .auth-buttons .btn {
+      display: inline-flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 14px 18px !important;
+      font-size: 1.06rem !important;
+      font-weight: 800 !important;
+      border-radius: 12px !important;
+      line-height: 1 !important;
+      text-decoration: none !important;
+    }
+
+    .nav-links .auth-buttons .signin {
+      background: #fff !important;
+      color: #111 !important;
+      border: 1px solid rgba(0, 0, 0, .08) !important;
+    }
+
+    .nav-links .auth-buttons .signup {
+      background: var(--brand) !important;
+      color: #fff !important;
+      border: 1px solid transparent !important;
+    }
+
+    /* Hamburger + kapama butonu görünür kıl */
+    .hamburger {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, .18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .hamburger .bar {
+      background: #fff;
+    }
+
+    .nav-links .menu-close {
+      position: absolute !important;
+      top: 18px !important;
+      right: 16px !important;
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 12px !important;
+      background: rgba(0, 0, 0, .28) !important;
+      border: 1px solid rgba(255, 255, 255, .16) !important;
+      color: #fff !important;
+      font-size: 28px !important;
+      display: grid !important;
+      place-items: center !important;
+      z-index: 1002 !important;
+      /* overlay’in üstünde */
+    }
+
+    /* Navbar’daki auth-buttons mobilde gizli kalsın (overlay’e taşınıyor) */
+    .navbar .auth-buttons {
+      display: none !important;
+    }
+
+    /* Scroll kilidi */
+    body.no-scroll {
+      height: 100vh;
+      overflow: hidden;
+    }
+  }
+}
+
+/* ==== MOBILE FULLSCREEN NAV — hamburger kapatma, büyük metinler, CTA'lar ==== */
+@media (max-width: 992px) {
+  .landing {
+
+    /* Arka blur katman */
+    .nav-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1000 !important;
+      background: rgba(0, 0, 0, .58) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s ease, visibility 0s linear .2s;
+    }
+
+    .nav-backdrop.is-show {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .2s ease;
+    }
+
+    /* Tam ekran link bölümü */
+    .nav-links {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1001 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      min-height: 100dvh !important;
+      gap: clamp(14px, 3.5vh, 22px) !important;
+      padding: calc(env(safe-area-inset-top, 12px) + 28px) 24px calc(env(safe-area-inset-bottom, 12px) + 28px) !important;
+      text-align: center !important;
+      background: transparent !important;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6%);
+      pointer-events: none;
+      transition: transform .28s ease, opacity .22s ease, visibility 0s linear .28s;
+    }
+
+    .nav-links.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Linkler büyük ve kontrastlı */
+    .nav-links .nav-link {
+      color: #fff !important;
+      font-size: clamp(1.4rem, 6.2vw, 2.2rem) !important;
+      font-weight: 800 !important;
+      letter-spacing: .01em !important;
+      line-height: 1.35 !important;
+      padding: .7rem 1.1rem !important;
+      border-radius: 14px !important;
+      transition: background .2s ease, transform .06s ease !important;
+    }
+
+    .nav-links .nav-link:hover {
+      background: rgba(255, 255, 255, .12) !important;
+    }
+
+    .nav-links .nav-link:active {
+      transform: translateY(1px) !important;
+    }
+
+    /* Auth (Giriş/Kayıt) — overlay içinde büyük CTA */
+    .nav-links .auth-buttons {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 12px !important;
+      width: min(520px, 90vw) !important;
+      margin-top: 6px !important;
+    }
+
+    .nav-links .auth-buttons a,
+    .nav-links .auth-buttons .btn {
+      display: inline-flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 15px 18px !important;
+      font-size: clamp(1.05rem, 4.4vw, 1.22rem) !important;
+      font-weight: 900 !important;
+      border-radius: 14px !important;
+      text-decoration: none !important;
+      line-height: 1 !important;
+    }
+
+    .nav-links .auth-buttons .signin {
+      background: #fff !important;
+      color: #111 !important;
+      border: 1px solid rgba(0, 0, 0, .08) !important;
+    }
+
+    .nav-links .auth-buttons .signup {
+      background: var(--brand) !important;
+      color: #fff !important;
+      border: 1px solid transparent !important;
+    }
+
+    /* Hamburger: açıkken X olur ve sağ üstte KAPATMA görevini üstlenir */
+    .hamburger {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, .28);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, .18);
+      position: relative;
+      z-index: 1003;
+      /* overlay üstünde kal */
+    }
+
+    .hamburger .bar {
+      width: 26px;
+      height: 2px;
+      background: #fff;
+    }
+
+    .hamburger.is-open {
+      position: fixed;
+      /* menü açıkken hep sağ üstte */
+      top: 14px;
+      right: 14px;
+      z-index: 1003;
+    }
+
+    .hamburger.is-open .bar:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .hamburger.is-open .bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.is-open .bar:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    /* Navbar’daki auth-buttons mobil navbar’da gizli (overlay’e taşınıyor) */
+    .navbar .auth-buttons {
+      display: none !important;
+    }
+
+    /* Scroll kilidi */
+    body.no-scroll {
+      height: 100vh;
+      overflow: hidden;
+    }
+  }
+}
+
+/* --- Mobile overlay görünürlük, tipografi ve z-index düzeltmeleri --- */
+@media (max-width: 992px) {
+
+  /* Hamburger en üstte kalsın ve X'e dönüşse bile tıklanabilir olsun */
+  .hamburger {
+    position: relative;
+    z-index: 1003;
+  }
+
+  .hamburger.is-open {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+  }
+
+  /* Backdrop */
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+  }
+
+  body.menu-open .nav-backdrop {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .2s ease;
+  }
+
+  /* Overlay menü */
+  .nav-links {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    padding: 2.4rem;
+    background: transparent;
+    /* arka plan yok; blur/backdrop arkada */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6%);
+    pointer-events: none;
+    transition: transform .28s ease, opacity .2s ease, visibility 0s linear .28s;
+  }
+
+  body.menu-open .nav-links {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: transform .28s ease, opacity .2s ease;
+  }
+
+  /* Link ve CTA'ları büyüt */
+  .nav-links .nav-link {
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(18px, 5.6vw, 28px);
+    padding: .6rem 1rem;
+    text-align: center;
+  }
+
+  /* Auth (giriş/kayıt) görünür ve büyük */
+  .nav-links .auth-buttons {
+    display: flex !important;
+    flex-direction: column;
+    gap: .8rem;
+    margin-top: .6rem;
+    width: min(280px, 76vw);
+  }
+
+  .nav-links .auth-buttons .btn {
+    font-size: clamp(16px, 4.8vw, 18px);
+    padding: .9rem 1.2rem;
+    border-radius: 12px;
+    font-weight: 800;
+  }
+
+  .nav-links .auth-buttons .signup {
+    background: var(--brand, #14b8a6);
+    color: #fff;
+    border: none;
+  }
+
+  .nav-links .auth-buttons .signin {
+    background: #fff;
+    color: #111;
+    border: 1px solid rgba(0, 0, 0, .12);
+  }
+
+  /* “X” görülsün: açıkken arka plan plakası */
+  .hamburger.is-open {
+    background: rgba(0, 0, 0, .35);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+  }
+
+  .hamburger .bar {
+    background: #fff;
+  }
+}
+
+/* Güvenlik ağı: yüksek DPI/koyu arkaplanda X daha belirgin dursun */
+@media (prefers-color-scheme: dark) {
+  .hamburger.is-open {
+    background: rgba(255, 255, 255, .12);
+    border-color: rgba(255, 255, 255, .2);
+  }
+}
+
+/* === MOBILE NAV OVERLAY FIX === */
+@media (max-width: 992px) {
+
+  /* overlay menü katmanı */
+  .nav-links {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    padding: 2.4rem 1.6rem;
+    background: transparent;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6%);
+    pointer-events: none;
+    transition: transform .28s ease, opacity .2s ease, visibility 0s linear .28s;
+  }
+
+  body.menu-open .nav-links {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* linkler büyük, ortalı ve belirgin */
+  .nav-links a.nav-link {
+    color: #fff;
+    font-weight: 600;
+    font-size: clamp(20px, 6.5vw, 28px) !important;
+    line-height: 1.3;
+    padding: .6rem 1rem;
+    text-align: center;
+  }
+
+  /* auth butonlarını overlay içinde görünür yap */
+  .nav-links .auth-buttons {
+    display: flex !important;
+    flex-direction: column;
+    gap: .9rem;
+    margin-top: .8rem;
+    width: min(320px, 80vw);
+  }
+
+  .nav-links .auth-buttons .btn {
+    font-size: clamp(16px, 4.8vw, 18px);
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .nav-links .auth-buttons .signup {
+    background: var(--brand, #14b8a6);
+    color: #fff;
+    border: none;
+  }
+
+  .nav-links .auth-buttons .signin {
+    background: #fff;
+    color: #111;
+    border: 1px solid rgba(0, 0, 0, .12);
+  }
+
+  /* hamburger X olarak kapatıcı – üstte kalsın */
+  .hamburger {
+    position: relative;
+    z-index: 1003;
+  }
+
+  .hamburger.is-open {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, .35);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+  }
+
+  .hamburger .bar {
+    background: #fff;
+  }
+
+  /* dahili kapama tuşunu gizle (hamburger kapatsın) */
+  .nav-links .menu-close {
+    display: none !important;
+  }
+
+  /* blur + siyah overlay */
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+  }
+
+  body.menu-open .nav-backdrop {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .2s ease;
+  }
+}
+
+/* ================== MOBILE NAV OVERLAY – KESİN OVERRIDE ================== */
+@media (max-width: 992px) {
+
+  /* overlay daima en üstte ve aktifken tıklanabilir olsun */
+  .landing .nav-links {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1100 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.2rem !important;
+    padding: 2.4rem 1.2rem !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+
+    /* bazı temalarda text-decoration parent’tan “propagate” edebiliyor; kökten sıfırla */
+    text-decoration: none !important;
+  }
+
+  /* hamburger X, overlay üzerinde kalsın */
+  .landing .hamburger {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 1200 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, .18) !important;
+    background: rgba(0, 0, 0, .35) !important;
+  }
+
+  .landing .hamburger .bar {
+    background: #fff !important;
+  }
+
+  /* linkler: büyük, kalın, çizgisiz, beyaz */
+  .landing .nav-links li {
+    list-style: none !important;
+  }
+
+  .landing .nav-links .nav-link,
+  .landing .nav-links .nav-link:link,
+  .landing .nav-links .nav-link:visited,
+  .landing .nav-links .nav-link:hover,
+  .landing .nav-links .nav-link:active {
+    display: block !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    -webkit-text-decoration: none !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    font-size: clamp(22px, 8vw, 28px) !important;
+    line-height: 1.3 !important;
+    padding: .6rem 1rem !important;
+  }
+
+  /* masaüstü kuralı mobilde gizliyorsa, overlay içindeki auth’ları zorla göster */
+  .landing .auth-buttons {
+    display: none;
+  }
+
+  /* dıştaki kapalı kalsın */
+  .landing .nav-links .auth-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: .9rem !important;
+    margin-top: .8rem !important;
+    width: min(320px, 80vw) !important;
+  }
+
+  .landing .nav-links .auth-buttons .btn {
+    font-size: clamp(16px, 4.8vw, 18px) !important;
+    padding: 1rem 1.2rem !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+  }
+
+  .landing .nav-links .auth-buttons .signup {
+    background: var(--brand, #14b8a6) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+
+  .landing .nav-links .auth-buttons .signin {
+    background: #fff !important;
+    color: #111 !important;
+    border: 1px solid rgba(0, 0, 0, .12) !important;
+  }
+
+  /* iç menü kapama tuşu görünmesin (hamburger X görevde) */
+  .landing .nav-links .menu-close {
+    display: none !important;
+  }
+
+  /* backdrop daima görünür ve üstte (hamburger’ten bir kademe altta) */
+  .landing .nav-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, .55) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+/* ================== MOBILE NAV – FIX: görünürlük, boyut, buton renkleri ================== */
+@media (max-width: 992px) {
+
+  /* Varsayılan: kapalı tut (önceki !important’ları bastır) */
+  .landing:not(.menu-open) .nav-links {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-6%) !important;
+  }
+
+  .landing:not(.menu-open) .nav-backdrop {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Açıkken göster */
+  .landing.menu-open .nav-links {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1100 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(1rem, 4vw, 1.6rem) !important;
+    /* ARALIĞI ARTIR */
+    padding: 2.4rem 1.2rem !important;
+    background: transparent !important;
+    /* blur arkadan geliyor */
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+  }
+
+  .landing.menu-open .nav-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, .55) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Hamburger (X) üstte kalsın */
+  .landing .hamburger {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 1200 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, .18) !important;
+    background: rgba(0, 0, 0, .35) !important;
+  }
+
+  .landing .hamburger .bar {
+    background: #fff !important;
+  }
+
+  /* Linkler: daha makul boyut + çizgisiz + tema uyumu */
+  .landing .nav-links li {
+    list-style: none !important;
+  }
+
+  .landing .nav-links .nav-link,
+  .landing .nav-links .nav-link:link,
+  .landing .nav-links .nav-link:visited,
+  .landing .nav-links .nav-link:hover,
+  .landing .nav-links .nav-link:active {
+    display: block !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    -webkit-text-decoration: none !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    font-size: clamp(18px, 5.5vw, 22px) !important;
+    /* DAHA KÜÇÜK */
+    line-height: 1.35 !important;
+    padding: .5rem 1rem !important;
+  }
+
+  /* Auth butonlarını overlay içinde göster + tema uyumu + boşluk */
+  .landing .auth-buttons {
+    display: none;
+  }
+
+  /* dıştaki kapalı kalsın */
+  .landing .nav-links .auth-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: min(340px, 82vw) !important;
+    gap: clamp(.7rem, 3.2vw, 1rem) !important;
+    /* ARALIĞI ARTIR */
+    margin-top: clamp(.6rem, 2.8vw, 1rem) !important;
+  }
+
+  .landing .nav-links .auth-buttons .btn {
+    font-size: clamp(15px, 4.2vw, 17px) !important;
+    padding: 1rem 1.2rem !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    border: 1px solid transparent !important;
+  }
+
+  .landing .nav-links .auth-buttons .signup {
+    background: var(--brand, #14b8a6) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+  }
+
+  .landing .nav-links .auth-buttons .signup:hover {
+    filter: brightness(1.05) !important;
+  }
+
+  .landing .nav-links .auth-buttons .signin {
+    background: #fff !important;
+    color: #111 !important;
+    border-color: rgba(0, 0, 0, .12) !important;
+  }
+
+  .landing .nav-links .auth-buttons .signin:hover {
+    background: #f8f8f8 !important;
+  }
+
+  /* İç “×” butonunu gizle (hamburger X kullanıyoruz) */
+  .landing .nav-links .menu-close {
+    display: none !important;
+  }
+}
+
+/* ================== LANDING QUICK FIX PACK (UPDATED) ================== */
+
+/* 2.1 Brand – koyu yeşil */
+.landing {
+  --brand: #1f6f46;
+  --brand-dark: #145c3a;
+}
+
+/* 2.2 Logo: büyüt + soldan boşluk */
+.landing .logo-container a {
+  font-size: clamp(1.25rem, 3.6vw, 1.9rem) !important;
+  font-weight: 800 !important;
+  margin-left: clamp(12px, 2.5vw, 28px) !important;
+  letter-spacing: .2px !important;
+  text-decoration: none !important;
+}
+
+/* 2.3 Nav linkleri: daha hafif ağırlık + rahat satır aralığı + çizgisiz */
+.landing .nav-links .nav-link,
+.landing .nav-links .nav-link:visited {
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  text-decoration: none !important;
+}
+
+/* Mobilde link boyutunu dengeli büyüt, aralarını aç */
+@media (max-width: 992px) {
+  .landing.menu-open .nav-links {
+    gap: clamp(14px, 3.5vh, 24px) !important;
+  }
+
+  .landing .nav-links .nav-link {
+    font-size: clamp(1.2rem, 5.6vw, 1.6rem) !important;
+  }
+}
+
+/* 2.4 Auth butonları (Sign in / Sign up) — görünür + minimalist */
+.landing .auth-buttons .btn {
+  border-radius: 10px !important;
+  padding: .7rem 1.1rem !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+/* Masaüstü buton renkleri */
+.landing .navbar .btn--secondary,
+.landing .navbar .btn--primary {
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: 1px solid transparent !important;
+}
+
+.landing .navbar .btn--secondary:hover,
+.landing .navbar .btn--primary:hover {
+  background: var(--brand-dark) !important;
+}
+
+/* Overlay içindeyken de görünsün */
+@media (max-width: 992px) {
+  .landing .nav-links .auth-buttons {
+    display: flex !important;
+    gap: 12px !important;
+    margin-top: 8px !important;
+  }
+
+  .landing .nav-links .signin {
+    background: #ffffff !important;
+    color: #111 !important;
+    border: 1px solid #e9e9e9 !important;
+  }
+
+  .landing .nav-links .signup {
+    background: var(--brand) !important;
+    color: #fff !important;
+    border: 1px solid transparent !important;
+  }
+
+  .landing .nav-links .signin:hover {
+    background: #f7f7f7 !important;
+  }
+
+  .landing .nav-links .signup:hover {
+    background: var(--brand-dark) !important;
+  }
+}
+
+/* 2.5 Hamburger / X butonu — en üste, net görünür */
+@media (max-width: 992px) {
+  .landing .hamburger {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    width: 48px !important;
+    height: 48px !important;
+    z-index: 1101 !important;
+    /* hepsinin üstünde */
+    background: rgba(0, 0, 0, .28) !important;
+    /* arka plan ekle ki görünür olsun */
+    border: 1px solid rgba(255, 255, 255, .2) !important;
+    border-radius: 10px !important;
+  }
+
+  .landing .hamburger .bar {
+    background: #fff !important;
+    height: 2px !important;
+  }
+
+  /* EXTRA: inline menu-close butonunu gizle (karışıklık olmasın) */
+  .landing .nav-links .menu-close {
+    display: none !important;
+  }
+}
+
+/* 2.6 Overlay sıralaması — overlay < nav-links < hamburger */
+@media (max-width: 992px) {
+  .landing .nav-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 900 !important;
+  }
+
+  .landing.menu-open .nav-links {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1001 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+  }
+
+  .landing:not(.menu-open) .nav-links {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-6%) !important;
+  }
+}
+
+/* 2.7 Genel tipografi (landing içinde): daha rahat okuma */
+.landing .hero .heading-primary {
+  letter-spacing: .2px !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+}
+
+.landing .alt-text,
+.landing .steps-subtitle,
+.landing .features-subtitle {
+  line-height: 1.55 !important;
+  font-weight: 500 !important;
+}
+
+/* ================== LANDING – QUICK MINIMAL PATCH (CSS ONLY) ================== */
+
+/* Tema rengi (koyu yeşil, daha minimal) */
+.landing {
+  --brand: #1f6f46;
+  --brand-dark: #145c3a;
+}
+
+/* Logo: biraz daha büyük ve soldan nefes */
+.landing .logo-container a {
+  font-size: clamp(1.25rem, 3.6vw, 1.9rem) !important;
+  font-weight: 800 !important;
+  margin-left: clamp(12px, 2.5vw, 28px) !important;
+  letter-spacing: .2px !important;
+  text-decoration: none !important;
+}
+
+/* NAV linkleri: daha hafif ağırlık + rahat satır aralığı */
+.landing .nav-links .nav-link,
+.landing .nav-links .nav-link:visited {
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  text-decoration: none !important;
+}
+
+/* Mobilde link boyutu ve aralık */
+@media (max-width: 992px) {
+  .landing.menu-open .nav-links {
+    gap: 18px !important;
+  }
+
+  .landing .nav-links .nav-link {
+    font-size: clamp(1.1rem, 5vw, 1.4rem) !important;
+  }
+}
+
+/* ================== Minimal BUTONLAR (Sign in / Sign up) ================== */
+.landing .auth-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Masaüstü & mobilde minimalist stil */
+.landing .auth-buttons .btn {
+  padding: .55rem 1rem !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  border: 1px solid rgba(255, 255, 255, .22) !important;
+  background: transparent !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.landing .auth-buttons .btn:hover {
+  background: rgba(255, 255, 255, .10) !important;
+}
+
+/* “Kayıt Ol” bir tık öne çıksın ama kalın durmasın */
+.landing .auth-buttons .signup {
+  border-color: transparent !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+}
+
+.landing .auth-buttons .signup:hover {
+  background: var(--brand-dark) !important;
+}
+
+/* Mobilde overlay içine taşındığında da görünsün */
+@media (max-width: 992px) {
+  .landing .nav-links .auth-buttons {
+    display: flex !important;
+    gap: 12px !important;
+  }
+}
+
+/* ================== Hamburger → X (saf CSS, JS gerekmez) ================== */
+/* Not: Üç <span class="bar"> kalabilir; açıkken onları gizleyip pseudo ile X çiziyoruz. */
+@media (max-width: 992px) {
+
+  /* hamburger konumu ve katmanları */
+  .landing .hamburger {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    width: 48px !important;
+    height: 48px !important;
+    z-index: 1101 !important;
+    /* hamburger her şeyin üstünde */
+    background: rgba(0, 0, 0, .28) !important;
+    border: 1px solid rgba(255, 255, 255, .2) !important;
+    border-radius: 10px !important;
+  }
+
+  .landing .hamburger .bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: opacity .15s ease;
+  }
+
+  .landing .hamburger.is-open .bar {
+    opacity: 0;
+  }
+
+  /* açıldığında barları sakla */
+
+  /* X çizgileri */
+  .landing .hamburger::before,
+  .landing .hamburger::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 24px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 0;
+    transition: transform .24s ease, opacity .15s ease;
+  }
+
+  .landing .hamburger.is-open::before {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .landing .hamburger.is-open::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  /* overlay ve nav katman sırası — overlay < menü < hamburger */
+  .landing .nav-backdrop {
+    z-index: 900 !important;
+  }
+
+  .landing.menu-open .nav-links {
+    z-index: 1001 !important;
+  }
+}
+
+/* ================== Tipografi rahatlatma ================== */
+.landing .hero .heading-primary {
+  letter-spacing: .2px !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+}
+
+.landing .alt-text,
+.landing .steps-subtitle,
+.landing .features-subtitle {
+  line-height: 1.55 !important;
+  font-weight: 500 !important;
+}
+
+/* ================== LANDING – AUTH BUTTONS (MINIMAL, NARROW) ================== */
+/* Konteyner: aralığı azalt */
+.landing .auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px !important;
+  /* önce 12px’ti */
+}
+
+/* Ortak buton tabanı */
+.landing .auth-buttons .btn {
+  padding: .45rem .9rem !important;
+  /* daha dar */
+  border-radius: 8px !important;
+  /* daha minimal */
+  font-weight: 500 !important;
+  /* daha az kalın */
+  font-size: .95rem !important;
+  /* bir tık daha küçük */
+  letter-spacing: .1px !important;
+  line-height: 1.1 !important;
+
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, .24) !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .06s ease;
+}
+
+.landing .auth-buttons .btn:hover {
+  background: rgba(255, 255, 255, .10) !important;
+  border-color: rgba(255, 255, 255, .32) !important;
+}
+
+.landing .auth-buttons .btn:active {
+  transform: translateY(1px);
+}
+
+/* Kayıt Ol (primary ama minimal) */
+.landing .auth-buttons .signup {
+  background: var(--brand) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  /* kalınlığı düşür */
+}
+
+.landing .auth-buttons .signup:hover {
+  background: var(--brand-dark) !important;
+}
+
+/* Mobilde overlay içine taşındığında da aynı kalsın */
+@media (max-width: 992px) {
+  .landing .nav-links .auth-buttons {
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 8px;
+    /* linklerden sonra nefes */
+  }
+
+  .landing .nav-links .auth-buttons .btn {
+    font-size: 1rem !important;
+    /* mobil okunabilirlik */
+    padding: .5rem 1rem !important;
+  }
+}
+
+/* ============= LANDING – AUTH BUTONLARI (daha dar, minimal) ============= */
+.landing .auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px !important;
+  /* aradaki boşluğu azalt */
+}
+
+/* Ortak taban: genişliği daraltmak için sadece yatay paddingle oynuyoruz */
+.landing .auth-buttons .btn {
+  padding-block: .62rem !important;
+  /* yükseklik benzer kalsın */
+  padding-inline: .70rem !important;
+  /* GENİŞLİĞİ DARALTAN kısım */
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  /* daha az kalın */
+  font-size: .95rem !important;
+  line-height: 1.2 !important;
+  letter-spacing: .1px !important;
+
+  white-space: nowrap !important;
+  /* satır kırmadan kompakt kalsın */
+  box-shadow: none !important;
+  text-decoration: none !important;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .06s ease;
+}
+
+/* Giriş (beyaz hat, transparan) */
+.landing .auth-buttons .signin {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, .28) !important;
+}
+
+.landing .auth-buttons .signin:hover {
+  background: rgba(255, 255, 255, .10) !important;
+  border-color: rgba(255, 255, 255, .35) !important;
+}
+
+/* Kayıt Ol (primary ama minimal, yatay dar) */
+:root {
+  --brand-dark: #129a8f;
+}
+
+/* yoksa küçük bir koyu ton tanımla */
+.landing .auth-buttons .signup {
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: 1px solid transparent !important;
+  font-weight: 500 !important;
+  padding-inline: .74rem !important;
+  /* azıcık daha geniş ama yine dar */
+}
+
+.landing .auth-buttons .signup:hover {
+  background: var(--brand-dark) !important;
+}
+
+/* Mobilde de dar kalsın; sadece okunabilirlik için 1.0rem'e çekiyoruz */
+@media (max-width: 992px) {
+  .landing .nav-links .auth-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 10px;
+  }
+
+  .landing .nav-links .auth-buttons .btn {
+    font-size: 2.4rem !important;
+    padding: 2rem 2rem !important;
+    width: 50%;
+    text-align: center;
+    margin: 0 auto;
+    /* halen dar */
+  }
+}
+
+/* ================== MOBILE NAV — Z-INDEX/POSITION HOTFIX ================== */
+@media (max-width: 992px) {
+
+  /* Overlay ALTA */
+  .landing .nav-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 900 !important;
+    /* < nav-links(1001) < hamburger(1101) */
+  }
+
+  /* Menü (linkler + auth buttons) ÜSTE */
+  .landing.menu-open .nav-links {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1001 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+  }
+
+  /* Hamburger/X en üstte kalsın (kapama her zaman tıklanabilir) */
+  .landing .hamburger {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 1101 !important;
+    /* hepsinin üstü */
+  }
+
+  /* Her ihtimale karşı: menü kapalıyken linkleri tamamen devre dışı bırak */
+  .landing:not(.menu-open) .nav-links {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-6%) !important;
+  }
+
+  /* Menü içindeki auth butonları görünür ve üstte */
+  .landing .nav-links .auth-buttons {
+    position: relative !important;
+    z-index: 1002 !important;
+  }
 }
 
 .dashboard {

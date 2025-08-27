@@ -2,7 +2,6 @@ from django.urls import path
 
 from .views import ShowInvitationView, InvitationEntryView
 from . import api
-
 app_name = 'invitations'
 
 urlpatterns = [

@@ -1,10 +1,29 @@
 {% extends '../dashboard-base.html' %}
 {% load static %}
 
+{% block body-page %}wizard{% endblock %}
+
 {% block content %}
-<div class="invitation-wizard-container">
+<div class="invitation-wizard-container"
+     data-onb="wiz-root"
+     data-onb-scope="wizard"
+     data-onb-title="Davet Sihirbazı"
+     data-onb-desc="Solda adım adım form, sağda canlı önizleme."
+     data-onb-order="1"
+     data-onb-place="right"
+     data-onb-pad="12">
+
   <!-- Progress -->
-  <div class="wizard-progress" role="tablist" aria-label="Adım İlerlemesi">
+  <div class="wizard-progress"
+       role="tablist"
+       aria-label="Adım İlerlemesi"
+       data-onb="wiz-progress"
+       data-onb-scope="wizard"
+       data-onb-title="Adım Çizgisi"
+       data-onb-desc="Buradan adımlar arasında geçiş yapabilirsiniz."
+       data-onb-order="2"
+       data-onb-place="bottom"
+       data-onb-pad="8">
     <div class="wizard-progressbar" aria-hidden="true"><span class="bar"></span></div>
     <button type="button" class="step active" data-step="1" role="tab" aria-selected="true" tabindex="0">1. Şablon</button>
     <button type="button" class="step" data-step="2" role="tab" tabindex="-1">2. Bilgiler</button>
@@ -15,10 +34,17 @@
 
   <div class="wizard-body">
     <!-- LEFT -->
-    <div class="wizard-form-area">
+    <div class="wizard-form-area" data-onb="wiz-form" data-onb-scope="wizard" data-onb-title="Form Alanı" data-onb-desc="Adımlardaki alanları burada doldurun." data-onb-order="3" data-onb-place="right" data-onb-pad="12">
 
       <!-- Step 1: Template -->
-      <div class="wizard-step step-0" data-step="1">
+      <div class="wizard-step step-0" data-step="1"
+           data-onb="wiz-templates"
+           data-onb-scope="wizard"
+           data-onb-title="Şablon Seçimi"
+           data-onb-desc="Davetiyenin görsel şablonunu seçin."
+           data-onb-order="4"
+           data-onb-place="right"
+           data-onb-pad="10">
         <div class="step-head">
           <h2>Şablon Seçimi</h2>
           <p class="muted">Stili seçin; içerikleri sonraki adımlarda düzenleyebilirsiniz.</p>
@@ -29,12 +55,21 @@
             <div class="thumb"><img src="{% static 'inv-temps/premium.png' %}" alt="Premium"></div>
             <div class="meta"><p>Premium</p><span class="badge">Önerilen</span></div>
           </label>
-          
         </div>
       </div>
 
       <!-- Step 2: Basic Info -->
-      <form id="step1-form" class="wizard-step step-1 hidden" data-step="2" novalidate>
+      <form id="step1-form"
+            class="wizard-step step-1 hidden"
+            data-step="2"
+            novalidate
+            data-onb="wiz-basic"
+            data-onb-scope="wizard"
+            data-onb-title="Temel Bilgiler"
+            data-onb-desc="Başlık, tarih ve saat zorunlu. Konum ve mesaj isteğe bağlı."
+            data-onb-order="5"
+            data-onb-place="right"
+            data-onb-pad="12">
         <div class="step-head">
           <h2>Temel Bilgiler</h2>
           <p class="muted">Başlık, tarih ve saat zorunludur. Konum ve mesaj isteğe bağlı.</p>
@@ -43,7 +78,14 @@
         <label for="eventTitle">Davet Başlığı</label>
         <input type="text" id="eventTitle" required placeholder="Örn: Ahmet & Ayşe Düğünü" autocomplete="off">
 
-        <div class="form-row">
+        <div class="form-row"
+             data-onb="wiz-basic-date"
+             data-onb-scope="wizard"
+             data-onb-title="Tarih & Saat"
+             data-onb-desc="Etkinliğin tarih ve saatini girin."
+             data-onb-order="6"
+             data-onb-place="bottom"
+             data-onb-pad="8">
           <div>
             <label for="eventDate">Tarih</label>
             <input type="date" id="eventDate" required>
@@ -61,78 +103,103 @@
         <textarea id="eventMessage" rows="3" placeholder="Kısa bir davet mesajı..."></textarea>
       </form>
 
-      <!-- Step 3: Settings (Reminders / Channels / Quiet hours) -->
-     <!-- Step 3: Settings (Reminders / Channels) -->
-<div class="wizard-step step-2 hidden" data-step="3" id="step-settings">
-  <div class="step-head">
-    <h2 class="step-title">Davet Ayarları</h2>
-    <p class="muted">Hatırlatıcı ve kanal ayarları.</p>
-  </div>
-
-  <div class="settings-grid">
-    <!-- Reminders -->
-    <section class="card soft rem-card" aria-labelledby="rem-title">
-      <header class="card-head">
-        <div class="head-left">
-          <div class="icon-badge" aria-hidden="true"><i class="fas fa-bell"></i></div>
-          <div>
-            <h3 id="rem-title">Hatırlatıcılar</h3>
-            <p class="muted">Etkinlikten önce otomatik bilgilendirme gönder.</p>
-          </div>
-        </div>
-        
-      </header>
-
-      <div class="card-body" id="reminderControls">
-        <!-- Kota: çoklu seçim -->
-        <div class="quota" aria-live="polite">
-          <div class="quota-top">
-            <span class="label">Seçili hatırlatıcı</span>
-            <span class="value"><strong id="remSelValue">0</strong>/<span id="remMaxValue">—</span></span>
-          </div>
-          <div class="quota-bar" aria-hidden="true">
-            <div class="quota-fill" id="remFill" style="width:0%"></div>
-          </div>
+      <!-- Step 3: Settings (Reminders / Channels) -->
+      <div class="wizard-step step-2 hidden" data-step="3" id="step-settings"
+           data-onb="wiz-settings"
+           data-onb-scope="wizard"
+           data-onb-title="Davet Ayarları"
+           data-onb-desc="Hatırlatıcılar ve bildirim kanalları."
+           data-onb-order="7"
+           data-onb-place="right"
+           data-onb-pad="12">
+        <div class="step-head">
+          <h2 class="step-title">Davet Ayarları</h2>
+          <p class="muted">Hatırlatıcı ve kanal ayarları.</p>
         </div>
 
-        <!-- Gün bazlı çoklu seçim -->
-        <div class="timeline days-multi">
-          <div class="chips" id="presetDays">
-            <label class="chip"><input type="checkbox" class="remDay" value="1"> <span>1 gün</span></label>
-            <label class="chip"><input type="checkbox" class="remDay" value="3"> <span>3 gün</span></label>
-            <label class="chip"><input type="checkbox" class="remDay" value="7"> <span>7 gün</span></label>
-            <label class="chip"><input type="checkbox" class="remDay" value="14"> <span>14 gün</span></label>
-          </div>
+        <div class="settings-grid">
+          <!-- Reminders -->
+          <section class="card soft rem-card" aria-labelledby="rem-title"
+                   data-onb="wiz-reminders"
+                   data-onb-scope="wizard"
+                   data-onb-title="Hatırlatıcılar"
+                   data-onb-desc="Etkinlikten önce otomatik bildirim gönderin. Kota ve kanalları buradan seçin."
+                   data-onb-order="8"
+                   data-onb-place="left"
+                   data-onb-pad="10">
+            <header class="card-head">
+              <div class="head-left">
+                <div class="icon-badge" aria-hidden="true"><i class="fas fa-bell"></i></div>
+                <div>
+                  <h3 id="rem-title">Hatırlatıcılar</h3>
+                  <p class="muted">Etkinlikten önce otomatik bilgilendirme gönder.</p>
+                </div>
+              </div>
+            </header>
 
-          <div class="custom-inline">
-            <label for="remAddDay" class="muted">Özel gün</label>
-            <input type="number" id="remAddDay" min="1" max="30" placeholder="1–30" inputmode="numeric" style="max-width:120px">
-            <button type="button" id="remAddBtn" class="btn-ghost">Ekle</button>
-          </div>
+            <div class="card-body" id="reminderControls">
+              <!-- Kota -->
+              <div class="quota" aria-live="polite">
+                <div class="quota-top">
+                  <span class="label">Seçili hatırlatıcı</span>
+                  <span class="value"><strong id="remSelValue">0</strong>/<span id="remMaxValue">—</span></span>
+                </div>
+                <div class="quota-bar" aria-hidden="true">
+                  <div class="quota-fill" id="remFill" style="width:0%"></div>
+                </div>
+              </div>
 
-          <div class="selected-days" id="selectedDays"></div>
-        </div>
+              <!-- Gün bazlı çoklu seçim -->
+              <div class="timeline days-multi">
+                <div class="chips" id="presetDays">
+                  <label class="chip"><input type="checkbox" class="remDay" value="1"> <span>1 gün</span></label>
+                  <label class="chip"><input type="checkbox" class="remDay" value="3"> <span>3 gün</span></label>
+                  <label class="chip"><input type="checkbox" class="remDay" value="7"> <span>7 gün</span></label>
+                  <label class="chip"><input type="checkbox" class="remDay" value="14"> <span>14 gün</span></label>
+                </div>
 
-        <div class="channels">
-          <span class="channels-title">Kanal</span>
-          <div class="channel-badges">
-            <label class="badge"><input type="checkbox" class="reminderChannel" value="email" checked> <i class="fas fa-envelope"></i> E-posta</label>
-            <label class="badge"><input type="checkbox" class="reminderChannel" value="sms"> <i class="fas fa-sms"></i> SMS</label>
-          </div>
-          <p class="muted xs">Paketinizde olmayan kanallar otomatik devre dışıdır.</p>
-        </div>
+                <div class="custom-inline">
+                  <label for="remAddDay" class="muted">Özel gün</label>
+                  <input type="number" id="remAddDay" min="1" max="30" placeholder="1–30" inputmode="numeric" style="max-width:120px">
+                  <button type="button" id="remAddBtn" class="btn-ghost">Ekle</button>
+                </div>
 
-        <div class="warn hidden" id="reminderWarning">
-          <i class="fas fa-exclamation-triangle"></i> Lütfen 1–30 gün arası seçin. Kota dolduysa daha fazla ekleyemezsiniz.
+                <div class="selected-days" id="selectedDays"></div>
+              </div>
+
+              <div class="channels"
+                   data-onb="wiz-channels"
+                   data-onb-scope="wizard"
+                   data-onb-title="Bildirim Kanalları"
+                   data-onb-desc="E-posta ve/veya SMS ile gönderim yapabilirsiniz."
+                   data-onb-order="9"
+                   data-onb-place="top"
+                   data-onb-pad="8">
+                <span class="channels-title">Kanal</span>
+                <div class="channel-badges">
+                  <label class="badge"><input type="checkbox" class="reminderChannel" value="email" checked> <i class="fas fa-envelope"></i> E-posta</label>
+                  <label class="badge"><input type="checkbox" class="reminderChannel" value="sms"> <i class="fas fa-sms"></i> SMS</label>
+                </div>
+                <p class="muted xs">Paketinizde olmayan kanallar otomatik devre dışıdır.</p>
+              </div>
+
+              <div class="warn hidden" id="reminderWarning">
+                <i class="fas fa-exclamation-triangle"></i> Lütfen 1–30 gün arası seçin. Kota dolduysa daha fazla ekleyemezsiniz.
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-    </section>
-  </div>
-</div>
-
 
       <!-- Step 4: Message & Multi-Channel Preview -->
-       <div class="wizard-step step-3 hidden" data-step="4">
+      <div class="wizard-step step-3 hidden" data-step="4"
+           data-onb="wiz-message"
+           data-onb-scope="wizard"
+           data-onb-title="Mesaj & Önizleme"
+           data-onb-desc="Metni yazdıkça SMS ve e-posta önizlemeleri canlı güncellenir."
+           data-onb-order="10"
+           data-onb-place="right"
+           data-onb-pad="12">
         <div class="step-head">
           <h2>Mesaj & Kanal Önizlemesi</h2>
           <p class="muted">Metni düzenledikçe SMS ve e-posta kartları canlı güncellenir.</p>
@@ -142,7 +209,14 @@
         <textarea id="broadcastMessage" rows="3" placeholder="Kısa bir davet mesajı yazın..."></textarea>
         <small class="muted" id="smsCounterBar"><span class="count">0</span>/<span class="limit">160</span> <span class="segments">(1 SMS)</span></small>
 
-        <div class="message-preview">
+        <div class="message-preview"
+             data-onb="wiz-preview-tabs"
+             data-onb-scope="wizard"
+             data-onb-title="Önizleme Modları"
+             data-onb-desc="SMS ve e-posta görünümünü burada kontrol edin."
+             data-onb-order="11"
+             data-onb-place="top"
+             data-onb-pad="8">
           <div class="mp-header">
             <div class="mp-tabs" role="tablist">
               <button class="mp-tab active" data-target="#mp-sms" role="tab" aria-selected="true">SMS</button>
@@ -176,17 +250,31 @@
             </div>
           </div>
         </div>
-      </div> 
+      </div>
 
       <!-- Step 5: Share -->
-      <div class="wizard-step step-4 hidden" data-step="4">
+      <div class="wizard-step step-4 hidden" data-step="4"
+           data-onb="wiz-share"
+           data-onb-scope="wizard"
+           data-onb-title="Paylaş & Aksiyonlar"
+           data-onb-desc="Bağlantıyı kopyalayın, hızlı e-posta/SMS gönderin veya kaydedin."
+           data-onb-order="12"
+           data-onb-place="right"
+           data-onb-pad="12">
         <div class="step-head">
           <h2>Paylaş & Aksiyonlar</h2>
         </div>
 
         <div class="share-actions pretty">
           <!-- Link Card -->
-          <section class="share-card glass">
+          <section class="share-card glass"
+                   data-onb="wiz-share-link"
+                   data-onb-scope="wizard"
+                   data-onb-title="Paylaşılabilir Bağlantı"
+                   data-onb-desc="Oluşturulan davet linkini buradan kopyalayın."
+                   data-onb-order="13"
+                   data-onb-place="bottom"
+                   data-onb-pad="8">
             <header><i class="fas fa-link"></i> Paylaşılabilir Bağlantı</header>
             <div class="link-row">
               <input type="text" id="shareLink" readonly value="https://davetjet.com/—" aria-label="Paylaşılabilir bağlantı">
@@ -195,17 +283,30 @@
           </section>
 
           <!-- Quick -->
-          <section class="share-card glass">
+          <section class="share-card glass"
+                   data-onb="wiz-quick"
+                   data-onb-scope="wizard"
+                   data-onb-title="Hızlı Aksiyon"
+                   data-onb-desc="Seçilmiş mesajı e-posta veya SMS ile paylaşın."
+                   data-onb-order="14"
+                   data-onb-place="left"
+                   data-onb-pad="8">
             <header><i class="fas fa-bolt"></i> Hızlı Aksiyon</header>
             <div class="quick-row">
               <button class="pill email" id="quickEmail"><i class="fas fa-envelope"></i> E-posta</button>
               <button class="pill sms" id="quickSms"><i class="fas fa-sms"></i> SMS</button>
             </div>
-            
           </section>
 
           <!-- Final -->
-          <section class="share-card glass">
+          <section class="share-card glass"
+                   data-onb="wiz-final"
+                   data-onb-scope="wizard"
+                   data-onb-title="Kaydet/Yayınla"
+                   data-onb-desc="Taslak olarak kaydedebilir veya yayınlayabilirsiniz."
+                   data-onb-order="15"
+                   data-onb-place="top"
+                   data-onb-pad="8">
             <header><i class="fas fa-flag-checkered"></i> Son</header>
             <div class="final-row">
               <button type="button" class="btn" id="saveDraftBtn">Taslağa Kaydet</button>
@@ -218,7 +319,14 @@
       </div>
 
       <!-- Nav -->
-      <div class="wizard-nav">
+      <div class="wizard-nav"
+           data-onb="wiz-nav"
+           data-onb-scope="wizard"
+           data-onb-title="Adım Kontrolleri"
+           data-onb-desc="Geri/İleri ile adımlar arasında gezinin."
+           data-onb-order="16"
+           data-onb-place="top"
+           data-onb-pad="8">
         <button type="button" class="btn back-btn" id="prevBtn" disabled>Geri</button>
         <button type="button" class="btn next-btn" id="nextBtn">İleri</button>
         <button type="button" class="btn" id="openDraftsBtn">Taslaklar</button>
@@ -226,8 +334,22 @@
     </div>
 
     <!-- RIGHT: Live Preview -->
-    <aside class="wizard-preview-area" id="previewArea" data-template="premium">
-      <div class="preview-header">
+    <aside class="wizard-preview-area" id="previewArea" data-template="premium"
+           data-onb="wiz-live"
+           data-onb-scope="wizard"
+           data-onb-title="Canlı Önizleme"
+           data-onb-desc="Formdaki bilgiler anında şablona yansır."
+           data-onb-order="17"
+           data-onb-place="left"
+           data-onb-pad="12">
+      <div class="preview-header"
+           data-onb="wiz-live-tools"
+           data-onb-scope="wizard"
+           data-onb-title="Önizleme Araçları"
+           data-onb-desc="Tam ekran ile büyük görünüm alabilirsiniz."
+           data-onb-order="18"
+           data-onb-place="bottom"
+           data-onb-pad="8">
         <h3>Canlı Önizleme</h3>
         <button id="expandPreviewBtn" title="Tam ekran önizleme" aria-label="Tam ekran önizleme"><i class="fas fa-expand"></i></button>
       </div>
@@ -238,7 +360,14 @@
   </div>
 
   <!-- Fullscreen modal -->
-  <div id="fullscreenPreviewModal" class="fullscreen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fs-title">
+  <div id="fullscreenPreviewModal" class="fullscreen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fs-title"
+       data-onb="wiz-live-fs"
+       data-onb-scope="wizard"
+       data-onb-title="Tam Ekran Önizleme"
+       data-onb-desc="Buradan davetiyeyi büyük ekranda inceleyin."
+       data-onb-order="19"
+       data-onb-place="top"
+       data-onb-pad="12">
     <div class="modal-header">
       <h4 id="fs-title">Davetiye Önizleme</h4>
       <button id="closeFullscreenPreview" aria-label="Kapat">&times;</button>
@@ -248,8 +377,15 @@
     </div>
   </div>
 
-  <!-- Drafts Modal (değişmedi) -->
-  <div id="draftsModal" class="fullscreen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="drafts-title">
+  <!-- Drafts Modal -->
+  <div id="draftsModal" class="fullscreen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="drafts-title"
+       data-onb="wiz-drafts"
+       data-onb-scope="wizard"
+       data-onb-title="Taslaklar"
+       data-onb-desc="Kaydettiğiniz taslakları burada yönetebilirsiniz."
+       data-onb-order="20"
+       data-onb-place="top"
+       data-onb-pad="12">
     <div class="drafts-modal-panel" role="document">
       <div class="dm-head">
         <div class="title"><i class="fas fa-file-alt"></i> Taslaklar</div>
