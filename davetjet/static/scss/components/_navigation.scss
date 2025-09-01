@@ -2296,20 +2296,20 @@
 .landing .auth-buttons {
   display: flex;
   align-items: center;
-  gap: 6px !important;
+  gap: 1.6rem !important;
   /* aradaki boşluğu azalt */
 }
 
 /* Ortak taban: genişliği daraltmak için sadece yatay paddingle oynuyoruz */
 .landing .auth-buttons .btn {
-  padding-block: .62rem !important;
+  padding-block: 1.3rem !important;
   /* yükseklik benzer kalsın */
-  padding-inline: .70rem !important;
+  padding-inline: 2.4rem !important;
   /* GENİŞLİĞİ DARALTAN kısım */
   border-radius: 8px !important;
   font-weight: 500 !important;
   /* daha az kalın */
-  font-size: .95rem !important;
+  font-size: 1.6rem !important;
   line-height: 1.2 !important;
   letter-spacing: .1px !important;
 
@@ -2343,7 +2343,7 @@
   color: #fff !important;
   border: 1px solid transparent !important;
   font-weight: 500 !important;
-  padding-inline: .74rem !important;
+  // padding-inline: .74rem !important;
   /* azıcık daha geniş ama yine dar */
 }
 

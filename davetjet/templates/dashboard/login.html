@@ -14,6 +14,7 @@
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <script src="{% static 'scripts/app.js' %}" type="module" defer></script>
+    <script src="{% static 'scripts/notifications.js' %}" type="module" defer></script>
   </head>
 
   <body class="login-page dark">
@@ -74,6 +75,38 @@
 
         <button type="submit" class="login-btn">Giriş</button>
       </form>
+
+      <div class="login-footer">
+        <div><p>Hesabınız yok mu?</p>
+        <a href="{% url 'core:register' %}">Kayıt Ol</a></div>
+        
+       <div> <p>Şifrenizi mi unuttunuz?</p>
+        <a href="{% url 'core:forget-password' %}">Şifremi Unuttum</a></div>
     </div>
+
+    <script>
+  (function () {
+    // toast yoksa sessiz çık
+    if (typeof window.toast !== "function") return;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Non-field errors
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          toast.error("{{ error|escapejs }}", { duration: 5000 });
+        {% endfor %}
+      {% endif %}
+
+      // Field errors (etiketiyle birlikte)
+      {% for field in form %}
+        {% if field.errors %}
+          {% for error in field.errors %}
+            toast.error("{{ field.label|default:field.name|escapejs }}: {{ error|escapejs }}", { duration: 5000 });
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    });
+  })();
+</script>
   </body>
 </html>

@@ -382,6 +382,9 @@ $c: variables.$colors;
   padding: clamp(20px, 3vw, 40px);
   overflow: auto;
   color: map-get($c, 'primary-dark');
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 
   /* Scrollbar */
   &::-webkit-scrollbar {

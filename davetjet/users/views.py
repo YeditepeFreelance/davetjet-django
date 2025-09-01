@@ -12,7 +12,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout
 from django.contrib.auth.password_validation import validate_password
-
+from django.contrib import messages
 import json
 
 @require_GET
@@ -83,6 +83,21 @@ class DashboardSettingsView(LoginRequiredMixin, View):
             'errors': user_form.errors or profile_form.errors
         })
 
+class ForgetPasswordView(View):
+    template_name = 'dashboard/forget-password.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get('email')
+        # Here you would typically handle sending a password reset email
+        # For now, we'll just simulate success if the email exists
+        if User.objects.filter(email=email).exists():
+            # Simulate sending email
+            return render(request, self.template_name)
+        else:
+            return render(request, self.template_name)
 
 class CustomRegisterView(View):
     form_class = CustomRegisterForm

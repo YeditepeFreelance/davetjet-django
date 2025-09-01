@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import path
-from users.views import CustomLoginView, CustomRegisterView, LogOutView, DashboardSettingsView, DashboardProfileView
+from users.views import CustomLoginView, CustomRegisterView, LogOutView, DashboardSettingsView, DashboardProfileView, ForgetPasswordView
 from recipients.views import ViewRecipientListView, EditRecipientListView
 from invitations.views import InvitationsListView, EditInvitationView, CreateInvitationView, CreateInvitationAPI
 from .views import DashboardView, SearchAPIView, InvitationEditView, SendingView
@@ -24,6 +24,7 @@ urlpatterns = [
     path('dashboard/sending/', SendingView.as_view(), name='sending'),
     # path('subscribe/', lambda request: render(request, 'utils/modal-subscribe.html'), name='modal-subscribe'),
     path('login/', CustomLoginView.as_view(), name='login'),
+    path('forget-password/', ForgetPasswordView.as_view(), name='forget-password'),
     path('register/', CustomRegisterView.as_view(), name='register'),
     path('logout/', LogOutView.as_view(), name='logout'),
 
