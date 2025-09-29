@@ -1,8 +1,58 @@
+import uuid
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import ListView, DetailView
 
 from .models import Subscription, Plan, Payment
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from django.utils.encoding import force_bytes
+import hashlib, hmac, base64
+from django.conf import settings
+from .models import Payment
+
+@csrf_exempt
+def paytr_notify(request):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    merchant_oid  = request.POST.get('merchant_oid', '')
+    status        = request.POST.get('status', '')
+    total_amount  = request.POST.get('total_amount', '')
+    hash_received = request.POST.get('hash', '')
+
+    # Hash doğrulama
+    merchant_key  = force_bytes(settings.MERCHANT_KEY)
+    merchant_salt = settings.MERCHANT_SALT
+    hash_str = f"{merchant_oid}{status}{total_amount}{merchant_salt}"
+    hash_calculated = base64.b64encode(
+        hmac.new(merchant_key, force_bytes(hash_str), hashlib.sha256).digest()
+    ).decode()
+
+    if hash_received != hash_calculated:
+        return HttpResponse('Invalid hash', status=400)
+
+    # Payment kaydını bul
+    try:
+        payment = Payment.objects.get(merchant_oid=merchant_oid)
+    except Payment.DoesNotExist:
+        return HttpResponse('Payment not found', status=404)
+
+    # Daha önce işlenmişse tekrar işleme
+    if not payment.processed:
+        payment.status = status
+        payment.total_amount = total_amount
+        payment.processed = True
+        payment.save()
+
+        # Ödeme başarılıysa plan atama
+        if status == "success" and payment.user:
+            package = payment.package  # FK Package sayesinde direkt alıyoruz
+            payment.user.profile.add_new_package(package)
+
+    # Her zaman OK dön
+    return HttpResponse('OK')
 
 class PaymentTestView(View):
     """

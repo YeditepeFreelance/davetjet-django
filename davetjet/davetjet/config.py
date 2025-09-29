@@ -8,6 +8,7 @@ language_choices = [
 billing_cycles = [
     ('monthly', 'Monthly'),
     ('yearly', 'Yearly'),
+    ('lifetime', 'Lifetime'),
 ]
 
 channel_choices = [

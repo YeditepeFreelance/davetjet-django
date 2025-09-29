@@ -58,6 +58,19 @@ class User(AbstractUser):
     def __str__(self):
         return self.username 
 
+    @property
+    def get_page_permissions(self):
+        project = Project.objects.filter(owner=self).first()
+        invitation = Invitation.objects.filter(project__owner=self).first()
+        recipient = Recipient.objects.filter(invitations__project__owner=self).first()
+        
+        if not project or not invitation: 
+            return 'create-invitation'
+        
+        if not recipient:
+            return 'edit-recipients-list'
+        
+        return 'all'
     
     def get_statistics(self, range_hours=24):
         projects = Project.objects.filter(owner=self)
@@ -201,6 +214,51 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+    def get_current_package(self):
+        Subscription = apps.get_model('payments', 'Subscription')
+        current_time = timezone.now()
+        active_sub = self.user.subscriptions.filter(
+            start_date__lte=current_time,
+            end_date__gte=current_time,
+            is_active=True
+        ).order_by('-end_date').first()
+        if active_sub:
+            return active_sub
+        return None
+    
+    def add_new_package(self, package):
+        Subscription = apps.get_model('payments', 'Subscription')
+
+        current_time = timezone.now()
+        active_sub = self.user.subscriptions.filter(
+            start_date__lte=current_time,
+            end_date__gte=current_time,
+            is_active=True
+        ).order_by('-end_date').first()
+        
+        if active_sub:
+            # Mevcut abonelik varsa, bu abonelik önceki kontrollerden dolayı farklı bir türdedir. Ve kullanıcı türü değiştirmek istiyor belli ki. Dolayısıyla bu abonelik türünü iptal edeceğiz yenisini aktifleştireceğiz. Bu if iptal edecek.
+            active_sub.is_active = False
+            active_sub.end_date = current_time
+            active_sub.save()
+        
+        # Yeni abonelik oluştur
+        start_date = current_time
+        end_date = start_date + timedelta(days=30 * 12)
+        new_sub = Subscription.objects.create(
+            user=self.user,
+            plan=package,
+            start_date=start_date,
+            end_date=end_date,
+            billing_cycle=package.billing_cycle,
+            is_active=True
+        )
+        self.user.subscriptions.add(new_sub)
+        # Update quotas
+
+        self.user.recipient_quota_limit = package.max_invitee
+        self.user.save()
 
     class Meta:
         verbose_name = 'Profile'

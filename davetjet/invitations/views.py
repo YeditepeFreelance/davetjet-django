@@ -25,7 +25,7 @@ from .utils import match_invitation,build_invitation_html # Fernet doğrulaması
 from .serializers import InvitationSerializer, CreateInvitationSerializer
 from .forms import InvitationForm
 from projects.models import Project
-
+from users.mixins import RequireActivePackageMixin
 
 # ==== Genel yardımcılar (HTML yerleşimleri) ====
 def _set_text(el, value: str | None):
@@ -77,7 +77,7 @@ def _set_access_cookie(response, inv: Invitation, token: str):
 
 
 # ==== Dashboard Views ====
-class EditInvitationView(LoginRequiredMixin, TemplateView):
+class EditInvitationView(LoginRequiredMixin, RequireActivePackageMixin, TemplateView):
     model = Invitation
     login_url = reverse_lazy('core:login')
     redirect_field_name = 'next'
@@ -91,7 +91,7 @@ class EditInvitationView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class InvitationsListView(LoginRequiredMixin, TemplateView):
+class InvitationsListView(LoginRequiredMixin, RequireActivePackageMixin, TemplateView):
     template_name = 'dashboard/invitations/index.html'
     login_url = 'core:login'
     redirect_field_name = 'next'
@@ -108,7 +108,7 @@ class InvitationsListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class CreateInvitationView(LoginRequiredMixin, CreateView):
+class CreateInvitationView(LoginRequiredMixin, RequireActivePackageMixin, CreateView):
     model = Invitation
     form_class = InvitationForm
     template_name = 'dashboard/invitations/create.html'

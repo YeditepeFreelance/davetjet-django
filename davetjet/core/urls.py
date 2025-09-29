@@ -3,12 +3,13 @@ from django.urls import path
 from users.views import CustomLoginView, CustomRegisterView, LogOutView, DashboardSettingsView, DashboardProfileView, ForgetPasswordView
 from recipients.views import ViewRecipientListView, EditRecipientListView
 from invitations.views import InvitationsListView, EditInvitationView, CreateInvitationView, CreateInvitationAPI
-from .views import DashboardView, SearchAPIView, InvitationEditView, SendingView
+from .views import DashboardView, SearchAPIView, InvitationEditView, SendingView, HomePageView, AnalyticsView, SubscribeView, SubscribeNextView, SubscribeSuccessView, SubscribeFailView, PackageView
+from payments.views import paytr_notify
 
 app_name = 'core'
 
 urlpatterns = [
-    path('', lambda request: render(request, 'landing/index.html'), name='index'),
+    path('', HomePageView.as_view(), name='index'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('dashboard/settings/', DashboardSettingsView.as_view(), name='settings'),
     path('dashboard/profile/', DashboardProfileView.as_view(), name='profile'),
@@ -18,9 +19,12 @@ urlpatterns = [
     path('dashboard/invitations/<int:pk>/', EditInvitationView.as_view(), name='edit-invitation'),
     path('dashboard/invitations/create-new', CreateInvitationView.as_view(), name='create-invitation'),
     path('dashboard/invitations/edit/<int:pk>/', InvitationEditView.as_view(), name='edit-invitation-api'),
-    path('dashboard/subscribe/', lambda request: render(request, 'dashboard/subscribe.html'), name='subscribe'),
-    path('dashboard/package/', lambda request: render(request, 'dashboard/package.html'), name='package'),
-    path('dashboard/analytics/', lambda request: render(request, 'dashboard/analytics/analytics.html'), name='analytics'),
+    path('dashboard/subscribe/', SubscribeView.as_view(), name='subscribe'),
+    path('dashboard/subscribe/next/<int:pk>/', SubscribeNextView.as_view(), name='subscribe-next'),
+    path('dashboard/subscribe/success', SubscribeSuccessView.as_view(), name='subscribe-success'),
+    path('dashboard/subscribe/fail', SubscribeFailView.as_view(), name='subscribe-fail'),
+    path('dashboard/package/', PackageView.as_view(), name='package'),
+    path('dashboard/analytics/', AnalyticsView.as_view(), name='analytics'),
     path('dashboard/sending/', SendingView.as_view(), name='sending'),
     # path('subscribe/', lambda request: render(request, 'utils/modal-subscribe.html'), name='modal-subscribe'),
     path('login/', CustomLoginView.as_view(), name='login'),
@@ -30,5 +34,7 @@ urlpatterns = [
 
     path('api/search/', SearchAPIView.as_view(), name='search-api'),
     path('api/invitations/create/', CreateInvitationAPI.as_view(), name='create-invitation-api'),
+    path('paytr/notify/', paytr_notify, name='paytr-notify'),
+
 ]
 

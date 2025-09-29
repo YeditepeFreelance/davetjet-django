@@ -17,23 +17,9 @@ document.querySelectorAll(".toggle-option").forEach((btn) => {
 });
 
 // Modal handling
-document.querySelectorAll(".choose-btn").forEach((btn) =>
-  btn.addEventListener("click", () => {
-    toggleModal(true);
-  })
-);
-
-function toggleModal(show) {
-  document.getElementById("paymentModal").classList.toggle("hidden", !show);
-  if (show) {
-    // Reset form and virtual card
-    paymentForm.reset();
-    resetVirtualCard();
-    paymentForm.classList.remove("loading", "error");
-    clearErrors();
-    document.getElementById("cardholderName").focus();
-  }
-}
+document
+  .querySelectorAll(".choose-btn")
+  .forEach((btn) => btn.addEventListener("click", () => {}));
 
 const paymentForm = document.querySelector(".payment-form");
 const cardNumberInput = paymentForm.querySelector("#cardNumber");

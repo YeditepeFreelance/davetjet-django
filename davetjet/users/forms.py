@@ -114,4 +114,7 @@ class CustomRegisterForm(UserCreationForm):
 
             profile.save()
 
+            user.profile = profile
+            user.save()
+
         return user

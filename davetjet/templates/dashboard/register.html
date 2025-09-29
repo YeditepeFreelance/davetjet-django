@@ -186,7 +186,8 @@
               name="phone_number"
               placeholder="+90 555 555 55 55"
               value="{{ form.phone_number.value|default_if_none:'' }}"
-            />
+              required
+              />
             {% if form.phone_number.errors %}
             <div class="field-error">
               {% for error in form.phone_number.errors %}

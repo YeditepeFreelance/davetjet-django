@@ -32,6 +32,7 @@ from invitations.models import Invitation
 from projects.models import Project  # <- projects.models'tan
 from .utils import process_recipient_file, get_recipient_usage
 from .serializers import RecipientNameSerializer, RSVPUpdateSerializer
+from users.mixins import RequireActivePackageMixin
 
 
 # ----- Kota Endpoints -----
@@ -239,7 +240,7 @@ class ExportRecipientsView(LoginRequiredMixin, View):
 
 
 # ----- Edit List (UI) -----
-class EditRecipientListView(LoginRequiredMixin, TemplateView):
+class EditRecipientListView(LoginRequiredMixin, RequireActivePackageMixin, TemplateView):
     model = Recipient
     login_url = reverse_lazy('core:login')
     redirect_field_name = 'next'
@@ -252,7 +253,7 @@ class EditRecipientListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ViewRecipientListView(LoginRequiredMixin, TemplateView):
+class ViewRecipientListView(LoginRequiredMixin, RequireActivePackageMixin, TemplateView):
     model = Recipient
     login_url = reverse_lazy('core:login')
     redirect_field_name = 'next'

@@ -224,3 +224,12 @@ EMAIL_HOST_PASSWORD = 'xmzlgemnfjgwupuv'  # Replace with your email password
 
 MEDIA_ROOT = BASE_DIR / "invites"     # proje kökünde /invites
 MEDIA_URL  = "/invites/"              # public URL kökü
+
+
+# PayTR 
+
+PAYTR_IFRAME_ROOT_URL = "https://www.paytr.com/odeme/api/get-token"
+
+MERCHANT_ID = '612693'
+MERCHANT_KEY = b'D1pjspGwYQG2Lku8'
+MERCHANT_SALT = b'oEih8S1Eicppys88'

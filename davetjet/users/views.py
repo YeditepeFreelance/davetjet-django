@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import logout
 from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
+from .mixins import RequireActivePackageMixin
 import json
 
 @require_GET
@@ -48,7 +49,7 @@ def check_password(request):
     except Exception:
         return JsonResponse({'valid': False, 'errors': ['Geçersiz şifre.']})
 
-class DashboardSettingsView(LoginRequiredMixin, View):
+class DashboardSettingsView(LoginRequiredMixin, RequireActivePackageMixin, View):
     template_name = 'dashboard/settings.html'
 
     def dispatch(self, request, *args, **kwargs):
@@ -155,7 +156,7 @@ class LogOutView(View):
         logout(request)
         return redirect('core:index')
 
-class DashboardProfileView(LoginRequiredMixin, View):
+class DashboardProfileView(LoginRequiredMixin, RequireActivePackageMixin, View):
     template_name = 'dashboard/profile.html'
     login_url = '/login/'
 

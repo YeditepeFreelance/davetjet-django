@@ -7,19 +7,19 @@
     <div class="plan-header">
       <div class="plan-icon"><i class="fas fa-seedling"></i></div>
       <div class="plan-details">
-        <h2 class="plan-name">Başlangıç Planı</h2>
-        <span class="plan-status active">Aktif</span>
-        <p class="plan-pricing">$12 / Ay</p>
-        <small>Yenilenmesine <span class="countdown">12 gün</span> kaldı</small>
+        <h2 class="plan-name">{{ subscription.plan_name }}</h2>
+        <span class="plan-status active">{% if subscription.is_active %}Aktif{% else %}Pasif{% endif %}</span>
+        <p class="plan-pricing">Tek Seferlik &ndash; {{ subscription.plan.price }} YTL</p>
+        <small>Ömür boyu ödeme yapıldı.</small>
       </div>
       <div class="plan-actions">
-        <button class="btn manage-btn">Yönet</button>
-        <button class="btn upgrade-btn">Yükselt</button>
+        <a href="{% url 'core:subscribe' %}" class="btn upgrade-btn">Yükselt</a>
+        <button class="btn cancel-btn" style="background-color: #b30000">İptal Et</button>
       </div>
     </div>
   </section>
 
-  <section class="usage-section glass-card">
+  {% comment %} <section class="usage-section glass-card">
     <h3>Kullanım Özeti</h3>
     <div class="usage-metrics">
       <div class="usage-item">
@@ -50,14 +50,14 @@
             <circle class="bg" cx="45" cy="45" r="40" />
             <circle class="value" cx="45" cy="45" r="40" style="stroke-dashoffset: 60" />
           </svg>
-          <div class="percent">76%</div>
+          <div class="percent">0%</div>
         </div>
         <div class="label">Yapay Zekâ Kullanımı</div>
       </div>
     </div>
-  </section>
+  </section> {% endcomment %}
 
-  <section class="billing-history glass-card">
+  {% comment %} <section class="billing-history glass-card">
     <div class="billing-header">
       <h3>Fatura Geçmişi</h3>
       <button class="btn view-invoice">Son Faturayı Görüntüle</button>
@@ -86,7 +86,7 @@
         </tr>
       </tbody>
     </table>
-  </section>
+  </section> {% endcomment %}
 </div>
 
 {% endblock %}

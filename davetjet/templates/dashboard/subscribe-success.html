@@ -1,0 +1,21 @@
+{% extends './dashboard-base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="success-page">
+    <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <h1>Davetjet'e Hoş geldiniz!</h1>
+    <div class="summary">
+        <p><strong>Kullanıcı:</strong> {{ user.get_full_name|default:user.username }}</p>
+        <p><strong>Plan:</strong> {{ payment.package.name }}</p>
+        <p><strong>Tutar:</strong> {{ payment.total_amount|floatformat:2 }} TL</p>
+        <p><strong>Tarih:</strong> {{ payment.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+    <div class="buttons">
+        <a href="{% url 'core:dashboard' %}" class="btn primary-btn">Dashboard'a Git</a>
+        <a href="{% url 'core:dashboard' %}" class="btn secondary-btn">Yardım</a>
+    </div>
+</div>
+{% endblock %}

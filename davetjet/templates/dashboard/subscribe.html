@@ -2,11 +2,18 @@
 {% load static %}
 
 {% block content %}
+{% if token %}
+<script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
+<iframe src="https://www.paytr.com/odeme/guvenli/{{ token }}" id="paytriframe" frameborder="0" scrolling="no" style="width: 100%;"></iframe>
+<script>iFrameResize({},'#paytriframe');</script>
+<a href="{% url 'core:subscribe-success' %}" class="btn btn--primary">Ödedim Testi</a>
+{% comment %} <a href="{% url 'core:subscribe-success' %}">Ödedim Test</a> {% endcomment %}
+{% endif %}
 <!-- /templates/subscription.html -->
 <div class="subscription-container">
   <header class="subscription-header">
-    <h1>Planını Seç</h1>
-    <p>Deneyimini yükselt — <strong>Aylık</strong> ve <strong>Yıllık</strong> planlar arasında geçiş yap.</p>
+    <h1>Planını Seç (Aktif: {{ package }})</h1>
+    <p>Deneyimini yükselt — <strong>Tek ödeme. Ömür boyu kullan.</strong></p>
     <div class="billing-toggle">
       <span class="label">Faturalandırma:</span>
       <div class="toggle-box">
@@ -16,44 +23,53 @@
   </header>
 
   <section class="plans">
-    <div class="plan-card current">
-      <div class="badge">Mevcut Plan</div>
-      <i class="fas fa-leaf icon"></i>
-      <h2>Başlangıç</h2>
-      <p>Denemek için ideal</p>
-      <div class="price" data-monthly="Ücretsiz" data-yearly="Ücretsiz">Ücretsiz</div>
-      <ul>
-        <li><i class="fas fa-envelope-open-text"></i> 10 Davetiye</li>
-        <li><i class="fas fa-users"></i> Maks. 50 Davetli</li>
-        <li><i class="fas fa-tools"></i> Temel Özellikler</li>
-      </ul>
-      <button disabled class="btn current-btn">Bu plandasınız</button>
+    <div class="plan-card">
+      {% with basic_plan=plans.0 %}
+        <div class="badge">En Ekonomik</div>
+        <i class="fas fa-leaf icon"></i>
+        <h2>{{ basic_plan.name }}</h2>
+        <p>Denemek için ideal</p>
+        <div class="price" data-monthly="{{ basic_plan.price }}" data-yearly="{{ basic_plan.price }}">{{ basic_plan.price }}</div>
+        <ul>
+          <li><i class="fas fa-envelope-open-text"></i> {{ basic_plan.max_event }} Davetiye</li>
+          <li><i class="fas fa-users"></i> Maks. {{ basic_plan.max_invitee }} Davetli</li>
+          <li><i class="fas fa-tools"></i> Temel Özellikler</li>
+        </ul>
+        {% comment %} <button disabled class="btn current-btn">Bu plandasınız</button> {% endcomment %}
+        <a href="{% url 'core:subscribe-next' basic_plan.id %}" class="btn choose-btn" data-plan="Pro">Planı Seç</a>
+
+      {% endwith %}
+
     </div>
 
     <div class="plan-card plan-highlight">
-      <i class="fas fa-rocket icon"></i>
-      <h2>Pro</h2>
-      <p>Büyüyen etkinlikler için ideal</p>
-      <div class="price" data-monthly="99₺" data-yearly="999₺">99₺</div>
-      <ul>
-        <li><i class="fas fa-envelope-open-text"></i> 100 Davetiye</li>
-        <li><i class="fas fa-users"></i> Maks. 500 Davetli</li>
-        <li><i class="fas fa-bolt"></i> Premium Özellikler</li>
-      </ul>
-      <button class="btn choose-btn" data-plan="Pro">Planı Seç</button>
+      {% with pro_plan=plans.2 %}
+        <i class="fas fa-rocket icon"></i>
+        <h2>{{ pro_plan.name }}</h2>
+        <p>Büyüyen etkinlikler için ideal</p>
+        <div class="price" data-monthly="{{ pro_plan.price }}" data-yearly="{{ pro_plan.price }}">{{ pro_plan.price }}</div>
+        <ul>
+          <li><i class="fas fa-envelope-open-text"></i> {{ pro_plan.max_event }} Davetiye</li>
+          <li><i class="fas fa-users"></i> Maks. {{ pro_plan.max_invitee }} Davetli</li>
+          <li><i class="fas fa-bolt"></i> Premium Özellikler</li>
+        </ul>
+        <a href="{% url 'core:subscribe-next' pro_plan.id %}" class="btn choose-btn" data-plan="Pro">Planı Seç</a>
+      {% endwith %}
     </div>
 
     <div class="plan-card">
-      <i class="fas fa-gem icon"></i>
-      <h2>Elite</h2>
-      <p>Büyük ölçekli deneyimler için</p>
-      <div class="price" data-monthly="199₺" data-yearly="1999₺">199₺</div>
-      <ul>
-        <li><i class="fas fa-envelope-open-text"></i> Sınırsız Davetiye</li>
-        <li><i class="fas fa-users"></i> Maks. 5000 Davetli</li>
-        <li><i class="fas fa-crown"></i> Tüm Özellikler</li>
-      </ul>
-      <button class="btn choose-btn" data-plan="Elite">Planı Seç</button>
+      {% with elite_plan=plans.1 %}
+        <i class="fas fa-gem icon"></i>
+        <h2>{{ elite_plan.name }}</h2>
+        <p>Büyük ölçekli deneyimler için</p>
+        <div class="price" data-monthly="{{ elite_plan.price }}" data-yearly="{{ elite_plan.price }}">{{ elite_plan.price }}</div>
+        <ul>
+          <li><i class="fas fa-envelope-open-text"></i> {{ elite_plan.max_event }} Davetiye</li>
+          <li><i class="fas fa-users"></i> Maks. {{ elite_plan.max_invitee }} Davetli</li>
+          <li><i class="fas fa-crown"></i> Tüm Özellikler</li>
+        </ul>
+        <a href="{% url 'core:subscribe-next' elite_plan.id %}" class="btn choose-btn" data-plan="Elite">Planı Seç</a>
+      {% endwith %}
     </div>
   </section>
 </div>

@@ -25,24 +25,18 @@ class PlanAdmin(admin.ModelAdmin):
     ordering = ('name',)
     list_per_page = 20
 
+
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('get_user', 'subscription', 'amount', 'currency', 'payment_date', 'status')
-    search_fields = ('user__username', 'subscription__plan__name')
-    list_filter = ('status', 'currency')
-    ordering = ('-payment_date',)
-    date_hierarchy = 'payment_date'
-    list_per_page = 20
-
-    def has_add_permission(self, request):
-        return False    
-    
-    def has_change_permission(self, request, obj=None):
-        return False
-    
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def get_user(self, obj):
-        return obj.subscription.user if obj.subscription else None
-    get_user.short_description = 'User'
+    list_display = (
+        'merchant_oid',
+        'user',
+        'status',
+        'total_amount',
+        'processed',
+        'created_at',
+        'updated_at'
+    )
+    list_filter = ('status', 'processed', 'created_at')
+    search_fields = ('merchant_oid', 'user__username', 'user__email')
+    readonly_fields = ('created_at', 'updated_at')
