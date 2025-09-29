@@ -193,7 +193,7 @@ class SubscribeNextView(LoginRequiredMixin, TemplateView):
             no_installment="0",
             max_installment="0",
             currency="TRY",
-            test_mode="1"  # Gerçek işlem için "0", test işlemi için "1"
+            test_mode="0"  # Gerçek işlem için "0", test işlemi için "1"
         )
         
         # Check if the user has already started payment session
