@@ -13,10 +13,6 @@ import hashlib, hmac, base64
 from django.conf import settings
 from .models import Payment
 
-import hmac, hashlib, base64
-from django.http import HttpResponse
-from django.utils.encoding import force_bytes
-
 @csrf_exempt
 def paytr_notify(request):
     if request.method != 'POST':
@@ -27,14 +23,13 @@ def paytr_notify(request):
     total_amount  = request.POST.get('total_amount', '')
     hash_received = request.POST.get('hash', '')
 
-    # Keys ve salt bytes olarak normalize ediliyor
+     # Hash doğrulama
     merchant_key  = settings.MERCHANT_KEY if isinstance(settings.MERCHANT_KEY, bytes) else settings.MERCHANT_KEY.encode("utf-8")
     merchant_salt = settings.MERCHANT_SALT if isinstance(settings.MERCHANT_SALT, bytes) else settings.MERCHANT_SALT.encode("utf-8")
 
-    # Doğru hash string sırası: merchant_oid + merchant_salt + status + total_amount
+    # PayTR dokümana göre: merchant_oid + merchant_salt + status + total_amount
     hash_str = merchant_oid.encode("utf-8") + merchant_salt + status.encode("utf-8") + total_amount.encode("utf-8")
 
-    # HMAC hesaplama (binary digest → base64)
     hmac_digest = hmac.new(merchant_key, hash_str, hashlib.sha256).digest()
     hash_calculated = base64.b64encode(hmac_digest).decode("utf-8")
 
@@ -47,19 +42,19 @@ def paytr_notify(request):
     except Payment.DoesNotExist:
         return HttpResponse('Payment not found', status=404)
 
-    # Tekrar işleme engeli
+    # Daha önce işlenmişse tekrar işleme
     if not payment.processed:
         payment.status = status
         payment.total_amount = total_amount
         payment.processed = True
         payment.save()
 
-        # Başarılı ödeme ise paketi kullanıcıya ata
+        # Ödeme başarılıysa plan atama
         if status == "success" and payment.user:
-            package = payment.package
+            package = payment.package  # FK Package sayesinde direkt alıyoruz
             payment.user.profile.add_new_package(package)
 
-    # PayTR her zaman 'OK' bekler
+    # Her zaman OK dön
     return HttpResponse('OK')
 
 class PaymentTestView(View):
