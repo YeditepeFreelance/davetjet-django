@@ -1,3 +1,4 @@
+import sys
 import uuid
 from django.shortcuts import render
 from django.views import View
@@ -30,6 +31,8 @@ def paytr_notify(request):
         hmac.new(merchant_key, force_bytes(hash_str), hashlib.sha256).digest()
     ).decode()
 
+    print(hash_received, hash_calculated, file=sys.stderr)  # Debug için
+    print(hash_received == hash_calculated, file=sys.stderr)  # Debug için
     if hash_received != hash_calculated:
         return HttpResponse('Invalid hash', status=400)
 
