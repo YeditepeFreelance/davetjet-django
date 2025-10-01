@@ -180,13 +180,13 @@ class SubscribeNextView(LoginRequiredMixin, TemplateView):
          
 
         package_obj = get_object_or_404(Plan, id=pk)
-
+        oid =  f"{request.user.id}{package_obj.id}{uuid.uuid4().hex[:8]}"
         token = build_paytr_iframe(
             user_ip=request.META.get('REMOTE_ADDR', ''),
             user_name=request.user.get_full_name() or request.user.username,
             user_address="NaN",
             user_phone=request.user.phone_number or "NaN",
-            merchant_oid = f"{request.user.id}{package_obj.id}{uuid.uuid4().hex[:8]}",
+            merchant_oid = oid,
             email=request.user.email,
             payment_amount=int(int(package_obj.price) * 100),  # Ödeme miktarını kuruş cinsinden belirtin (örneğin, 10.00 TL için 1000)
             user_basket=[[f"Davetjet {package_obj.name} Ömür Boyu Erişim", "{{ package_obj.price }}", 1]],
@@ -204,7 +204,7 @@ class SubscribeNextView(LoginRequiredMixin, TemplateView):
         payment = Payment.objects.create(
             user=request.user,
             package=package_obj,
-            merchant_oid=f"{request.user.id}{package_obj.id}{uuid.uuid4().hex[:8]}",
+            merchant_oid=oid,
             status="pending",   # henüz ödeme tamamlanmadı
             total_amount=package_obj.price,  
             processed=False
