@@ -17,7 +17,8 @@ import hmac, hashlib, base64
 from django.http import HttpResponse
 from django.utils.encoding import force_bytes
 
-def paytr_callback(request):
+@csrf_exempt
+def paytr_notify(request):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
