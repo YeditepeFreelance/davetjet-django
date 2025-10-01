@@ -13,8 +13,11 @@ import hashlib, hmac, base64
 from django.conf import settings
 from .models import Payment
 
-@csrf_exempt
-def paytr_notify(request):
+import hmac, hashlib, base64
+from django.http import HttpResponse
+from django.utils.encoding import force_bytes
+
+def paytr_callback(request):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
@@ -23,16 +26,17 @@ def paytr_notify(request):
     total_amount  = request.POST.get('total_amount', '')
     hash_received = request.POST.get('hash', '')
 
-    # Hash doğrulama
-    merchant_key  = force_bytes(settings.MERCHANT_KEY)
-    merchant_salt = settings.MERCHANT_SALT
-    hash_str = f"{merchant_oid}{status}{total_amount}{merchant_salt}"
-    hash_calculated = base64.b64encode(
-        hmac.new(merchant_key, force_bytes(hash_str), hashlib.sha256).digest()
-    ).decode()
+    # Keys ve salt bytes olarak normalize ediliyor
+    merchant_key  = settings.MERCHANT_KEY if isinstance(settings.MERCHANT_KEY, bytes) else settings.MERCHANT_KEY.encode("utf-8")
+    merchant_salt = settings.MERCHANT_SALT if isinstance(settings.MERCHANT_SALT, bytes) else settings.MERCHANT_SALT.encode("utf-8")
 
-    print(hash_received, hash_calculated, file=sys.stderr)  # Debug için
-    print(hash_received == hash_calculated, file=sys.stderr)  # Debug için
+    # Doğru hash string sırası: merchant_oid + merchant_salt + status + total_amount
+    hash_str = merchant_oid.encode("utf-8") + merchant_salt + status.encode("utf-8") + total_amount.encode("utf-8")
+
+    # HMAC hesaplama (binary digest → base64)
+    hmac_digest = hmac.new(merchant_key, hash_str, hashlib.sha256).digest()
+    hash_calculated = base64.b64encode(hmac_digest).decode("utf-8")
+
     if hash_received != hash_calculated:
         return HttpResponse('Invalid hash', status=400)
 
@@ -42,19 +46,19 @@ def paytr_notify(request):
     except Payment.DoesNotExist:
         return HttpResponse('Payment not found', status=404)
 
-    # Daha önce işlenmişse tekrar işleme
+    # Tekrar işleme engeli
     if not payment.processed:
         payment.status = status
         payment.total_amount = total_amount
         payment.processed = True
         payment.save()
 
-        # Ödeme başarılıysa plan atama
+        # Başarılı ödeme ise paketi kullanıcıya ata
         if status == "success" and payment.user:
-            package = payment.package  # FK Package sayesinde direkt alıyoruz
+            package = payment.package
             payment.user.profile.add_new_package(package)
 
-    # Her zaman OK dön
+    # PayTR her zaman 'OK' bekler
     return HttpResponse('OK')
 
 class PaymentTestView(View):
