@@ -2055,6 +2055,10 @@
   letter-spacing: .2px !important;
   line-height: 1.15 !important;
   font-weight: 800 !important;
+
+  @include respond(480px) {
+    font-size: 7.2rem;
+  }
 }
 
 .landing .alt-text,

@@ -126,15 +126,14 @@
         <div class="hero-transition-image-container">
           <picture>
             <!-- Mobile -->
-            <source
+            {% comment %} <source
               srcset="{% static 'images/iphonex.png' %}"
               type="image/png"
               media="(max-width: 480px)"
-            />
+            /> {% endcomment %}
             <!-- Desktop -->
             <source srcset="{% static 'images/laptop.svg' %}" />
             <!-- Fallback -->
-            <img src="{% static 'images/laptop.png' %}" alt="Cihaz önizleme" />
           </picture>
         </div>
       </header>

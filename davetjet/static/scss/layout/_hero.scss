@@ -24,6 +24,11 @@
 
   & .badge {
     margin-bottom: 4rem;
+
+    @include respond(480px) {
+      font-size: 2.4rem;
+      padding: 2rem 3.2rem;
+    }
   }
 
   & .hero-transition-image-container {
@@ -74,7 +79,9 @@
         align-items: center;
 
         &>.btn {
-          width: 40vw;
+          width: 60vw;
+          padding: 2.4rem;
+          font-size: 3rem;
         }
       }
     }
@@ -84,7 +91,7 @@
     }
 
     @include respond(480px) {
-      margin-top: 25%;
+      margin-top: 60%;
     }
 
   }
