@@ -126,14 +126,15 @@
         <div class="hero-transition-image-container">
           <picture>
             <!-- Mobile -->
-            {% comment %} <source
+<source
               srcset="{% static 'images/iphonex.png' %}"
               type="image/png"
               media="(max-width: 480px)"
-            /> {% endcomment %}
+            />
             <!-- Desktop -->
             <source srcset="{% static 'images/laptop.svg' %}" />
             <!-- Fallback -->
+            <img src="{% static 'images/laptop.svg' %}" alt="DavetJet önizleme" loading="lazy" />
           </picture>
         </div>
       </header>
